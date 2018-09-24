@@ -305,7 +305,7 @@
                     if (confirm('Внимание!\nБудет сформирован график для каждой позиции в спецификации.\n')) {
                         var rqp = {
                             SessionId: Nskd.Server.SessionId,
-                            Command: 'Order.F3.Save',
+                            Command: 'DeliverySchedule.F3.Save',
                             Parameters: [{ Name: "id", Value: specId }]
                         };
                         inputs.each(function (i, e) {
@@ -313,7 +313,7 @@
                         });
                         //alert(Nskd.Json.toString(rqp)); return;
                         Nskd.Http.post({
-                            url: '/Order/F3/Save',
+                            url: '/DeliverySchedule/F3/Save',
                             rqp: rqp,
                             done: function (data) {
                                 $('#_layout_content').html(data);
@@ -327,14 +327,14 @@
                 if (inputs.length > 0) {
                     var rqp = {
                         SessionId: Nskd.Server.SessionId,
-                        Command: 'Order.F3.Save2',
+                        Command: 'DeliverySchedule.F3.Save2',
                         Parameters: [{ Name: "id", Value: specId }]
                     };
                     inputs.each(function (i, e) {
                         rqp.Parameters.push({ Name: e.name, Value: e.value });
                     });
                     Nskd.Http.post({
-                        url: '/Order/F3/Save2',
+                        url: '/DeliverySchedule/F3/Save2',
                         rqp: rqp,
                         done: function (data) {
                             $('#_layout_content').html(data);

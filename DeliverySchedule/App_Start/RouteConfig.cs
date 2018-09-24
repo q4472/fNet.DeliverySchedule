@@ -11,6 +11,18 @@ namespace DeliverySchedule
 
             routes.MapRoute(
                 name: null,
+                url: "deliveryschedule/f3/save2",
+                defaults: new { controller = "F3", action = "Save2" }
+            );
+
+            routes.MapRoute(
+                name: null,
+                url: "deliveryschedule/f3/save",
+                defaults: new { controller = "F3", action = "Save" }
+            );
+
+            routes.MapRoute(
+                name: null,
                 url: "deliveryschedule/f3",
                 defaults: new { controller = "F3", action = "Index" }
             );

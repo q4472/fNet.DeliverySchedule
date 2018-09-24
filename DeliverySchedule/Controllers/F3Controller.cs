@@ -3,7 +3,7 @@ using Nskd;
 using System;
 using System.Web.Mvc;
 
-namespace MvcApplication2.Areas.Order.Controllers
+namespace DeliverySchedule.Controllers
 {
     public class F3Controller : Controller
     {
