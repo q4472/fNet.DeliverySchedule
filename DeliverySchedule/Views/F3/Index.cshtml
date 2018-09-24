@@ -1,0 +1,397 @@
+﻿@using System.Data
+
+@model DeliverySchedule.Models.F3Model
+
+<style type="text/css">
+    #p_order_f3_index input {
+        border: 1px solid black;
+        width: 80px;
+    }
+
+    #p_order_f3_index th {
+        font-weight: bold;
+        padding: 2px;
+        border: 1px solid black;
+    }
+
+    #p_order_f3_index td {
+        padding: 2px;
+        border: 1px solid black;
+    }
+</style>
+
+<div id="p_order_f3_index">
+    @if (Model != null)
+    {
+        <input type="hidden" name="SpecId" value="@Model.SpecId" />
+        if (Model.Head != null && Model.Head.Rows.Count > 0)
+        {
+            Object o = Model.Head.Rows[0]["дата_первой_поставки"];
+
+            Object oSiop = Model.Head.Rows[0]["срок_исполнения_отгрузка_покупатель"];
+            String sSiop = String.Empty;
+            DateTime? dDpo = null;
+            String sDpo = String.Empty;
+            if (oSiop != DBNull.Value)
+            {
+                sSiop = ((Int32)oSiop).ToString();
+                if (o != DBNull.Value)
+                {
+                    dDpo = ((DateTime)o).AddDays(-(Int32)oSiop);
+                    sDpo = ((DateTime)dDpo).ToString("dd.MM.yy");
+                }
+            }
+
+            Object oSiso = Model.Head.Rows[0]["срок_исполнения_склад_отгрузка"];
+            String sSiso = String.Empty;
+            DateTime? dDps = null;
+            String sDps = String.Empty;
+            if (oSiso != DBNull.Value)
+            {
+                sSiso = ((Int32)oSiso).ToString();
+                if (dDpo != null)
+                {
+                    dDps = ((DateTime)dDpo).AddDays(-(Int32)oSiso);
+                    sDps = ((DateTime)dDps).ToString("dd.MM.yy");
+                }
+            }
+
+            Object oSizs = Model.Head.Rows[0]["срок_исполнения_заявка_склад"];
+            String sSizs = String.Empty;
+            DateTime? dDozp = null;
+            String sDozp = String.Empty;
+            if (oSizs != DBNull.Value)
+            {
+                sSizs = ((Int32)oSizs).ToString();
+                if (dDps != null)
+                {
+                    dDozp = ((DateTime)dDps).AddDays(-(Int32)oSizs);
+                    sDozp = ((DateTime)dDozp).ToString("dd.MM.yy");
+                }
+            }
+
+            <div>Идентификатор спецификации: @Model.SpecId</div>
+            <p>Основные параметры</p>
+            <table class="pars">
+                <tr>
+                    <td>
+                        <table>
+                            <tr>
+                                <td style="text-align: right; padding-right: 4px">Дата контракта:</td>
+                                <td>
+                                    <input type="text"
+                                           name="дата_контракта"
+                                           value="@Model.Head.Rows[0]["дата_контракта"]"
+                                           data-modified="0"
+                                           class="date-selector" />
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right; padding-right: 4px">Количество поставок:</td>
+                                <td>
+                                    <input type="text"
+                                           name="количество_поставок"
+                                           value="@Model.Head.Rows[0]["количество_поставок"]"
+                                           data-modified="0"
+                                           onchange="this.value = Nskd.Validator.numberNorm(this.value, 1, 36)" />
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right; padding-right: 4px">Период поставок:</td>
+                                <td>
+                                    <input type="text"
+                                           name="период_поставок"
+                                           value="@Model.Head.Rows[0]["период_поставок"]"
+                                           data-modified="0"
+                                           onchange="this.value = Nskd.Validator.numberNorm(this.value, 0, 365)" />
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right; padding-right: 4px">Дата первой поставки (получения покупателем):</td>
+                                <td>
+                                    <input type="text"
+                                           name="дата_первой_поставки"
+                                           value="@Model.Head.Rows[0]["дата_первой_поставки"]"
+                                           data-modified="0"
+                                           class="date-selector" />
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right; padding-right: 4px">Срок от отгрузки до получения покупателем:</td>
+                                <td>
+                                    <input type="text"
+                                           name="срок_исполнения_отгрузка_покупатель"
+                                           value="@sSiop"
+                                           data-modified="0"
+                                           onchange="this.value = Nskd.Validator.numberNorm(this.value, 0, 365)" />
+                                </td>
+                                <td>&nbsp;=> Дата первой отгрузки: <span>@sDpo</span></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right; padding-right: 4px">Срок от поставки к нам до отгрузки покупателю:</td>
+                                <td>
+                                    <input type="text"
+                                           name="срок_исполнения_склад_отгрузка"
+                                           value="@sSiso"
+                                           data-modified="0"
+                                           onchange="this.value = Nskd.Validator.numberNorm(this.value, 0, 365)" />
+                                </td>
+                                <td>&nbsp;=> К нам на склад первая партия должна поступить: <span>@sDps</span></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right; padding-right: 4px">Срок от заявки на покупку до поставки к нам:</td>
+                                <td>
+                                    <input type="text"
+                                           name="срок_исполнения_заявка_склад"
+                                           value="@sSizs"
+                                           data-modified="0"
+                                           onchange="this.value = Nskd.Validator.numberNorm(this.value, 0, 365)" />
+                                </td>
+                                <td>&nbsp;=> Дата отправки заявки поставщику на первую партию: <span>@sDozp</span></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right; padding-right: 4px">Дата окончания поставок: </td>
+                                <td>
+                                    <input type="text"
+                                           name="дата_окончания_поставок"
+                                           value="@Model.Head.Rows[0]["дата_окончания_поставок"]"
+                                           data-modified="0"
+                                           class="date-selector" />
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+
+                                <td style="text-align: right; padding-right: 4px">Дата окончания действия контракта: </td>
+                                <td>
+                                    <input type="text"
+                                           name="дата_окончания_действия_контракта"
+                                           value="@Model.Head.Rows[0]["дата_окончания_действия_контракта"]"
+                                           data-modified="0"
+                                           class="date-selector" />
+                                </td>
+                                <td></td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td>
+                        <input type="button" class="save_button" value="Сохранить" disabled="disabled" onclick="OrderF3Index.save()" />
+                    </td>
+                </tr>
+            </table>
+        }
+        <br />
+        if (Model.Table != null && Model.Table.Rows.Count > 0)
+        {
+            <table class="shedule_rows">
+                <colgroup>
+                    <col width="100" />
+                    <col width="200" />
+                    <col width="200" />
+                    <col width="200" />
+                    <col width="100" />
+                </colgroup>
+                <tr>
+                    <td colspan="5" style="text-align: right;">
+                        <div style="padding: 4px;" onclick="OrderF3Index.save2()">
+                            <span style="background-color: #cccccc; border: 1px solid black; padding: 2px;">Сохранить</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Торговое наименование</th>
+                    <th>Лекарственная форма и дозировка</th>
+                    <th>Производитель</th>
+                    <th>Страна</th>
+                    <th>Количество</th>
+                    @if (Model.Shedule != null && Model.Shedule.Columns.Count > 2)
+                    {
+                        for (Int32 ci = 2; ci < Model.Shedule.Columns.Count; ci++)
+                        {
+                            DataColumn dc = Model.Shedule.Columns[ci];
+                            String cn = dc.ColumnName;
+                            if (cn.Length >= 10)
+                            {
+                                cn = cn.Substring(8, 2) + "." + cn.Substring(5, 2) + "." + cn.Substring(2, 2);
+                            }
+                            <th>
+                                <input type="text"
+                                       name="_@dc.ColumnName"
+                                       value="@cn"
+                                       data-modified="0"
+                                       class="date-selector" />
+                            </th>
+                        }
+                    }
+                </tr>
+                @foreach (DataRow dr in Model.Table.Rows)
+                {
+                    Guid tp_id = (Guid)dr["tp_id"];
+                    <tr>
+                        <td>@dr["наименование"]</td>
+                        <td>@dr["лекарственная_форма_и_дозировка"]</td>
+                        <td>@dr["производитель"]</td>
+                        <td>@dr["страна"]</td>
+                        <td>@dr["количество"]</td>
+                        @if (Model.Shedule != null && Model.Shedule.Rows.Count > 0)
+                        {
+                            foreach (DataRow sdr in Model.Shedule.Rows)
+                            {
+                                if ((Guid)sdr["tp_id"] == tp_id)
+                                {
+                                    if (Model.Shedule.Columns.Count > 2)
+                                    {
+                                        for (Int32 ci = 2; ci < Model.Shedule.Columns.Count; ci++)
+                                        {
+                                            <td>
+                                                <input type="text"
+                                                       name="_@sdr[1]_@Model.Shedule.Columns[ci].ColumnName"
+                                                       value="@sdr[ci]"
+                                                       data-modified="0"
+                                                       onchange="this.value = Nskd.Validator.numberNorm(this.value, 0)" />
+                                            </td>
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    </tr>
+                }
+            </table>
+        }
+    }
+</div>
+<script type="text/javascript">
+    var OrderF3Index = (function () {
+        var mainDiv = $('#p_order_f3_index');
+        var specId = mainDiv.find('input[name="SpecId"]').val();
+        var pars = mainDiv.find('table.pars');
+        var parsInputs = pars.find('input[type="text"]');
+        var saveButton = mainDiv.find('input[type="button"].save_button');
+        var sheduleInputs = mainDiv.find('table.shedule_rows input[type="text"]');
+
+        parsInputs.keyup(function () {
+            this.setAttribute('data-modified', '1');
+            saveButton.prop('disabled', false);
+        });
+        parsInputs.change(function () {
+            this.setAttribute('data-modified', '1');
+            saveButton.prop('disabled', false);
+        });
+
+        sheduleInputs.keyup(function () {
+            this.setAttribute('data-modified', '1');
+        });
+        sheduleInputs.change(function () {
+            this.setAttribute('data-modified', '1');
+        });
+
+        var dp = mainDiv.find('input.date-selector');
+        dp.datepicker({
+            dateFormat: 'dd.mm.y',
+            firstDay: 1,
+            defaultDate: 0
+        });
+
+        return {
+            save: function () {
+                var inputs = mainDiv.find('table.pars input[data-modified="1"]');
+                if (inputs.length > 0) {
+                    if (confirm('Внимание!\nБудет сформирован график для каждой позиции в спецификации.\n')) {
+                        var rqp = {
+                            SessionId: Nskd.Server.SessionId,
+                            Command: 'Order.F3.Save',
+                            Parameters: [{ Name: "id", Value: specId }]
+                        };
+                        inputs.each(function (i, e) {
+                            rqp.Parameters.push({ Name: e.name, Value: e.value });
+                        });
+                        //alert(Nskd.Json.toString(rqp)); return;
+                        Nskd.Http.post({
+                            url: '/Order/F3/Save',
+                            rqp: rqp,
+                            done: function (data) {
+                                $('#_layout_content').html(data);
+                            }
+                        });
+                    }
+                }
+            },
+            save2: function () {
+                var inputs = mainDiv.find('table.shedule_rows input[data-modified="1"]');
+                if (inputs.length > 0) {
+                    var rqp = {
+                        SessionId: Nskd.Server.SessionId,
+                        Command: 'Order.F3.Save2',
+                        Parameters: [{ Name: "id", Value: specId }]
+                    };
+                    inputs.each(function (i, e) {
+                        rqp.Parameters.push({ Name: e.name, Value: e.value });
+                    });
+                    Nskd.Http.post({
+                        url: '/Order/F3/Save2',
+                        rqp: rqp,
+                        done: function (data) {
+                            $('#_layout_content').html(data);
+                        }
+                    });
+                }
+            }
+        };
+    })();
+
+/*
+    $('#p_order_f1_shedule_culc').click(function (event) {
+        var inputs = $('#p_order_f1_shedule_form1 input[type="text"]');
+        if (inputs.filter('.input-validation-error').length == 0) {
+
+            // данные из шапки длч расчёта
+            var d = new Date(inputs[0].value);
+            var c = new Number(inputs[1].value);
+            var p = new Number(inputs[2].value);
+            var w1 = new Number(inputs[3].value);
+            var w2 = new Number(inputs[4].value);
+            var w3 = new Number(inputs[5].value);
+            //alert(d2);
+
+            var trs = $('#p_order_f1_shedule_table tr');
+            // удаляем всё что дальше 7 колонки. Оставляем 5 колонок из таблицы и 2 из расписания.
+            trs.find('th:gt(6), td:gt(6)').remove();
+
+            var d1 = new Date(d.getTime() - ((w1 + w2 + w3) * 86400000));
+            var totalValue = 100;
+            for (var i = 0; i < c; i++) {
+
+                $(trs[0]).append('<th>' + dateToString(d1) + '</th>');
+                d1 = new Date(d1.getTime() + (p * 86400000));
+
+                var v = Math.ceil(totalValue / (c - i));
+                $(trs[1]).append('<th>' + v + '</th>');
+                totalValue -= v;
+            }
+
+            for (var ri = 2; ri < trs.length; ri++) {
+                totalValue = new Number($(trs[ri]).find('td:eq(4)').text());
+                //alert(totalValue);
+                for (var i = 0; i < c; i++) {
+                    var v = Math.ceil(totalValue / (c - i));
+                    $(trs[ri]).append('<td><input type="text" name="Shedule.Rows[' + (ri - 2) + '][' + (i + 2) + ']" value="' + v + '" data-val="true" data-val-number="" /></td>');
+                    totalValue -= v;
+                }
+            }
+            $('#p_order_f1_save').prop('disabled', false);
+        }
+    });
+    function dateToString(date) {
+        var y = date.getFullYear();
+        var m = date.getMonth() + 1;
+        var d = date.getDate();
+        return '' + y + '-' + ((m < 10) ? '0' + m : m) + '-' + ((d < 10) ? '0' + d : d);
+    }
+*/
+</script>

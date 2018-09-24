@@ -1,4 +1,29 @@
-﻿@if (HttpContext.Current.IsDebuggingEnabled)
-{
-    <div>Debugging is enabled.</div>
-}
+﻿<div id="deliveryschedule_views_home_index">
+    @if (HttpContext.Current.IsDebuggingEnabled)
+    {
+        <div>Debugging is enabled.</div>
+    }
+    <input type="button" value="График поставок для спецификации с id='102200'." onclick="DeliveryScheduleViewsHomeIndex.goToDeliverySchedulePage()" />
+</div>
+<script type="text/javascript">
+    var DeliveryScheduleViewsHomeIndex = (function () {
+        return {
+            goToDeliverySchedulePage: function () {
+                var rqp = {
+                    SessionId: '00000000-0000-0000-0000-000000000000',
+                    Command: 'GoToDeliverySchedulePage',
+                    Parameters: [
+                        { Name: 'id', Value: '102200' }
+                    ]
+                };
+                Nskd.Http.post({
+                    url: '/DeliverySchedule/F3',
+                    rqp: rqp,
+                    done: function (data) {
+                        $('#_layout_content').html(data);
+                    }
+                });
+            }
+        };
+    })();
+</script>
