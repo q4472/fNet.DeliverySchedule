@@ -1,2 +1,4 @@
-﻿@{
+﻿@if (HttpContext.Current.IsDebuggingEnabled)
+{
+    <div>Debugging is enabled.</div>
 }
