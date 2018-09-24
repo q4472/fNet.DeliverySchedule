@@ -14,9 +14,9 @@ namespace DeliverySchedule
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute(
-                name: "Default",
-                url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
+                name: null,
+                url: "{*pathInfo}",
+                defaults: new { controller = "Home", action = "Index" }
             );
         }
     }
