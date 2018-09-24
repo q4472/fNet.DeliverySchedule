@@ -1,43 +1,124 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title – приложение ASP.NET</title>
+    <meta name="viewport" content="width=device-width" />
+    <title>Фарм-Сиб</title>
     @Styles.Render("~/Content/css")
-    @Scripts.Render("~/bundles/modernizr")
+    @Styles.Render("~/Content/themes/base/css")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/jqueryfu")
+    @Scripts.Render("~/bundles/nskd")
+    @RenderSection("scripts", false)
+    <style type="text/css">
+        html {
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 9pt;
+            width: 100%;
+            height: 100%;
+        }
+
+        #_layout_left_section {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 20px;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #ffddff;
+            border-right: 1px solid black;
+            width: 199px;
+            height: auto;
+        }
+
+        #_layout_content {
+            position: fixed;
+            left: 200px;
+            top: 0;
+            right: 0;
+            bottom: 20px;
+            margin: 0;
+            padding: 0;
+            overflow: auto;
+            background: #ffffdd;
+            width: auto;
+            height: auto;
+        }
+
+        #_layout_footer {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #dddddd;
+            width: 100%;
+            height: 20px;
+        }
+    </style>
+    <style type="text/css" media="print">
+        #_layout_content {
+            position: relative;
+            left: 0;
+            top: 0;
+            overflow: visible;
+            background: #ffffff;
+        }
+
+        #_layout_left_section {
+            display: none;
+        }
+
+        #_layout_footer {
+            display: none;
+        }
+    </style>
+    <script type="text/javascript">
+
+        window.onload = function () {
+            if ((typeof Nskd) != 'undefined') {
+                Nskd.Server.SessionId = '@TempData["SessionId"]';
+            }
+        };
+    </script>
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                @Html.ActionLink("Имя приложения", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Домашняя страница", "Index", "Home")</li>
-                    <li>@Html.ActionLink("О программе", "About", "Home")</li>
-                    <li>@Html.ActionLink("Контакт", "Contact", "Home")</li>
-                </ul>
-            </div>
-        </div>
+    <div id="_layout_left_section">
+        @RenderPage("~/Views/Shared/LeftSection.cshtml")
     </div>
-    <div class="container body-content">
+    <div id="_layout_content">
         @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year – приложение ASP.NET</p>
-        </footer>
     </div>
+    <div id="_layout_footer">
+        <span id="_layout_footer_validation" style="padding: 2px;">@Html.ValidationSummary()</span>
+        <span id="_layout_footer_msg" style="display: none; padding: 2px;">&nbsp;</span>
+        <span id="_layout_footer_loading" style="display: none; padding: 2px;">Загрузка данных ...</span>
+    </div>
+    <script type="text/javascript">
 
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
-    @RenderSection("scripts", required: false)
+        $('#_layout_left_section').dblclick(LayoutContainerSwitchLeftSection);
+
+        function LayoutContainerSwitchLeftSection() {
+            var lls = $('#_layout_left_section');
+            var lc = $('#_layout_content');
+            if (lls.css('margin-left') == '0px') {
+                lls.css('margin-left', '-180px');
+                lc.css('margin-left', '-180px');
+            } else {
+                lls.css('margin-left', '0px');
+                lc.css('margin-left', '0px');
+            }
+        }
+
+    </script>
 </body>
 </html>
