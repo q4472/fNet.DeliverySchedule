@@ -31,7 +31,44 @@ namespace DeliverySchedule.Models
         }
         public void Update2(RequestPackage rqp)
         {
-            // сначала исправляем количество со старой датой
+            // сначала исправляем сроки исполнения
+            foreach (RequestParameter p in rqp.Parameters)
+            {
+                String name = p.Name;
+                String value = p.Value as String;
+                if (name.Length == 40 && value != null && (new Regex(@"_[0-9a-f-]{36}_s\d")).IsMatch(name))
+                {
+                    Guid.TryParse(name.Substring(1, 36), out Guid tpId);
+                    String fieldName = name.Substring(38, 2);
+                    RequestPackage rqp1 = new RequestPackage
+                    {
+                        SessionId = rqp.SessionId,
+                        Command = "dbo.[спецификации_график_параметры_тп_изменить]",
+                        Parameters = new RequestParameter[]
+                        {
+                            new RequestParameter { Name = "session_id", Value = rqp.SessionId },
+                            new RequestParameter { Name = "tp_uid", Value = tpId },
+                            null // Parameters[2]
+                        }
+                    };
+                    switch (fieldName)
+                    {
+                        case "s1":
+                            rqp1.Parameters[2] = new RequestParameter { Name = "срок_исполнения_заявка_склад", Value = value };
+                            break;
+                        case "s2":
+                            rqp1.Parameters[2] = new RequestParameter { Name = "срок_исполнения_склад_отгрузка", Value = value };
+                            break;
+                        case "s3":
+                            rqp1.Parameters[2] = new RequestParameter { Name = "срок_исполнения_отгрузка_покупатель", Value = value };
+                            break;
+                        default:
+                            break;
+                    }
+                    rqp1.GetResponse("http://127.0.0.1:11012/");
+                }
+            }
+            // потом исправляем количество со старой датой
             foreach (RequestParameter p in rqp.Parameters)
             {
                 String name = p.Name;
@@ -53,7 +90,7 @@ namespace DeliverySchedule.Models
                             new RequestParameter { Name = "количество", Value = value }
                         }
                     };
-                    rqp1.GetResponse("http://127.0.0.1:11002/");
+                    rqp1.GetResponse("http://127.0.0.1:11012/");
                 }
             }
             // теперь изменяем дату
@@ -77,7 +114,7 @@ namespace DeliverySchedule.Models
                             new RequestParameter { Name = "new_date", Value = newDate }
                         }
                     };
-                    rqp1.GetResponse("http://127.0.0.1:11002/");
+                    rqp1.GetResponse("http://127.0.0.1:11012/");
                 }
             }
             // обновить данные для страницы
@@ -94,7 +131,7 @@ namespace DeliverySchedule.Models
                     new RequestParameter() { Name = "id", Value = SpecId }
                 }
             };
-            ResponsePackage rsp = rqp.GetResponse("http://127.0.0.1:11002/");
+            ResponsePackage rsp = rqp.GetResponse("http://127.0.0.1:11012/");
             if (rsp != null && rsp.Data != null && rsp.Data.Tables.Count > 0)
             {
                 Head = rsp.Data.Tables[0];

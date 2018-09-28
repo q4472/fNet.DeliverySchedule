@@ -3,24 +3,25 @@
 @model DeliverySchedule.Models.F3Model
 
 <style type="text/css">
-    #p_order_f3_index input {
+    #deliveryschedule_views_f3_index input {
         border: 1px solid black;
         width: 80px;
+        text-align: right;
     }
 
-    #p_order_f3_index th {
+    #deliveryschedule_views_f3_index th {
         font-weight: bold;
         padding: 2px;
         border: 1px solid black;
     }
 
-    #p_order_f3_index td {
+    #deliveryschedule_views_f3_index td {
         padding: 2px;
         border: 1px solid black;
     }
 </style>
 
-<div id="p_order_f3_index">
+<div id="deliveryschedule_views_f3_index">
     @if (Model != null)
     {
         <input type="hidden" name="SpecId" value="@Model.SpecId" />
@@ -197,9 +198,7 @@
                 </colgroup>
                 <tr>
                     <td colspan="5" style="text-align: right;">
-                        <div style="padding: 4px;" onclick="OrderF3Index.save2()">
-                            <span style="background-color: #cccccc; border: 1px solid black; padding: 2px;">Сохранить</span>
-                        </div>
+                        <input type="button" class="save2_button" value="Сохранить" onclick="OrderF3Index.save2()" disabled="disabled" />
                     </td>
                 </tr>
                 <tr>
@@ -208,6 +207,9 @@
                     <th>Производитель</th>
                     <th>Страна</th>
                     <th>Количество</th>
+                    <th>З->С</th>
+                    <th>С->О</th>
+                    <th>О->П</th>
                     @if (Model.Shedule != null && Model.Shedule.Columns.Count > 2)
                     {
                         for (Int32 ci = 2; ci < Model.Shedule.Columns.Count; ci++)
@@ -231,36 +233,42 @@
                 @foreach (DataRow dr in Model.Table.Rows)
                 {
                     Guid tp_id = (Guid)dr["tp_id"];
-                    <tr>
-                        <td>@dr["наименование"]</td>
-                        <td>@dr["лекарственная_форма_и_дозировка"]</td>
-                        <td>@dr["производитель"]</td>
-                        <td>@dr["страна"]</td>
-                        <td>@dr["количество"]</td>
-                        @if (Model.Shedule != null && Model.Shedule.Rows.Count > 0)
+                <tr>
+                    <td>@dr["наименование"]</td>
+                    <td>@dr["лекарственная_форма_и_дозировка"]</td>
+                    <td>@dr["производитель"]</td>
+                    <td>@dr["страна"]</td>
+                    <td>@dr["количество"]</td>
+                    <td><input type="text" name="_@(tp_id)_s1" value="@dr["срок_исполнения_заявка_склад"]" 
+                               data-modified="0" onchange="Nskd.Validator.nNorm(this, 0)" style="width: 30px"></td>
+                    <td><input type="text" name="_@(tp_id)_s2" value="@dr["срок_исполнения_склад_отгрузка"]" 
+                               data-modified="0" onchange="Nskd.Validator.nNorm(this, 0)" style="width: 30px"></td>
+                    <td><input type="text" name="_@(tp_id)_s3" value="@dr["срок_исполнения_отгрузка_покупатель"]" 
+                               data-modified="0" onchange="Nskd.Validator.nNorm(this, 0)" style="width: 30px"></td>
+                    @if (Model.Shedule != null && Model.Shedule.Rows.Count > 0)
+                    {
+                        foreach (DataRow sdr in Model.Shedule.Rows)
                         {
-                            foreach (DataRow sdr in Model.Shedule.Rows)
+                            if ((Guid)sdr["tp_id"] == tp_id)
                             {
-                                if ((Guid)sdr["tp_id"] == tp_id)
+                                if (Model.Shedule.Columns.Count > 2)
                                 {
-                                    if (Model.Shedule.Columns.Count > 2)
+                                    for (Int32 ci = 2; ci < Model.Shedule.Columns.Count; ci++)
                                     {
-                                        for (Int32 ci = 2; ci < Model.Shedule.Columns.Count; ci++)
-                                        {
-                                            <td>
-                                                <input type="text"
-                                                       name="_@sdr[1]_@Model.Shedule.Columns[ci].ColumnName"
-                                                       value="@sdr[ci]"
-                                                       data-modified="0"
-                                                       onchange="this.value = Nskd.Validator.numberNorm(this.value, 0)" />
-                                            </td>
-                                        }
+                                        <td>
+                                            <input type="text"
+                                                   name="_@sdr[1]_@Model.Shedule.Columns[ci].ColumnName"
+                                                   value="@sdr[ci]"
+                                                   data-modified="0"
+                                                   onchange="Nskd.Validator.nNorm(this, 0)" />
+                                        </td>
                                     }
-                                    break;
                                 }
+                                break;
                             }
                         }
-                    </tr>
+                    }
+                </tr>
                 }
             </table>
         }
@@ -268,11 +276,12 @@
 </div>
 <script type="text/javascript">
     var OrderF3Index = (function () {
-        var mainDiv = $('#p_order_f3_index');
+        var mainDiv = $('#deliveryschedule_views_f3_index');
         var specId = mainDiv.find('input[name="SpecId"]').val();
         var pars = mainDiv.find('table.pars');
         var parsInputs = pars.find('input[type="text"]');
         var saveButton = mainDiv.find('input[type="button"].save_button');
+        var save2Button = mainDiv.find('input[type="button"].save2_button');
         var sheduleInputs = mainDiv.find('table.shedule_rows input[type="text"]');
 
         parsInputs.keyup(function () {
@@ -286,9 +295,11 @@
 
         sheduleInputs.keyup(function () {
             this.setAttribute('data-modified', '1');
+            save2Button.prop('disabled', false);
         });
         sheduleInputs.change(function () {
             this.setAttribute('data-modified', '1');
+            save2Button.prop('disabled', false);
         });
 
         var dp = mainDiv.find('input.date-selector');
@@ -323,6 +334,7 @@
                 }
             },
             save2: function () {
+                save2Button.prop('disabled', true);
                 var inputs = mainDiv.find('table.shedule_rows input[data-modified="1"]');
                 if (inputs.length > 0) {
                     var rqp = {
