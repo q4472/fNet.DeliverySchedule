@@ -194,7 +194,6 @@
                     <col width="200" />
                     <col width="200" />
                     <col width="200" />
-                    <col width="100" />
                 </colgroup>
                 <tr>
                     <td colspan="5" style="text-align: right;">
@@ -206,10 +205,11 @@
                     <th>Лекарственная форма и дозировка</th>
                     <th>Производитель</th>
                     <th>Страна</th>
-                    <th>Количество</th>
                     <th>З->С</th>
                     <th>С->О</th>
                     <th>О->П</th>
+                    <th>Количество</th>
+                    <th>Распред-ть</th>
                     @if (Model.Shedule != null && Model.Shedule.Columns.Count > 2)
                     {
                         for (Int32 ci = 2; ci < Model.Shedule.Columns.Count; ci++)
@@ -238,13 +238,49 @@
                     <td>@dr["лекарственная_форма_и_дозировка"]</td>
                     <td>@dr["производитель"]</td>
                     <td>@dr["страна"]</td>
-                    <td>@dr["количество"]</td>
-                    <td><input type="text" name="_@(tp_id)_s1" value="@dr["срок_исполнения_заявка_склад"]" 
-                               data-modified="0" onchange="Nskd.Validator.nNorm(this, 0)" style="width: 30px"></td>
-                    <td><input type="text" name="_@(tp_id)_s2" value="@dr["срок_исполнения_склад_отгрузка"]" 
-                               data-modified="0" onchange="Nskd.Validator.nNorm(this, 0)" style="width: 30px"></td>
-                    <td><input type="text" name="_@(tp_id)_s3" value="@dr["срок_исполнения_отгрузка_покупатель"]" 
-                               data-modified="0" onchange="Nskd.Validator.nNorm(this, 0)" style="width: 30px"></td>
+                    <td>
+                        <input type="text" name="_@(tp_id)_s1" value="@dr["срок_исполнения_заявка_склад"]"
+                               data-modified="0" style="width: 30px">
+                    </td>
+                    <td>
+                        <input type="text" name="_@(tp_id)_s2" value="@dr["срок_исполнения_склад_отгрузка"]"
+                               data-modified="0" style="width: 30px">
+                    </td>
+                    <td>
+                        <input type="text" name="_@(tp_id)_s3" value="@dr["срок_исполнения_отгрузка_покупатель"]"
+                               data-modified="0" style="width: 30px">
+                    </td>
+                    <td style="text-align: right">@(((Decimal)dr["количество"]).ToString("n0"))</td>
+                    @if (Model.Shedule != null && Model.Shedule.Rows.Count > 0)
+                    {
+                        Int32 s = (Int32)((Decimal)dr["количество"]);
+                        foreach (DataRow sdr in Model.Shedule.Rows)
+                        {
+                            if ((Guid)sdr["tp_id"] == tp_id)
+                            {
+                                if (Model.Shedule.Columns.Count > 2)
+                                {
+                                    for (Int32 ci = 2; ci < Model.Shedule.Columns.Count; ci++)
+                                    {
+                                        if (sdr[ci] != DBNull.Value) { s -= (Int32)((Decimal)sdr[ci]); }
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                        if (s < 0)
+                        {
+                            <td class="todo" style="text-align: right; color: red">@s</td>
+                        }
+                        else if (s == 0)
+                        {
+                            <td class="todo" style="text-align: right"></td>
+                        }
+                        else
+                        {
+                            <td class="todo" style="text-align: right; color: black">@s</td>
+                        }
+                    }
                     @if (Model.Shedule != null && Model.Shedule.Rows.Count > 0)
                     {
                         foreach (DataRow sdr in Model.Shedule.Rows)
@@ -259,8 +295,7 @@
                                             <input type="text"
                                                    name="_@sdr[1]_@Model.Shedule.Columns[ci].ColumnName"
                                                    value="@sdr[ci]"
-                                                   data-modified="0"
-                                                   onchange="Nskd.Validator.nNorm(this, 0)" />
+                                                   data-modified="0" />
                                         </td>
                                     }
                                 }
@@ -298,8 +333,10 @@
             save2Button.prop('disabled', false);
         });
         sheduleInputs.change(function () {
+            Nskd.Validator.nNorm(this, 0);
             this.setAttribute('data-modified', '1');
             save2Button.prop('disabled', false);
+            calcToDo(this);
         });
 
         var dp = mainDiv.find('input.date-selector');
@@ -308,6 +345,27 @@
             firstDay: 1,
             defaultDate: 0
         });
+
+        function calcToDo(e) {
+            var tr = $(e).closest('tr');
+            var tds = tr.find('td');
+            var inps = tr.find('input');
+            var s = parseInt(tds.eq(7).text());
+            inps.each(function (i, e) {
+                var v = parseInt($(e).val());
+                if (isNaN(v)) v = 0;
+                if (i > 2) s -= v;
+            });
+            if (s < 0) {
+                tds.eq(8).css('color', 'red');
+                tds.eq(8).text(s.toString());
+            } else if (s == 0) {
+                tds.eq(8).text('');
+            } else {
+                tds.eq(8).css('color', 'black');
+                tds.eq(8).text(s.toString());
+            }
+        };
 
         return {
             save: function () {
