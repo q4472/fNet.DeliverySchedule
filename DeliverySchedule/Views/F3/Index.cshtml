@@ -333,7 +333,9 @@
             save2Button.prop('disabled', false);
         });
         sheduleInputs.change(function () {
-            Nskd.Validator.nNorm(this, 0);
+            if (!$(this).hasClass('date-selector')) {
+                Nskd.Validator.nNorm(this, 0);
+            }
             this.setAttribute('data-modified', '1');
             save2Button.prop('disabled', false);
             calcToDo(this);
