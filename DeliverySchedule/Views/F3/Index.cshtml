@@ -124,33 +124,21 @@
                             <tr>
                                 <td style="text-align: right; padding-right: 4px">Срок от отгрузки до получения покупателем:</td>
                                 <td>
-                                    <input type="text"
-                                           name="срок_исполнения_отгрузка_покупатель"
-                                           value="@sSiop"
-                                           data-modified="0"
-                                           onchange="this.value = Nskd.Validator.numberNorm(this.value, 0, 365)" />
+                                    @sSiop
                                 </td>
                                 <td>&nbsp;=> Дата первой отгрузки: <span>@sDpo</span></td>
                             </tr>
                             <tr>
                                 <td style="text-align: right; padding-right: 4px">Срок от поставки к нам до отгрузки покупателю:</td>
                                 <td>
-                                    <input type="text"
-                                           name="срок_исполнения_склад_отгрузка"
-                                           value="@sSiso"
-                                           data-modified="0"
-                                           onchange="this.value = Nskd.Validator.numberNorm(this.value, 0, 365)" />
+                                    @sSiso
                                 </td>
                                 <td>&nbsp;=> К нам на склад первая партия должна поступить: <span>@sDps</span></td>
                             </tr>
                             <tr>
                                 <td style="text-align: right; padding-right: 4px">Срок от заявки на покупку до поставки к нам:</td>
                                 <td>
-                                    <input type="text"
-                                           name="срок_исполнения_заявка_склад"
-                                           value="@sSizs"
-                                           data-modified="0"
-                                           onchange="this.value = Nskd.Validator.numberNorm(this.value, 0, 365)" />
+                                    @sSizs
                                 </td>
                                 <td>&nbsp;=> Дата отправки заявки поставщику на первую партию: <span>@sDozp</span></td>
                             </tr>
@@ -188,6 +176,7 @@
         <br />
         if (Model.Table != null && Model.Table.Rows.Count > 0)
         {
+            <div><input type="button" class="save2_button" value="Сохранить" onclick="OrderF3Index.save2()" disabled="disabled" /></div>
             <table class="shedule_rows">
                 <colgroup>
                     <col width="100" />
@@ -196,11 +185,6 @@
                     <col width="200" />
                 </colgroup>
                 <tr>
-                    <td colspan="5" style="text-align: right;">
-                        <input type="button" class="save2_button" value="Сохранить" onclick="OrderF3Index.save2()" disabled="disabled" />
-                    </td>
-                </tr>
-                <tr>
                     <th>Торговое наименование</th>
                     <th>Лекарственная форма и дозировка</th>
                     <th>Производитель</th>
@@ -208,8 +192,8 @@
                     <th>З->С</th>
                     <th>С->О</th>
                     <th>О->П</th>
-                    <th>Количество</th>
-                    <th>Распред-ть</th>
+                    <th>Кол-во</th>
+                    <th>Распр-ть</th>
                     @if (Model.Shedule != null && Model.Shedule.Columns.Count > 2)
                     {
                         for (Int32 ci = 2; ci < Model.Shedule.Columns.Count; ci++)
@@ -222,32 +206,33 @@
                             }
                             <th>
                                 <input type="text"
-                                       name="_@dc.ColumnName"
+                                       name="@cn"
                                        value="@cn"
                                        data-modified="0"
                                        class="date-selector" />
                             </th>
                         }
                     }
+                    <th onclick="OrderF3Index.addColumn()">&nbsp;*&nbsp;</th>
                 </tr>
                 @foreach (DataRow dr in Model.Table.Rows)
                 {
                     Guid tp_id = (Guid)dr["tp_id"];
-                <tr>
+                <tr data-tp_uid="@tp_id">
                     <td>@dr["наименование"]</td>
                     <td>@dr["лекарственная_форма_и_дозировка"]</td>
                     <td>@dr["производитель"]</td>
                     <td>@dr["страна"]</td>
                     <td>
-                        <input type="text" name="_@(tp_id)_s1" value="@dr["срок_исполнения_заявка_склад"]"
+                        <input type="text" name="s1" value="@dr["срок_исполнения_заявка_склад"]"
                                data-modified="0" style="width: 30px">
                     </td>
                     <td>
-                        <input type="text" name="_@(tp_id)_s2" value="@dr["срок_исполнения_склад_отгрузка"]"
+                        <input type="text" name="s2" value="@dr["срок_исполнения_склад_отгрузка"]"
                                data-modified="0" style="width: 30px">
                     </td>
                     <td>
-                        <input type="text" name="_@(tp_id)_s3" value="@dr["срок_исполнения_отгрузка_покупатель"]"
+                        <input type="text" name="s3" value="@dr["срок_исполнения_отгрузка_покупатель"]"
                                data-modified="0" style="width: 30px">
                     </td>
                     <td style="text-align: right">@(((Decimal)dr["количество"]).ToString("n0"))</td>
@@ -291,9 +276,15 @@
                                 {
                                     for (Int32 ci = 2; ci < Model.Shedule.Columns.Count; ci++)
                                     {
+                                        DataColumn dc = Model.Shedule.Columns[ci];
+                                        String cn = dc.ColumnName;
+                                        if (cn.Length >= 10)
+                                        {
+                                            cn = cn.Substring(8, 2) + "." + cn.Substring(5, 2) + "." + cn.Substring(2, 2);
+                                        }
                                         <td>
                                             <input type="text"
-                                                   name="_@sdr[1]_@Model.Shedule.Columns[ci].ColumnName"
+                                                   name="@cn"
                                                    value="@sdr[ci]"
                                                    data-modified="0" />
                                         </td>
@@ -303,6 +294,7 @@
                             }
                         }
                     }
+                    <td></td>
                 </tr>
                 }
             </table>
@@ -316,8 +308,9 @@
         var pars = mainDiv.find('table.pars');
         var parsInputs = pars.find('input[type="text"]');
         var saveButton = mainDiv.find('input[type="button"].save_button');
+        var shdl = mainDiv.find('table.shedule_rows');
         var save2Button = mainDiv.find('input[type="button"].save2_button');
-        var sheduleInputs = mainDiv.find('table.shedule_rows input[type="text"]');
+        var sheduleInputs = shdl.find('input[type="text"]');
 
         parsInputs.keyup(function () {
             this.setAttribute('data-modified', '1');
@@ -333,16 +326,15 @@
             save2Button.prop('disabled', false);
         });
         sheduleInputs.change(function () {
-            if (!$(this).hasClass('date-selector')) {
-                Nskd.Validator.nNorm(this, 0);
-            }
             this.setAttribute('data-modified', '1');
             save2Button.prop('disabled', false);
-            calcToDo(this);
+            if (!$(this).hasClass('date-selector')) {
+                Nskd.Validator.nNorm(this, 0);
+                calcToDo(this);
+            }
         });
 
-        var dp = mainDiv.find('input.date-selector');
-        dp.datepicker({
+        mainDiv.find('input.date-selector').datepicker({
             dateFormat: 'dd.mm.y',
             firstDay: 1,
             defaultDate: 0
@@ -371,7 +363,7 @@
 
         return {
             save: function () {
-                var inputs = mainDiv.find('table.pars input[data-modified="1"]');
+                var inputs = pars.find('input[data-modified="1"]');
                 if (inputs.length > 0) {
                     if (confirm('Внимание!\nБудет сформирован график для каждой позиции в спецификации.\n')) {
                         var rqp = {
@@ -395,7 +387,7 @@
             },
             save2: function () {
                 save2Button.prop('disabled', true);
-                var inputs = mainDiv.find('table.shedule_rows input[data-modified="1"]');
+                var inputs = shdl.find('input[data-modified="1"]');
                 if (inputs.length > 0) {
                     var rqp = {
                         SessionId: Nskd.Server.SessionId,
@@ -403,8 +395,15 @@
                         Parameters: [{ Name: "id", Value: specId }]
                     };
                     inputs.each(function (i, e) {
-                        rqp.Parameters.push({ Name: e.name, Value: e.value });
+                        var tr = $(e).closest('tr');
+                        var name = '';
+                        var tpUid = tr.attr('data-tp_uid');
+                        if (tpUid) { name = '_' + tpUid + '_'; }
+                        name += e.name;
+                        rqp.Parameters.push({ Name: name, Value: e.value });
                     });
+                    //alert(Nskd.Json.toString(rqp));
+                    //return;
                     Nskd.Http.post({
                         url: '/DeliverySchedule/F3/Save2',
                         rqp: rqp,
@@ -413,57 +412,52 @@
                         }
                     });
                 }
+            },
+            addColumn: function () {
+                var date = new Date();
+                var yy = '' + (date.getFullYear() - 2000);
+                var mm = '' + (date.getMonth() + 1); if (mm.length == 1) mm = '0' + mm;
+                var dd = '' + (date.getDate()); if (dd.length == 1) dd = '0' + dd;
+                var colName = dd + '.' + mm + '.' + yy;
+                var trs = shdl.find('tr');
+                trs.each(function (i, e) {
+                    var tr = $(e);
+                    if (i == 0) {
+                        var newInput = $('<input type="text" name="' + colName + '" value="' + colName + '" data-modified="0" class="date-selector" />');
+                        newInput.datepicker({
+                            dateFormat: 'dd.mm.y',
+                            firstDay: 1,
+                            defaultDate: 0
+                        });
+                        newInput.change(function () {
+                            this.setAttribute('data-modified', '1');
+                            save2Button.prop('disabled', false);
+                            var input = $(this);
+                            var th = input.closest('th');
+                            var tr = th.closest('tr');
+                            var ths = tr.find('th');
+                            var index = ths.index(th);
+                            trs.each(function (i, e) {
+                                if (i != 0) $(e).find('td').eq(index).find('input').name = $(this).val();
+                            });
+                        });
+                        var newTh = $('<th>');
+                        newTh.append(newInput);
+                        tr.find('th').last().replaceWith(newTh);
+                        //tr.append('<th onclick="OrderF3Index.addColumn()">&nbsp;*&nbsp;</th>');
+                    } else {
+                        var input = $('<input type="text" name="' + colName + '" value="" data-modified="0" />');
+                        input.change(function () {
+                            this.setAttribute('data-modified', '1');
+                            save2Button.prop('disabled', false);
+                            Nskd.Validator.nNorm(this, 0);
+                            calcToDo(this);
+                        });
+                        tr.find('td').last().append(input);
+                        //tr.append('<td>');
+                    }
+                });
             }
         };
     })();
-
-/*
-    $('#p_order_f1_shedule_culc').click(function (event) {
-        var inputs = $('#p_order_f1_shedule_form1 input[type="text"]');
-        if (inputs.filter('.input-validation-error').length == 0) {
-
-            // данные из шапки длч расчёта
-            var d = new Date(inputs[0].value);
-            var c = new Number(inputs[1].value);
-            var p = new Number(inputs[2].value);
-            var w1 = new Number(inputs[3].value);
-            var w2 = new Number(inputs[4].value);
-            var w3 = new Number(inputs[5].value);
-            //alert(d2);
-
-            var trs = $('#p_order_f1_shedule_table tr');
-            // удаляем всё что дальше 7 колонки. Оставляем 5 колонок из таблицы и 2 из расписания.
-            trs.find('th:gt(6), td:gt(6)').remove();
-
-            var d1 = new Date(d.getTime() - ((w1 + w2 + w3) * 86400000));
-            var totalValue = 100;
-            for (var i = 0; i < c; i++) {
-
-                $(trs[0]).append('<th>' + dateToString(d1) + '</th>');
-                d1 = new Date(d1.getTime() + (p * 86400000));
-
-                var v = Math.ceil(totalValue / (c - i));
-                $(trs[1]).append('<th>' + v + '</th>');
-                totalValue -= v;
-            }
-
-            for (var ri = 2; ri < trs.length; ri++) {
-                totalValue = new Number($(trs[ri]).find('td:eq(4)').text());
-                //alert(totalValue);
-                for (var i = 0; i < c; i++) {
-                    var v = Math.ceil(totalValue / (c - i));
-                    $(trs[ri]).append('<td><input type="text" name="Shedule.Rows[' + (ri - 2) + '][' + (i + 2) + ']" value="' + v + '" data-val="true" data-val-number="" /></td>');
-                    totalValue -= v;
-                }
-            }
-            $('#p_order_f1_save').prop('disabled', false);
-        }
-    });
-    function dateToString(date) {
-        var y = date.getFullYear();
-        var m = date.getMonth() + 1;
-        var d = date.getDate();
-        return '' + y + '-' + ((m < 10) ? '0' + m : m) + '-' + ((d < 10) ? '0' + d : d);
-    }
-*/
 </script>

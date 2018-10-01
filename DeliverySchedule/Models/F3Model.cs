@@ -31,7 +31,7 @@ namespace DeliverySchedule.Models
         }
         public void Update2(RequestPackage rqp)
         {
-            // сначала исправляем сроки исполнения
+            // исправляем сроки исполнения
             foreach (RequestParameter p in rqp.Parameters)
             {
                 String name = p.Name;
@@ -68,15 +68,15 @@ namespace DeliverySchedule.Models
                     rqp1.GetResponse("http://127.0.0.1:11012/");
                 }
             }
-            // потом исправляем количество со старой датой
+            // исправляем количество со старой датой
             foreach (RequestParameter p in rqp.Parameters)
             {
                 String name = p.Name;
                 String value = p.Value as String;
-                if (name.Length == 48 && value != null && (new Regex(@"_[0-9a-f-]{36}_\d\d\d\d\-\d\d-\d\d")).IsMatch(name))
+                if (name.Length == 46 && value != null && (new Regex(@"_[0-9a-f-]{36}_\d\d\.\d\d\.\d\d")).IsMatch(name))
                 {
                     Guid.TryParse(name.Substring(1, 36), out Guid tpId);
-                    DateTime.TryParse(name.Substring(38, 10), out DateTime date);
+                    DateTime.TryParse("20" + name.Substring(44, 2) + "-" + name.Substring(41, 2) + "-" + name.Substring(38, 2), out DateTime date);
                     RequestPackage rqp1 = new RequestPackage
                     {
                         SessionId = rqp.SessionId,
@@ -93,14 +93,14 @@ namespace DeliverySchedule.Models
                     rqp1.GetResponse("http://127.0.0.1:11012/");
                 }
             }
-            // теперь изменяем дату
+            // изменяем дату
             foreach (RequestParameter p in rqp.Parameters)
             {
                 String name = p.Name;
                 String value = p.Value as String;
-                if (name.Length == 11 && value != null && (new Regex(@"\d\d\.\d\d.\d\d")).IsMatch(value))
+                if (name.Length == 8 && value != null && (new Regex(@"\d\d\.\d\d\.\d\d")).IsMatch(value))
                 {
-                    DateTime.TryParse(name.Substring(1, 10), out DateTime oldDate);
+                    DateTime.TryParse("20" + name.Substring(6, 2) + "-" + name.Substring(3, 2) + "-" + name.Substring(0, 2), out DateTime oldDate);
                     DateTime.TryParse("20" + value.Substring(6, 2) + "-" + value.Substring(3, 2) + "-" + value.Substring(0, 2), out DateTime newDate);
                     RequestPackage rqp1 = new RequestPackage
                     {
