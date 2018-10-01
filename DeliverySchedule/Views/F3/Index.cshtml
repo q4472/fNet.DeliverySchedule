@@ -3,9 +3,9 @@
 @model DeliverySchedule.Models.F3Model
 
 <style type="text/css">
-    #deliveryschedule_views_f3_index input {
+    #deliveryschedule_views_f3_index input[type="text"] {
         border: 1px solid black;
-        width: 80px;
+        width: 70px;
         text-align: right;
     }
 
@@ -71,12 +71,15 @@
                 }
             }
 
-            <div>Идентификатор спецификации: @Model.SpecId</div>
-            <p>Основные параметры</p>
-            <table class="pars">
+            <div style="margin: 4px">Идентификатор спецификации: @Model.SpecId</div>
+            <table style="margin-left: 4px; margin-top: 4px">
                 <tr>
-                    <td>
-                        <table>
+                    <td style="border: 1px solid black; padding: 4px;">
+                        <div style="margin-bottom: 2px">
+                            <span style="font-weight: bold; font-size: 12pt">Основные параметры&nbsp;&nbsp;&nbsp;</span>
+                            <input type="button" class="save_button" value="Сохранить" disabled="disabled" onclick="OrderF3Index.save()" />
+                        </div>
+                        <table class="pars">
                             <tr>
                                 <td style="text-align: right; padding-right: 4px">Дата контракта:</td>
                                 <td>
@@ -154,7 +157,6 @@
                                 <td></td>
                             </tr>
                             <tr>
-
                                 <td style="text-align: right; padding-right: 4px">Дата окончания действия контракта: </td>
                                 <td>
                                     <input type="text"
@@ -165,114 +167,48 @@
                                 </td>
                                 <td></td>
                             </tr>
+                            <tr>
+                                <td>Поставка по графику</td>
+                                <td><input type="checkbox" checked="checked" /></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Поставка по заявкам</td>
+                                <td><input type="checkbox" checked="checked" /></td>
+                                <td></td>
+                            </tr>
                         </table>
-                    </td>
-                    <td>
-                        <input type="button" class="save_button" value="Сохранить" disabled="disabled" onclick="OrderF3Index.save()" />
                     </td>
                 </tr>
             </table>
         }
-        <br />
         if (Model.Table != null && Model.Table.Rows.Count > 0)
         {
-            <div><input type="button" class="save2_button" value="Сохранить" onclick="OrderF3Index.save2()" disabled="disabled" /></div>
-            <table class="shedule_rows">
-                <colgroup>
-                    <col width="100" />
-                    <col width="200" />
-                    <col width="200" />
-                    <col width="200" />
-                </colgroup>
+            <table style="margin-left: 4px; margin-top: 4px">
                 <tr>
-                    <th>Торговое наименование</th>
-                    <th>Лекарственная форма и дозировка</th>
-                    <th>Производитель</th>
-                    <th>Страна</th>
-                    <th>З->С</th>
-                    <th>С->О</th>
-                    <th>О->П</th>
-                    <th>Кол-во</th>
-                    <th>Распр-ть</th>
-                    @if (Model.Shedule != null && Model.Shedule.Columns.Count > 2)
-                    {
-                        for (Int32 ci = 2; ci < Model.Shedule.Columns.Count; ci++)
-                        {
-                            DataColumn dc = Model.Shedule.Columns[ci];
-                            String cn = dc.ColumnName;
-                            if (cn.Length >= 10)
-                            {
-                                cn = cn.Substring(8, 2) + "." + cn.Substring(5, 2) + "." + cn.Substring(2, 2);
-                            }
-                            <th>
-                                <input type="text"
-                                       name="@cn"
-                                       value="@cn"
-                                       data-modified="0"
-                                       class="date-selector" />
-                            </th>
-                        }
-                    }
-                    <th onclick="OrderF3Index.addColumn()">&nbsp;*&nbsp;</th>
-                </tr>
-                @foreach (DataRow dr in Model.Table.Rows)
-                {
-                    Guid tp_id = (Guid)dr["tp_id"];
-                <tr data-tp_uid="@tp_id">
-                    <td>@dr["наименование"]</td>
-                    <td>@dr["лекарственная_форма_и_дозировка"]</td>
-                    <td>@dr["производитель"]</td>
-                    <td>@dr["страна"]</td>
-                    <td>
-                        <input type="text" name="s1" value="@dr["срок_исполнения_заявка_склад"]"
-                               data-modified="0" style="width: 30px">
-                    </td>
-                    <td>
-                        <input type="text" name="s2" value="@dr["срок_исполнения_склад_отгрузка"]"
-                               data-modified="0" style="width: 30px">
-                    </td>
-                    <td>
-                        <input type="text" name="s3" value="@dr["срок_исполнения_отгрузка_покупатель"]"
-                               data-modified="0" style="width: 30px">
-                    </td>
-                    <td style="text-align: right">@(((Decimal)dr["количество"]).ToString("n0"))</td>
-                    @if (Model.Shedule != null && Model.Shedule.Rows.Count > 0)
-                    {
-                        Int32 s = (Int32)((Decimal)dr["количество"]);
-                        foreach (DataRow sdr in Model.Shedule.Rows)
-                        {
-                            if ((Guid)sdr["tp_id"] == tp_id)
-                            {
-                                if (Model.Shedule.Columns.Count > 2)
-                                {
-                                    for (Int32 ci = 2; ci < Model.Shedule.Columns.Count; ci++)
-                                    {
-                                        if (sdr[ci] != DBNull.Value) { s -= (Int32)((Decimal)sdr[ci]); }
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                        if (s < 0)
-                        {
-                            <td class="todo" style="text-align: right; color: red">@s</td>
-                        }
-                        else if (s == 0)
-                        {
-                            <td class="todo" style="text-align: right"></td>
-                        }
-                        else
-                        {
-                            <td class="todo" style="text-align: right; color: black">@s</td>
-                        }
-                    }
-                    @if (Model.Shedule != null && Model.Shedule.Rows.Count > 0)
-                    {
-                        foreach (DataRow sdr in Model.Shedule.Rows)
-                        {
-                            if ((Guid)sdr["tp_id"] == tp_id)
-                            {
-                                if (Model.Shedule.Columns.Count > 2)
+                    <td style="border: 1px solid black; padding: 4px;">
+                        <div style="margin-bottom: 2px">
+                            <span style="font-weight: bold; font-size: 12pt">График&nbsp;&nbsp;&nbsp;</span>
+                            <input type="button" class="save2_button" value="Сохранить" onclick="OrderF3Index.save2()" disabled="disabled" />
+                        </div>
+                        <table class="shedule_rows">
+                            <colgroup>
+                                <col width="100" />
+                                <col width="200" />
+                                <col width="200" />
+                                <col width="200" />
+                            </colgroup>
+                            <tr>
+                                <th>Торговое наименование</th>
+                                <th>Лекарственная форма и дозировка</th>
+                                <th>Производитель</th>
+                                <th>Страна</th>
+                                <th>З->С</th>
+                                <th>С->О</th>
+                                <th>О->П</th>
+                                <th>Кол-во</th>
+                                <th>Распр-ть</th>
+                                @if (Model.Shedule != null && Model.Shedule.Columns.Count > 2)
                                 {
                                     for (Int32 ci = 2; ci < Model.Shedule.Columns.Count; ci++)
                                     {
@@ -282,21 +218,102 @@
                                         {
                                             cn = cn.Substring(8, 2) + "." + cn.Substring(5, 2) + "." + cn.Substring(2, 2);
                                         }
-                                        <td>
+                                        <th>
                                             <input type="text"
                                                    name="@cn"
-                                                   value="@sdr[ci]"
-                                                   data-modified="0" />
-                                        </td>
+                                                   value="@cn"
+                                                   data-modified="0"
+                                                   class="date-selector" />
+                                        </th>
                                     }
                                 }
-                                break;
+                                <th onclick="OrderF3Index.addColumn()">&nbsp;*&nbsp;</th>
+                            </tr>
+                            @foreach (DataRow dr in Model.Table.Rows)
+                            {
+                                Guid tp_id = (Guid)dr["tp_id"];
+                                <tr data-tp_uid="@tp_id">
+                                    <td>@dr["наименование"]</td>
+                                    <td>@dr["лекарственная_форма_и_дозировка"]</td>
+                                    <td>@dr["производитель"]</td>
+                                    <td>@dr["страна"]</td>
+                                    <td>
+                                        <input type="text" name="s1" value="@dr["срок_исполнения_заявка_склад"]"
+                                               data-modified="0" style="width: 30px">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="s2" value="@dr["срок_исполнения_склад_отгрузка"]"
+                                               data-modified="0" style="width: 30px">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="s3" value="@dr["срок_исполнения_отгрузка_покупатель"]"
+                                               data-modified="0" style="width: 30px">
+                                    </td>
+                                    <td style="text-align: right">@(((Decimal)dr["количество"]).ToString("n0"))</td>
+                                    @if (Model.Shedule != null && Model.Shedule.Rows.Count > 0)
+                                    {
+                                        Int32 s = (Int32)((Decimal)dr["количество"]);
+                                        foreach (DataRow sdr in Model.Shedule.Rows)
+                                        {
+                                            if ((Guid)sdr["tp_id"] == tp_id)
+                                            {
+                                                if (Model.Shedule.Columns.Count > 2)
+                                                {
+                                                    for (Int32 ci = 2; ci < Model.Shedule.Columns.Count; ci++)
+                                                    {
+                                                        if (sdr[ci] != DBNull.Value) { s -= (Int32)((Decimal)sdr[ci]); }
+                                                    }
+                                                }
+                                                break;
+                                            }
+                                        }
+                                        if (s < 0)
+                                        {
+                                            <td class="todo" style="text-align: right; color: red">@s</td>
+                                        }
+                                        else if (s == 0)
+                                        {
+                                            <td class="todo" style="text-align: right"></td>
+                                        }
+                                        else
+                                        {
+                                            <td class="todo" style="text-align: right; color: black">@s</td>
+                                        }
+                                    }
+                                    @if (Model.Shedule != null && Model.Shedule.Rows.Count > 0)
+                                    {
+                                        foreach (DataRow sdr in Model.Shedule.Rows)
+                                        {
+                                            if ((Guid)sdr["tp_id"] == tp_id)
+                                            {
+                                                if (Model.Shedule.Columns.Count > 2)
+                                                {
+                                                    for (Int32 ci = 2; ci < Model.Shedule.Columns.Count; ci++)
+                                                    {
+                                                        DataColumn dc = Model.Shedule.Columns[ci];
+                                                        String cn = dc.ColumnName;
+                                                        if (cn.Length >= 10)
+                                                        {
+                                                            cn = cn.Substring(8, 2) + "." + cn.Substring(5, 2) + "." + cn.Substring(2, 2);
+                                                        }
+                                                        <td>
+                                                            <input type="text"
+                                                                   name="@cn"
+                                                                   value="@sdr[ci]"
+                                                                   data-modified="0" />
+                                                        </td>
+                                                    }
+                                                }
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    <td></td>
+                                </tr>
                             }
-                        }
-                    }
-                    <td></td>
+                        </table>
+                    </td>
                 </tr>
-                }
             </table>
         }
     }
@@ -423,13 +440,13 @@
                 trs.each(function (i, e) {
                     var tr = $(e);
                     if (i == 0) {
-                        var newInput = $('<input type="text" name="' + colName + '" value="' + colName + '" data-modified="0" class="date-selector" />');
-                        newInput.datepicker({
+                        var input = $('<input type="text" name="' + colName + '" value="' + colName + '" data-modified="0" class="date-selector" />');
+                        input.datepicker({
                             dateFormat: 'dd.mm.y',
                             firstDay: 1,
                             defaultDate: 0
                         });
-                        newInput.change(function () {
+                        input.change(function () {
                             this.setAttribute('data-modified', '1');
                             save2Button.prop('disabled', false);
                             var input = $(this);
@@ -441,9 +458,13 @@
                                 if (i != 0) $(e).find('td').eq(index).find('input').name = $(this).val();
                             });
                         });
-                        var newTh = $('<th>');
-                        newTh.append(newInput);
-                        tr.find('th').last().replaceWith(newTh);
+                        input.keyup(function () {
+                            this.setAttribute('data-modified', '1');
+                            save2Button.prop('disabled', false);
+                        });
+                        var th = $('<th>');
+                        th.append(input);
+                        tr.find('th').last().replaceWith(th);
                         //tr.append('<th onclick="OrderF3Index.addColumn()">&nbsp;*&nbsp;</th>');
                     } else {
                         var input = $('<input type="text" name="' + colName + '" value="" data-modified="0" />');
@@ -452,6 +473,10 @@
                             save2Button.prop('disabled', false);
                             Nskd.Validator.nNorm(this, 0);
                             calcToDo(this);
+                        });
+                        input.keyup(function () {
+                            this.setAttribute('data-modified', '1');
+                            save2Button.prop('disabled', false);
                         });
                         tr.find('td').last().append(input);
                         //tr.append('<td>');
