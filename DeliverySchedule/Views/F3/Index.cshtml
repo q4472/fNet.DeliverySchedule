@@ -19,6 +19,10 @@
         padding: 2px;
         border: 1px solid black;
     }
+
+    #deliveryschedule_views_f3_index *.err-bg {
+        background-color: #f99;
+    }
 </style>
 
 <div id="deliveryschedule_views_f3_index">
@@ -72,110 +76,156 @@
             }
 
             <div style="margin: 4px">Идентификатор спецификации: @Model.SpecId</div>
-            <table style="margin-left: 4px; margin-top: 4px">
+            <table style="margin-left: 4px; margin-top: 4px; background-color: #cfc">
                 <tr>
                     <td style="border: 1px solid black; padding: 4px;">
                         <div style="margin-bottom: 2px">
                             <span style="font-weight: bold; font-size: 12pt">Основные параметры&nbsp;&nbsp;&nbsp;</span>
                             <input type="button" class="save_button" value="Сохранить" disabled="disabled" onclick="OrderF3Index.save()" />
+                            <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Расчитать новый график</span>
+                            <input type="checkbox" name="расчитать_новый_график" checked="checked" data-modified="0" disabled="disabled" />
                         </div>
-                        <table class="pars">
+                        <table class="pars" style="background-color: #ffd">
                             <tr>
-                                <td style="text-align: right; padding-right: 4px">Дата контракта:</td>
                                 <td>
-                                    <input type="text"
-                                           name="дата_контракта"
-                                           value="@Nskd.Convert.ToString(Model.Head.Rows[0]["дата_контракта"])"
-                                           data-modified="0"
-                                           class="date-selector" />
+                                    <table>
+                                        <tr>
+                                            <td style="text-align: right; padding-right: 4px">Дата контракта:</td>
+                                            <td>
+                                                <input type="text"
+                                                       name="дата_контракта"
+                                                       value="@Nskd.Convert.ToString(Model.Head.Rows[0]["дата_контракта"])"
+                                                       data-modified="0"
+                                                       class="date-selector" />
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align: right; padding-right: 4px">Количество поставок:</td>
+                                            <td>
+                                                <input type="text"
+                                                       name="количество_поставок"
+                                                       value="@Model.Head.Rows[0]["количество_поставок"]"
+                                                       data-modified="0"
+                                                       onchange="this.value = Nskd.Validator.numberNorm(this.value, 1, 36)" />
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align: right; padding-right: 4px">Период поставок:</td>
+                                            <td>
+                                                <input type="text"
+                                                       name="период_поставок"
+                                                       value="@Model.Head.Rows[0]["период_поставок"]"
+                                                       data-modified="0"
+                                                       onchange="this.value = Nskd.Validator.numberNorm(this.value, 0, 365)" />
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align: right; padding-right: 4px">Дата первой поставки (получения покупателем):</td>
+                                            <td>
+                                                <input type="text"
+                                                       name="дата_первой_поставки"
+                                                       value="@Nskd.Convert.ToString(Model.Head.Rows[0]["дата_первой_поставки"])"
+                                                       data-modified="0"
+                                                       class="date-selector" />
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align: right; padding-right: 4px">Срок от отгрузки до получения покупателем:</td>
+                                            <td>
+                                                @sSiop
+                                            </td>
+                                            <td>&nbsp;=> Дата первой отгрузки: <span>@sDpo</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align: right; padding-right: 4px">Срок от поставки к нам до отгрузки покупателю:</td>
+                                            <td>
+                                                @sSiso
+                                            </td>
+                                            <td>&nbsp;=> К нам на склад первая партия должна поступить: <span>@sDps</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align: right; padding-right: 4px">Срок от заявки на покупку до поставки к нам:</td>
+                                            <td>
+                                                @sSizs
+                                            </td>
+                                            <td>&nbsp;=> Дата отправки заявки поставщику на первую партию: <span>@sDozp</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align: right; padding-right: 4px">Дата окончания поставок: </td>
+                                            <td>
+                                                <input type="text"
+                                                       name="дата_окончания_поставок"
+                                                       value="@Nskd.Convert.ToString(Model.Head.Rows[0]["дата_окончания_поставок"])"
+                                                       data-modified="0"
+                                                       class="date-selector" />
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align: right; padding-right: 4px">Дата окончания действия контракта: </td>
+                                            <td>
+                                                <input type="text"
+                                                       name="дата_окончания_действия_контракта"
+                                                       value="@Nskd.Convert.ToString(Model.Head.Rows[0]["дата_окончания_действия_контракта"])"
+                                                       data-modified="0"
+                                                       class="date-selector" />
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                    </table>
                                 </td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td style="text-align: right; padding-right: 4px">Количество поставок:</td>
                                 <td>
-                                    <input type="text"
-                                           name="количество_поставок"
-                                           value="@Model.Head.Rows[0]["количество_поставок"]"
-                                           data-modified="0"
-                                           onchange="this.value = Nskd.Validator.numberNorm(this.value, 1, 36)" />
+                                    <table>
+                                        <tr>
+                                            <td>Поставка по графику</td>
+                                            @if ((Boolean)Model.Head.Rows[0]["поставка_по_графику"])
+                                            {
+                                                <td><input type="checkbox" name="поставка_по_графику" data-modified="0" checked="checked" /></td>
+                                            }
+                                            else
+                                            {
+                                                <td><input type="checkbox" name="поставка_по_графику" data-modified="0" /></td>
+                                            }
+                                        </tr>
+                                        <tr>
+                                            <td>Поставка по заявкам</td>
+                                            @if ((Boolean)Model.Head.Rows[0]["поставка_по_заявкам"])
+                                            {
+                                                <td><input type="checkbox" name="поставка_по_заявкам" data-modified="0" checked="checked" /></td>
+                                            }
+                                            else
+                                            {
+                                                <td><input type="checkbox" name="поставка_по_заявкам" data-modified="0" /></td>
+                                            }
+                                        </tr>
+                                        <tr>
+                                            <td>Готово для отд. закупок</td>
+                                            @if ((Boolean)Model.Head.Rows[0]["готово_для_отдела_закупок"])
+                                            {
+                                                <td><input type="checkbox" name="готово_для_отдела_закупок" data-modified="0" checked="checked" /></td>
+                                            }
+                                            else
+                                            {
+                                                <td><input type="checkbox" name="готово_для_отдела_закупок" data-modified="0" /></td>
+                                            }
+                                        </tr>
+                                        <tr>
+                                            <td>Принято отд. закупок</td>
+                                            @if ((Boolean)Model.Head.Rows[0]["принято_отделом_закупок"])
+                                            {
+                                                <td><input type="checkbox" name="принято_отделом_закупок" data-modified="0" disabled="disabled" checked="checked" /></td>
+                                            }
+                                            else
+                                            {
+                                                <td><input type="checkbox" name="принято_отделом_закупок" data-modified="0" disabled="disabled" /></td>
+                                            }
+                                        </tr>
+                                    </table>
                                 </td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td style="text-align: right; padding-right: 4px">Период поставок:</td>
-                                <td>
-                                    <input type="text"
-                                           name="период_поставок"
-                                           value="@Model.Head.Rows[0]["период_поставок"]"
-                                           data-modified="0"
-                                           onchange="this.value = Nskd.Validator.numberNorm(this.value, 0, 365)" />
-                                </td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td style="text-align: right; padding-right: 4px">Дата первой поставки (получения покупателем):</td>
-                                <td>
-                                    <input type="text"
-                                           name="дата_первой_поставки"
-                                           value="@Nskd.Convert.ToString(Model.Head.Rows[0]["дата_первой_поставки"])"
-                                           data-modified="0"
-                                           class="date-selector" />
-                                </td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td style="text-align: right; padding-right: 4px">Срок от отгрузки до получения покупателем:</td>
-                                <td>
-                                    @sSiop
-                                </td>
-                                <td>&nbsp;=> Дата первой отгрузки: <span>@sDpo</span></td>
-                            </tr>
-                            <tr>
-                                <td style="text-align: right; padding-right: 4px">Срок от поставки к нам до отгрузки покупателю:</td>
-                                <td>
-                                    @sSiso
-                                </td>
-                                <td>&nbsp;=> К нам на склад первая партия должна поступить: <span>@sDps</span></td>
-                            </tr>
-                            <tr>
-                                <td style="text-align: right; padding-right: 4px">Срок от заявки на покупку до поставки к нам:</td>
-                                <td>
-                                    @sSizs
-                                </td>
-                                <td>&nbsp;=> Дата отправки заявки поставщику на первую партию: <span>@sDozp</span></td>
-                            </tr>
-                            <tr>
-                                <td style="text-align: right; padding-right: 4px">Дата окончания поставок: </td>
-                                <td>
-                                    <input type="text"
-                                           name="дата_окончания_поставок"
-                                           value="@Nskd.Convert.ToString(Model.Head.Rows[0]["дата_окончания_поставок"])"
-                                           data-modified="0"
-                                           class="date-selector" />
-                                </td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td style="text-align: right; padding-right: 4px">Дата окончания действия контракта: </td>
-                                <td>
-                                    <input type="text"
-                                           name="дата_окончания_действия_контракта"
-                                           value="@Nskd.Convert.ToString(Model.Head.Rows[0]["дата_окончания_действия_контракта"])"
-                                           data-modified="0"
-                                           class="date-selector" />
-                                </td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>Поставка по графику</td>
-                                <td><input type="checkbox" checked="checked" /></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>Поставка по заявкам</td>
-                                <td><input type="checkbox" checked="checked" /></td>
-                                <td></td>
                             </tr>
                         </table>
                     </td>
@@ -184,30 +234,35 @@
         }
         if (Model.Table != null && Model.Table.Rows.Count > 0)
         {
-            <table style="margin-left: 4px; margin-top: 4px">
+            <table style="margin-left: 4px; margin-top: 4px; background-color: #cfc">
                 <tr>
                     <td style="border: 1px solid black; padding: 4px;">
                         <div style="margin-bottom: 2px">
                             <span style="font-weight: bold; font-size: 12pt">График&nbsp;&nbsp;&nbsp;</span>
                             <input type="button" class="save2_button" value="Сохранить" onclick="OrderF3Index.save2()" disabled="disabled" />
                         </div>
-                        <table class="shedule_rows">
+                        <table class="shedule_rows" style="background-color: #ffd">
                             <colgroup>
                                 <col width="100" />
                                 <col width="200" />
                                 <col width="200" />
                                 <col width="200" />
+                                <col width="50" />
+                                <col width="50" />
+                                <col width="50" />
+                                <col width="80" />
+                                <col width="80" />
                             </colgroup>
                             <tr>
                                 <th>Торговое наименование</th>
                                 <th>Лекарственная форма и дозировка</th>
                                 <th>Производитель</th>
                                 <th>Страна</th>
-                                <th>З->С</th>
-                                <th>С->О</th>
-                                <th>О->П</th>
+                                <th>З -> С</th>
+                                <th>С -> О</th>
+                                <th>О -> П</th>
                                 <th>Кол-во</th>
-                                <th>Распр-ть</th>
+                                <th>Остаток по заявкам</th>
                                 @if (Model.Shedule != null && Model.Shedule.Columns.Count > 2)
                                 {
                                     for (Int32 ci = 2; ci < Model.Shedule.Columns.Count; ci++)
@@ -237,15 +292,15 @@
                                     <td>@dr["лекарственная_форма_и_дозировка"]</td>
                                     <td>@dr["производитель"]</td>
                                     <td>@dr["страна"]</td>
-                                    <td>
+                                    <td style="text-align: right">
                                         <input type="text" name="s1" value="@dr["срок_исполнения_заявка_склад"]"
                                                data-modified="0" style="width: 30px">
                                     </td>
-                                    <td>
+                                    <td style="text-align: right">
                                         <input type="text" name="s2" value="@dr["срок_исполнения_склад_отгрузка"]"
                                                data-modified="0" style="width: 30px">
                                     </td>
-                                    <td>
+                                    <td style="text-align: right">
                                         <input type="text" name="s3" value="@dr["срок_исполнения_отгрузка_покупатель"]"
                                                data-modified="0" style="width: 30px">
                                     </td>
@@ -323,7 +378,7 @@
         var mainDiv = $('#deliveryschedule_views_f3_index');
         var specId = mainDiv.find('input[name="SpecId"]').val();
         var pars = mainDiv.find('table.pars');
-        var parsInputs = pars.find('input[type="text"]');
+        var parsInputs = pars.find('input[type="text"], input[type="checkbox"]');
         var saveButton = mainDiv.find('input[type="button"].save_button');
         var shdl = mainDiv.find('table.shedule_rows');
         var save2Button = mainDiv.find('input[type="button"].save2_button');
@@ -331,39 +386,39 @@
 
         parsInputs.keyup(function () {
             this.setAttribute('data-modified', '1');
-            saveButton.prop('disabled', false);
+            checkForm();
         });
         parsInputs.change(function () {
             this.setAttribute('data-modified', '1');
-            saveButton.prop('disabled', false);
+            checkForm();
         });
-
         sheduleInputs.keyup(function () {
             this.setAttribute('data-modified', '1');
-            save2Button.prop('disabled', false);
+            calcToDo(this);
+            checkForm();
         });
         sheduleInputs.change(function () {
             this.setAttribute('data-modified', '1');
-            save2Button.prop('disabled', false);
             if (!$(this).hasClass('date-selector')) {
                 Nskd.Validator.nNorm(this, 0);
                 calcToDo(this);
             }
+            checkForm();
         });
 
         mainDiv.find('input.date-selector').datepicker({
             dateFormat: 'dd.mm.y',
             firstDay: 1,
             defaultDate: 0
-        });
+        }).change(checkForm);
 
         function calcToDo(e) {
             var tr = $(e).closest('tr');
             var tds = tr.find('td');
             var inps = tr.find('input');
-            var s = parseInt(tds.eq(7).text());
+            var s = parseInt(tds.eq(7).text().replace(/[^\d-]/g, ''));
             inps.each(function (i, e) {
-                var v = parseInt($(e).val());
+                var v = parseInt($(e).val().replace(/[^\d-]/g, ''));
                 if (isNaN(v)) v = 0;
                 if (i > 2) s -= v;
             });
@@ -376,30 +431,84 @@
                 tds.eq(8).css('color', 'black');
                 tds.eq(8).text(s.toString());
             }
-        };
+        }
+        function checkForm() {
+            // Проверяем шапку на ошибку в датах
+            var parsError = false;
+            var d1 = $('input[name="дата_контракта"]');
+            var d2 = $('input[name="дата_первой_поставки"]');
+            var d3 = $('input[name="дата_окончания_поставок"]');
+            var d4 = $('input[name="дата_окончания_действия_контракта"]');
+            if (d2.datepicker('getDate') < d1.datepicker('getDate')) { d2.addClass('err-bg'); parsError = true; } else d2.removeClass('err-bg');
+            if (d3.datepicker('getDate') < d2.datepicker('getDate')) { d3.addClass('err-bg'); parsError = true; } else d3.removeClass('err-bg');
+            if (d4.datepicker('getDate') < d3.datepicker('getDate')) { d4.addClass('err-bg'); parsError = true; } else d4.removeClass('err-bg');
+            saveButton.prop('disabled', parsError || pars.find('input[data-modified="1"]').length == 0);
+            // Проверяем таблицу на ошибку в датах
+            var shdlError = false;
+            var ds = shdl.find('input.date-selector');
+            ds.each(function (i, e) {
+                e = $(e);
+                var d = e.datepicker('getDate');
+                if (d < d2.datepicker('getDate') || d > d3.datepicker('getDate')) { e.addClass('err-bg'); shdlError = true; } else e.removeClass('err-bg');
+            });
+            // Прверяем таблицу на ошибки в столбце "по заявкам"
+            // 1. все ячейки должны быть пустыми при отсутствии галки "по заявкам"
+            var isOrd = pars.find('input[type="checkbox"][name="поставка_по_заявкам"]').prop('checked');
+            var todoTds = shdl.find('td.todo');
+            if (!isOrd) {
+                todoTds.each(function (i, e) {
+                    e = $(e);
+                    if (e.text() != '') {
+                        shdlError = true;
+                        e.addClass('err-bg');
+                    } else {
+                        e.removeClass('err-bg');
+                    }
+                });
+            } else {
+                todoTds.each(function (i, e) {
+                    e = $(e);
+                    // 2. остаток "по заявкам" должен быть положительным
+                    if (e.text().indexOf('-') < 0) {
+                        e.removeClass('err-bg');
+                    } else {
+                        shdlError = true;
+                        e.addClass('err-bg');
+                    }
+                });
+            }
+            save2Button.prop('disabled', shdlError || shdl.find('input[data-modified="1"]').length == 0);
+        }
+        // При загрузке с сервера тоже проверяем.
+        checkForm();
 
         return {
             save: function () {
                 var inputs = pars.find('input[data-modified="1"]');
                 if (inputs.length > 0) {
-                    if (confirm('Внимание!\nБудет сформирован график для каждой позиции в спецификации.\n')) {
-                        var rqp = {
-                            SessionId: Nskd.Server.SessionId,
-                            Command: 'DeliverySchedule.F3.Save',
-                            Parameters: [{ Name: "id", Value: specId }]
+                    var rqp = {
+                        SessionId: Nskd.Server.SessionId,
+                        Command: 'DeliverySchedule.F3.Save',
+                        Parameters: [{ Name: "id", Value: specId }]
+                    };
+                    inputs.each(function (i, e) {
+                        if (e.type === 'checkbox') rqp.Parameters.push({ Name: e.name, Value: e.checked });
+                        else rqp.Parameters.push({ Name: e.name, Value: e.value });
+                    });
+                    if (pars.find('input[name="поставка_по_графику"]').prop('checked')) {
+                        if (confirm('Внимание!\nБудет сформирован график для каждой позиции в спецификации.\n')) {
+                            //rqp.Parameters.push({ Name: '', Value: e.value });
                         };
-                        inputs.each(function (i, e) {
-                            rqp.Parameters.push({ Name: e.name, Value: e.value });
-                        });
-                        //alert(Nskd.Json.toString(rqp)); return;
-                        Nskd.Http.post({
-                            url: '/DeliverySchedule/F3/Save',
-                            rqp: rqp,
-                            done: function (data) {
-                                $('#_layout_content').html(data);
-                            }
-                        });
                     }
+                    //alert(Nskd.Json.toString(rqp));
+                    //return;
+                    Nskd.Http.post({
+                        url: '/DeliverySchedule/F3/Save',
+                        rqp: rqp,
+                        done: function (data) {
+                            $('#_layout_content').html(data);
+                        }
+                    });
                 }
             },
             save2: function () {
@@ -419,7 +528,7 @@
                         name += e.name;
                         rqp.Parameters.push({ Name: name, Value: e.value });
                     });
-                    //alert(Nskd.Json.toString(rqp));
+                    //alert(Nskd.Json.toString(rqp)); 
                     //return;
                     Nskd.Http.post({
                         url: '/DeliverySchedule/F3/Save2',
@@ -448,7 +557,6 @@
                         });
                         input.change(function () {
                             this.setAttribute('data-modified', '1');
-                            save2Button.prop('disabled', false);
                             var input = $(this);
                             var th = input.closest('th');
                             var tr = th.closest('tr');
@@ -457,10 +565,11 @@
                             trs.each(function (i, e) {
                                 if (i != 0) $(e).find('td').eq(index).find('input').name = $(this).val();
                             });
+                            checkForm();
                         });
                         input.keyup(function () {
                             this.setAttribute('data-modified', '1');
-                            save2Button.prop('disabled', false);
+                            checkForm();
                         });
                         var th = $('<th>');
                         th.append(input);
@@ -470,13 +579,14 @@
                         var input = $('<input type="text" name="' + colName + '" value="" data-modified="0" />');
                         input.change(function () {
                             this.setAttribute('data-modified', '1');
-                            save2Button.prop('disabled', false);
                             Nskd.Validator.nNorm(this, 0);
                             calcToDo(this);
+                            checkForm();
                         });
                         input.keyup(function () {
                             this.setAttribute('data-modified', '1');
-                            save2Button.prop('disabled', false);
+                            calcToDo(this);
+                            checkForm();
                         });
                         tr.find('td').last().append(input);
                         //tr.append('<td>');
