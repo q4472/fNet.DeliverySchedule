@@ -208,6 +208,8 @@
     <Content Include="Scripts\Cryptico-master\jsbn.js" />
     <Content Include="Scripts\Cryptico-master\random.js" />
     <Content Include="Scripts\Cryptico-master\rsa.js" />
+    <None Include="Properties\PublishProfiles\ip14.pubxml" />
+    <None Include="Properties\PublishProfiles\local.pubxml" />
     <None Include="Scripts\jquery-2.1.4.intellisense.js" />
     <Content Include="Scripts\jquery-2.1.4.js" />
     <Content Include="Scripts\jquery-2.1.4.min.js" />
