@@ -1,5 +1,4 @@
 ﻿@using System.Data
-
 @model DeliverySchedule.Models.F3Model
 
 <style type="text/css">
@@ -22,6 +21,10 @@
 
     #deliveryschedule_views_f3_index *.err-bg {
         background-color: #f99;
+    }
+
+    #deliveryschedule_views_f3_index *.err-color {
+        color: red;
     }
 </style>
 
@@ -83,7 +86,7 @@
                             <span style="font-weight: bold; font-size: 12pt">Основные параметры&nbsp;&nbsp;&nbsp;</span>
                             <input type="button" class="save_button" value="Сохранить" disabled="disabled" onclick="OrderF3Index.save()" />
                             <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Расчитать новый график</span>
-                            <input type="checkbox" name="расчитать_новый_график" checked="checked" data-modified="0" disabled="disabled" />
+                            <input type="checkbox" name="расчитать_новый_график" data-modified="0" />
                         </div>
                         <table class="pars" style="background-color: #ffd">
                             <tr>
@@ -203,6 +206,18 @@
                                             }
                                         </tr>
                                         <tr>
+                                            <td>Поставка по протоколу</td>
+                                            @if ((Boolean)Model.Head.Rows[0]["поставка_по_протоколу"])
+                                            {
+                                                <td><input type="checkbox" name="поставка_по_протоколу" data-modified="0" checked="checked" /></td>
+                                            }
+                                            else
+                                            {
+                                                <td><input type="checkbox" name="поставка_по_протоколу" data-modified="0" /></td>
+                                            }
+                                        </tr>
+                                        <tr><td style="border: none">&nbsp;</td><td style="border: none">&nbsp;</td></tr>
+                                        <tr>
                                             <td>Готово для отд. закупок</td>
                                             @if ((Boolean)Model.Head.Rows[0]["готово_для_отдела_закупок"])
                                             {
@@ -252,6 +267,7 @@
                                 <col width="50" />
                                 <col width="80" />
                                 <col width="80" />
+                                <col width="80" />
                             </colgroup>
                             <tr>
                                 <th>Торговое наименование</th>
@@ -263,6 +279,7 @@
                                 <th>О -> П</th>
                                 <th>Кол-во</th>
                                 <th>Остаток по заявкам</th>
+                                <th>Поставка по протоколу</th>
                                 @if (Model.Shedule != null && Model.Shedule.Columns.Count > 2)
                                 {
                                     for (Int32 ci = 2; ci < Model.Shedule.Columns.Count; ci++)
@@ -287,84 +304,59 @@
                             @foreach (DataRow dr in Model.Table.Rows)
                             {
                                 Guid tp_id = (Guid)dr["tp_id"];
-                                <tr data-tp_uid="@tp_id">
-                                    <td>@dr["наименование"]</td>
-                                    <td>@dr["лекарственная_форма_и_дозировка"]</td>
-                                    <td>@dr["производитель"]</td>
-                                    <td>@dr["страна"]</td>
-                                    <td style="text-align: right">
-                                        <input type="text" name="s1" value="@dr["срок_исполнения_заявка_склад"]"
-                                               data-modified="0" style="width: 30px">
-                                    </td>
-                                    <td style="text-align: right">
-                                        <input type="text" name="s2" value="@dr["срок_исполнения_склад_отгрузка"]"
-                                               data-modified="0" style="width: 30px">
-                                    </td>
-                                    <td style="text-align: right">
-                                        <input type="text" name="s3" value="@dr["срок_исполнения_отгрузка_покупатель"]"
-                                               data-modified="0" style="width: 30px">
-                                    </td>
-                                    <td style="text-align: right">@(((Decimal)dr["количество"]).ToString("n0"))</td>
-                                    @if (Model.Shedule != null && Model.Shedule.Rows.Count > 0)
+                            <tr data-tp_uid="@tp_id">
+                                <td>@dr["наименование"]</td>
+                                <td>@dr["лекарственная_форма_и_дозировка"]</td>
+                                <td>@dr["производитель"]</td>
+                                <td>@dr["страна"]</td>
+                                <td style="text-align: right">
+                                    <input type="text" name="s1" value="@dr["срок_исполнения_заявка_склад"]"
+                                           data-modified="0" style="width: 30px" />
+                                </td>
+                                <td style="text-align: right">
+                                    <input type="text" name="s2" value="@dr["срок_исполнения_склад_отгрузка"]"
+                                           data-modified="0" style="width: 30px" />
+                                </td>
+                                <td style="text-align: right">
+                                    <input type="text" name="s3" value="@dr["срок_исполнения_отгрузка_покупатель"]"
+                                           data-modified="0" style="width: 30px" />
+                                </td>
+                                <td class="row-qty" style="text-align: right">@(((Decimal)dr["количество"]).ToString("n0"))</td>
+                                <td class="todo" style="text-align: right"></td>
+                                <td style="text-align: right">
+                                    <input type="text" value="xxx"
+                                           data-modified="0" style="width: 30px" />
+                                </td>
+                                @if (Model.Shedule != null && Model.Shedule.Rows.Count > 0)
+                                {
+                                    foreach (DataRow sdr in Model.Shedule.Rows)
                                     {
-                                        Int32 s = (Int32)((Decimal)dr["количество"]);
-                                        foreach (DataRow sdr in Model.Shedule.Rows)
+                                        if ((Guid)sdr["tp_id"] == tp_id)
                                         {
-                                            if ((Guid)sdr["tp_id"] == tp_id)
+                                            if (Model.Shedule.Columns.Count > 2)
                                             {
-                                                if (Model.Shedule.Columns.Count > 2)
+                                                for (Int32 ci = 2; ci < Model.Shedule.Columns.Count; ci++)
                                                 {
-                                                    for (Int32 ci = 2; ci < Model.Shedule.Columns.Count; ci++)
+                                                    DataColumn dc = Model.Shedule.Columns[ci];
+                                                    String cn = dc.ColumnName;
+                                                    if (cn.Length >= 10)
                                                     {
-                                                        if (sdr[ci] != DBNull.Value) { s -= (Int32)((Decimal)sdr[ci]); }
+                                                        cn = cn.Substring(8, 2) + "." + cn.Substring(5, 2) + "." + cn.Substring(2, 2);
                                                     }
+                                                    <td>
+                                                        <input type="text"
+                                                               name="@cn"
+                                                               value="@sdr[ci]"
+                                                               data-modified="0" />
+                                                    </td>
                                                 }
-                                                break;
                                             }
-                                        }
-                                        if (s < 0)
-                                        {
-                                            <td class="todo" style="text-align: right; color: red">@s</td>
-                                        }
-                                        else if (s == 0)
-                                        {
-                                            <td class="todo" style="text-align: right"></td>
-                                        }
-                                        else
-                                        {
-                                            <td class="todo" style="text-align: right; color: black">@s</td>
+                                            break;
                                         }
                                     }
-                                    @if (Model.Shedule != null && Model.Shedule.Rows.Count > 0)
-                                    {
-                                        foreach (DataRow sdr in Model.Shedule.Rows)
-                                        {
-                                            if ((Guid)sdr["tp_id"] == tp_id)
-                                            {
-                                                if (Model.Shedule.Columns.Count > 2)
-                                                {
-                                                    for (Int32 ci = 2; ci < Model.Shedule.Columns.Count; ci++)
-                                                    {
-                                                        DataColumn dc = Model.Shedule.Columns[ci];
-                                                        String cn = dc.ColumnName;
-                                                        if (cn.Length >= 10)
-                                                        {
-                                                            cn = cn.Substring(8, 2) + "." + cn.Substring(5, 2) + "." + cn.Substring(2, 2);
-                                                        }
-                                                        <td>
-                                                            <input type="text"
-                                                                   name="@cn"
-                                                                   value="@sdr[ci]"
-                                                                   data-modified="0" />
-                                                        </td>
-                                                    }
-                                                }
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    <td></td>
-                                </tr>
+                                }
+                                <td></td>
+                            </tr>
                             }
                         </table>
                     </td>
@@ -383,53 +375,33 @@
         var shdl = mainDiv.find('table.shedule_rows');
         var save2Button = mainDiv.find('input[type="button"].save2_button');
         var sheduleInputs = shdl.find('input[type="text"]');
-
-        parsInputs.keyup(function () {
-            this.setAttribute('data-modified', '1');
-            checkForm();
-        });
-        parsInputs.change(function () {
-            this.setAttribute('data-modified', '1');
-            checkForm();
-        });
-        sheduleInputs.keyup(function () {
-            this.setAttribute('data-modified', '1');
-            calcToDo(this);
-            checkForm();
-        });
-        sheduleInputs.change(function () {
-            this.setAttribute('data-modified', '1');
-            if (!$(this).hasClass('date-selector')) {
-                Nskd.Validator.nNorm(this, 0);
-                calcToDo(this);
-            }
-            checkForm();
-        });
-
-        mainDiv.find('input.date-selector').datepicker({
-            dateFormat: 'dd.mm.y',
-            firstDay: 1,
-            defaultDate: 0
-        }).change(checkForm);
+        var todoTds = shdl.find('td.todo');
+        var dateSelectors = mainDiv.find('input.date-selector');
 
         function calcToDo(e) {
             var tr = $(e).closest('tr');
-            var tds = tr.find('td');
+            calcRowToDo(tr);
+        }
+        function calcRowToDo(tr) {
+            var td = tr.find('td.todo');
             var inps = tr.find('input');
-            var s = parseInt(tds.eq(7).text().replace(/[^\d-]/g, ''));
+            var s = parseInt(tr.find('td.row-qty').text().replace(/[^\d-]/g, ''));
             inps.each(function (i, e) {
-                var v = parseInt($(e).val().replace(/[^\d-]/g, ''));
-                if (isNaN(v)) v = 0;
-                if (i > 2) s -= v;
+                if (i > 2) {
+                    var v = parseInt($(e).val().replace(/[^\d-]/g, ''));
+                    if (isNaN(v)) v = 0;
+                    s -= v;
+                }
             });
             if (s < 0) {
-                tds.eq(8).css('color', 'red');
-                tds.eq(8).text(s.toString());
+                td.addClass('err-color');
+                td.text(s.toString());
             } else if (s == 0) {
-                tds.eq(8).text('');
+                td.removeClass('err-color');
+                td.text('');
             } else {
-                tds.eq(8).css('color', 'black');
-                tds.eq(8).text(s.toString());
+                td.removeClass('err-color');
+                td.text(s.toString());
             }
         }
         function checkForm() {
@@ -452,34 +424,59 @@
                 if (d < d2.datepicker('getDate') || d > d3.datepicker('getDate')) { e.addClass('err-bg'); shdlError = true; } else e.removeClass('err-bg');
             });
             // Прверяем таблицу на ошибки в столбце "по заявкам"
-            // 1. все ячейки должны быть пустыми при отсутствии галки "по заявкам"
             var isOrd = pars.find('input[type="checkbox"][name="поставка_по_заявкам"]').prop('checked');
-            var todoTds = shdl.find('td.todo');
-            if (!isOrd) {
-                todoTds.each(function (i, e) {
-                    e = $(e);
-                    if (e.text() != '') {
-                        shdlError = true;
-                        e.addClass('err-bg');
-                    } else {
-                        e.removeClass('err-bg');
-                    }
-                });
-            } else {
-                todoTds.each(function (i, e) {
-                    e = $(e);
-                    // 2. остаток "по заявкам" должен быть положительным
-                    if (e.text().indexOf('-') < 0) {
-                        e.removeClass('err-bg');
-                    } else {
-                        shdlError = true;
-                        e.addClass('err-bg');
-                    }
-                });
-            }
+            todoTds.each(function (i, e) {
+                e = $(e);
+                // 1. все ячейки должны быть пустыми при отсутствии галки "по заявкам"
+                if (!isOrd && e.text() != '') {
+                    shdlError = true;
+                    e.addClass('err-bg');
+                } else {
+                    e.removeClass('err-bg');
+                }
+                // 2. остаток "по заявкам" должен быть положительным
+                if (e.text().indexOf('-') < 0) {
+                    e.removeClass('err-color');
+                } else {
+                    shdlError = true;
+                    e.addClass('err-color');
+                }
+            });
             save2Button.prop('disabled', shdlError || shdl.find('input[data-modified="1"]').length == 0);
         }
-        // При загрузке с сервера тоже проверяем.
+
+        parsInputs.keyup(function () {
+            this.setAttribute('data-modified', '1');
+            checkForm();
+        });
+        parsInputs.change(function () {
+            this.setAttribute('data-modified', '1');
+            checkForm();
+        });
+        sheduleInputs.keyup(function () {
+            this.setAttribute('data-modified', '1');
+            calcToDo(this);
+            checkForm();
+        });
+        sheduleInputs.change(function () {
+            this.setAttribute('data-modified', '1');
+            if (!$(this).hasClass('date-selector')) {
+                Nskd.Validator.nNorm(this, 0);
+                calcToDo(this);
+            }
+            checkForm();
+        });
+        dateSelectors.datepicker({
+            dateFormat: 'dd.mm.y',
+            firstDay: 1,
+            defaultDate: 0
+        });
+        dateSelectors.change(checkForm);
+
+        // При загрузке с сервера сразу проверяем.
+        todoTds.each(function (i, e) {
+            calcRowToDo($(e).closest('tr'));
+        });
         checkForm();
 
         return {
@@ -495,9 +492,10 @@
                         if (e.type === 'checkbox') rqp.Parameters.push({ Name: e.name, Value: e.checked });
                         else rqp.Parameters.push({ Name: e.name, Value: e.value });
                     });
-                    if (pars.find('input[name="поставка_по_графику"]').prop('checked')) {
-                        if (confirm('Внимание!\nБудет сформирован график для каждой позиции в спецификации.\n')) {
-                            //rqp.Parameters.push({ Name: '', Value: e.value });
+                    if (pars.find('input[name="поставка_по_графику"]').prop('checked')
+                        && mainDiv.find('input[name="расчитать_новый_график"]').prop('checked')) {
+                        if (confirm('Внимание!\nБудет сформирован новый график для каждой позиции в спецификации.\n')) {
+                            rqp.Parameters.push({ Name: 'расчитать_новый_график', Value: true });
                         };
                     }
                     //alert(Nskd.Json.toString(rqp));
@@ -528,7 +526,7 @@
                         name += e.name;
                         rqp.Parameters.push({ Name: name, Value: e.value });
                     });
-                    //alert(Nskd.Json.toString(rqp)); 
+                    //alert(Nskd.Json.toString(rqp));
                     //return;
                     Nskd.Http.post({
                         url: '/DeliverySchedule/F3/Save2',
