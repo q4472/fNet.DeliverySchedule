@@ -73,10 +73,11 @@ namespace DeliverySchedule.Models
             {
                 String name = p.Name;
                 String value = p.Value as String;
-                if (name.Length == 46 && value != null && (new Regex(@"_[0-9a-f-]{36}_\d\d\.\d\d\.\d\d")).IsMatch(name))
+                if (name.Length == 50 && value != null && (new Regex(@"_[0-9a-f-]{36}_\d\d\d\d\-\d\d\-\d\d \d")).IsMatch(name))
                 {
                     Guid.TryParse(name.Substring(1, 36), out Guid tpId);
-                    DateTime.TryParse("20" + name.Substring(44, 2) + "-" + name.Substring(41, 2) + "-" + name.Substring(38, 2), out DateTime date);
+                    DateTime.TryParse(name.Substring(38, 10), out DateTime date);
+                    Int32.TryParse(name.Substring(49, 1), out Int32 ftype);
                     RequestPackage rqp1 = new RequestPackage
                     {
                         SessionId = rqp.SessionId,
@@ -87,7 +88,8 @@ namespace DeliverySchedule.Models
                             new RequestParameter { Name = "код_спецификации", Value = SpecId },
                             new RequestParameter { Name = "tp_id", Value = tpId },
                             new RequestParameter { Name = "дата", Value = date },
-                            new RequestParameter { Name = "количество", Value = value }
+                            new RequestParameter { Name = "количество", Value = value },
+                            new RequestParameter { Name = "тип_формирования", Value = ftype }
                         }
                     };
                     rqp1.GetResponse("http://127.0.0.1:11012/");
@@ -98,10 +100,12 @@ namespace DeliverySchedule.Models
             {
                 String name = p.Name;
                 String value = p.Value as String;
-                if (name.Length == 8 && value != null && (new Regex(@"\d\d\.\d\d\.\d\d")).IsMatch(value))
+                if (name.Length == 12 && (new Regex(@"\d\d\d\d\-\d\d\-\d\d \d")).IsMatch(name)
+                    && value != null && (new Regex(@"\d\d\.\d\d\.\d\d")).IsMatch(value))
                 {
-                    DateTime.TryParse("20" + name.Substring(6, 2) + "-" + name.Substring(3, 2) + "-" + name.Substring(0, 2), out DateTime oldDate);
+                    DateTime.TryParse(name.Substring(0, 10), out DateTime oldDate);
                     DateTime.TryParse("20" + value.Substring(6, 2) + "-" + value.Substring(3, 2) + "-" + value.Substring(0, 2), out DateTime newDate);
+                    Int32.TryParse(name.Substring(11, 1), out Int32 ftype);
                     RequestPackage rqp1 = new RequestPackage
                     {
                         SessionId = rqp.SessionId,
@@ -111,7 +115,8 @@ namespace DeliverySchedule.Models
                             new RequestParameter { Name = "session_id", Value = rqp.SessionId },
                             new RequestParameter { Name = "id", Value = SpecId },
                             new RequestParameter { Name = "old_date", Value = oldDate },
-                            new RequestParameter { Name = "new_date", Value = newDate }
+                            new RequestParameter { Name = "new_date", Value = newDate },
+                            new RequestParameter { Name = "тип_формирования", Value = ftype }
                         }
                     };
                     rqp1.GetResponse("http://127.0.0.1:11012/");
