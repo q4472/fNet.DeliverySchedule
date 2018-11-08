@@ -1,6 +1,5 @@
 ﻿@using System.Data
 @model DeliverySchedule.Models.F3Model
-
 <style type="text/css">
     #deliveryschedule_views_f3_index input[type="text"] {
         border: 1px solid black;
@@ -17,6 +16,10 @@
     #deliveryschedule_views_f3_index td {
         padding: 2px;
         border: 1px solid black;
+    }
+
+    #deliveryschedule_views_f3_index *._1c {
+        background-color: #ff9;
     }
 
     #deliveryschedule_views_f3_index *.err-bg {
@@ -297,43 +300,52 @@
                             </tr>
                         </table>
                     </td>
+                    <td>
+                        <span style="font-weight: bold; font-size: 12pt">Действия для выделенных строк</span>
+                        <br />
+                        <br />
+                        <input type="button" value="Объединить в группу" />
+                        <br />
+                        <br />
+                        <input type="button" value="Выполнить зачёт" />
+                    </td>
                 </tr>
             </table>
         }
         if (Model.Table != null && Model.Table.Rows.Count > 0)
         {
+            DataView tableView = Model.Table.DefaultView;
+            //tableView.RowFilter = "[tp_id] is null";
+            tableView.Sort = "[гр_наименование], [гр_форма_выпуска], [гр_дозировка], [количество], [номер_строки] desc";
             <table style="margin-left: 4px; margin-top: 4px; background-color: #cfc">
                 <tr>
                     <td style="border: 1px solid black; padding: 4px;">
                         <div style="margin-bottom: 2px">
                             <span style="font-weight: bold; font-size: 12pt">График&nbsp;&nbsp;&nbsp;</span>
                             <input type="button" class="save2_button" value="Сохранить" onclick="OrderF3Index.save2()" disabled="disabled" />
+                            <span>&nbsp;&nbsp;&nbsp;Накладные 1с&nbsp;&nbsp;&nbsp;</span>
+                            <input type="checkbox" class="_1c-show" onclick="OrderF3Index.show1cRows(this)">
                         </div>
                         <table class="shedule_rows" style="background-color: #ffd">
                             <colgroup>
-                                <col width="30" />
-                                <col width="100" />
-                                <col width="200" />
-                                <col width="200" />
-                                <col width="200" />
-                                <col width="50" />
-                                <col width="50" />
-                                <col width="50" />
-                                <col width="80" />
-                                <col width="80" />
-                                <col width="80" />
+                                <col width="30" /> <!-- № -->
+                                <col width="700" /><!-- Описание -->
+                                <col width="20" /> <!-- Галка сопоставления строк -->
+                                <col width="50" /> <!-- З -> С -->
+                                <col width="50" /> <!-- С -> О -->
+                                <col width="50" /> <!-- О -> П -->
+                                <col width="80" /> <!-- Кол-во -->
+                                <col width="80" /> <!-- Остаток по заявкам -->
+                                <!-- колонки по графику, заявкам, протоколу -->
                             </colgroup>
                             <tr>
                                 <th>№</th>
-                                <th>Торговое наименование</th>
-                                <th>Лекарственная форма и дозировка</th>
-                                <th>Производитель</th>
-                                <th>Страна</th>
+                                <th>Описание</th>
+                                <th>&nbsp;</th>
                                 <th>З -> С</th>
                                 <th>С -> О</th>
                                 <th>О -> П</th>
                                 <th>Кол-во</th>
-                                <th><span>Отгружено</span><br /><span>по контакту</span><br /></th>
                                 <th><span>Остаток по</span><br /><span>заявкам</span></th>
                                 @if (Model.Shedule != null && Model.Shedule.Columns.Count > 3)
                                 {
@@ -383,69 +395,77 @@
                                 }
                                 <th onclick="OrderF3Index.addColumn()">&nbsp;*&nbsp;</th>
                             </tr>
-                            @foreach (DataRow dr in Model.Table.Rows)
+                            @foreach (DataRowView dr in tableView)
                             {
-                                Guid tp_id = (Guid)dr["tp_id"];
-                                <tr data-tp_uid="@tp_id">
-                                    <td style="text-align: right">@dr["номер_строки"]</td>
-                                    <td>@dr["наименование"]</td>
-                                    <td>@dr["лекарственная_форма_и_дозировка"]</td>
-                                    <td>@dr["производитель"]</td>
-                                    <td>@dr["страна"]</td>
-                                    <td style="text-align: right">
-                                        <input type="text" name="s1" value="@dr["срок_исполнения_заявка_склад"]"
-                                               data-modified="0" style="width: 30px" />
-                                    </td>
-                                    <td style="text-align: right">
-                                        <input type="text" name="s2" value="@dr["срок_исполнения_склад_отгрузка"]"
-                                               data-modified="0" style="width: 30px" />
-                                    </td>
-                                    <td style="text-align: right">
-                                        <input type="text" name="s3" value="@dr["срок_исполнения_отгрузка_покупатель"]"
-                                               data-modified="0" style="width: 30px" />
-                                    </td>
-                                    <td class="row-qty" style="text-align: right">@(((Decimal)dr["количество"]).ToString("n0"))</td>
-                                    <td style="text-align: right">
-                                        <span>xxx</span>
-                                    </td>
-                                    <td class="todo" style="text-align: right"></td>
-                                    @if (Model.Shedule != null && Model.Shedule.Rows.Count > 0)
-                                    {
-                                        foreach (DataRow sdr in Model.Shedule.Rows)
+                                String tp_id = (dr["tp_id"] == DBNull.Value) ? "" : ((Guid)dr["tp_id"]).ToString();
+                                if (tp_id != "")
+                                {
+                                    <tr data-tp_uid="@tp_id" class="fnet">
+                                        <td style="text-align: right">@dr["номер_строки"]</td>
+                                        <td>@dr["descr"]</td>
+                                        <td><input type="checkbox" /></td>
+                                        <td style="text-align: right">
+                                            <input type="text" name="s1" value="@dr["срок_исполнения_заявка_склад"]"
+                                                   data-modified="0" style="width: 30px" />
+                                        </td>
+                                        <td style="text-align: right">
+                                            <input type="text" name="s2" value="@dr["срок_исполнения_склад_отгрузка"]"
+                                                   data-modified="0" style="width: 30px" />
+                                        </td>
+                                        <td style="text-align: right">
+                                            <input type="text" name="s3" value="@dr["срок_исполнения_отгрузка_покупатель"]"
+                                                   data-modified="0" style="width: 30px" />
+                                        </td>
+                                        <td class="row-qty" style="text-align: right">@(((Decimal)dr["количество"]).ToString("n0"))</td>
+                                        <td class="todo" style="text-align: right"></td>
+                                        @if (Model.Shedule != null && Model.Shedule.Rows.Count > 0)
                                         {
-                                            if ((Guid)sdr["tp_id"] == tp_id)
+                                            foreach (DataRow sdr in Model.Shedule.Rows)
                                             {
-                                                if (Model.Shedule.Columns.Count > 3)
+                                                if (((Guid)sdr["tp_id"]).ToString() == tp_id)
                                                 {
-                                                    for (Int32 ci = 3; ci < Model.Shedule.Columns.Count; ci++)
+                                                    if (Model.Shedule.Columns.Count > 3)
                                                     {
-                                                        DataColumn dc = Model.Shedule.Columns[ci];
-                                                        String cn = dc.ColumnName;
-                                                        String ct = String.Empty;
-                                                        if (cn.Length >= 10)
+                                                        for (Int32 ci = 3; ci < Model.Shedule.Columns.Count; ci++)
                                                         {
-                                                            cn = cn.Substring(8, 2)
-                                                                + "." + cn.Substring(5, 2)
-                                                                + "." + cn.Substring(2, 2);
-                                                            if (dc.ColumnName.Length >= 12)
+                                                            DataColumn dc = Model.Shedule.Columns[ci];
+                                                            String cn = dc.ColumnName;
+                                                            String ct = String.Empty;
+                                                            if (cn.Length >= 10)
                                                             {
-                                                                ct = dc.ColumnName.Substring(11, 1);
+                                                                cn = cn.Substring(8, 2)
+                                                                    + "." + cn.Substring(5, 2)
+                                                                    + "." + cn.Substring(2, 2);
+                                                                if (dc.ColumnName.Length >= 12)
+                                                                {
+                                                                    ct = dc.ColumnName.Substring(11, 1);
+                                                                }
                                                             }
+                                                            <td>
+                                                                <input type="text"
+                                                                       name="@dc.ColumnName"
+                                                                       value="@sdr[ci]"
+                                                                       data-modified="0" />
+                                                            </td>
                                                         }
-                                                        <td>
-                                                            <input type="text"
-                                                                   name="@dc.ColumnName"
-                                                                   value="@sdr[ci]"
-                                                                   data-modified="0" />
-                                                        </td>
                                                     }
+                                                    break;
                                                 }
-                                                break;
                                             }
                                         }
-                                    }
-                                    <td></td>
-                                </tr>
+                                        <td></td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    <tr data-tp_uid="" class="_1c" style="display: none">
+                                        <td>1c</td>
+                                        <td>@dr["descr"]</td>
+                                        <td><input type="checkbox" /></td>
+                                        <td colspan="3" style="text-align: right">Количество по накладным:</td>
+                                        <td style="text-align: right">@(((Decimal)dr["количество"]).ToString("n0"))</td>
+                                    </tr>
+                                }
                             }
                         </table>
                     </td>
@@ -501,7 +521,7 @@
         }
         function calcRowToDo(tr) {
             var td = tr.find('td.todo');
-            var inps = tr.find('input');
+            var inps = tr.find('input[type="text"]');
             var s = parseInt(tr.find('td.row-qty').text().replace(/[^\d-]/g, ''));
             inps.each(function (i, e) {
                 if (i > 2) {
@@ -522,6 +542,11 @@
             }
         }
         function checkForm() {
+            var errs = checkFormForErrors();
+            saveButton.prop('disabled', errs.parsError || pars.find('input[data-modified="1"]').length == 0);
+            save2Button.prop('disabled', errs.shdlError || shdl.find('input[data-modified="1"]').length == 0);
+        }
+        function checkFormForErrors() {
             // Проверяем шапку на ошибку в датах
             var parsError = false;
             var d1 = $('input[name="дата_контракта"]');
@@ -531,7 +556,6 @@
             if (d2.datepicker('getDate') < d1.datepicker('getDate')) { d2.addClass('err-bg'); parsError = true; } else d2.removeClass('err-bg');
             if (d3.datepicker('getDate') < d2.datepicker('getDate')) { d3.addClass('err-bg'); parsError = true; } else d3.removeClass('err-bg');
             if (d4.datepicker('getDate') < d3.datepicker('getDate')) { d4.addClass('err-bg'); parsError = true; } else d4.removeClass('err-bg');
-            saveButton.prop('disabled', parsError || pars.find('input[data-modified="1"]').length == 0);
             // Проверяем таблицу на ошибку в датах
             var shdlError = false;
             var ds = shdl.find('input.date-selector');
@@ -559,7 +583,16 @@
                     e.addClass('err-color');
                 }
             });
-            save2Button.prop('disabled', shdlError || shdl.find('input[data-modified="1"]').length == 0);
+            return { 'parsError': parsError, 'shdlError': shdlError };
+        }
+        function doFormFormat() {
+            var trs = shdl.find('tr');
+            //alert(trs.length);
+            // пропускаем заголовок и последнюю строку
+            for (var index = 1; index < trs.length - 1;) {
+                // проверка блока
+                index = doBlock(trs, index);
+            }
         }
         function currDate(format) {
             var date = new Date();
@@ -573,6 +606,28 @@
                 date = (yyyy + '-' + mm + '-' + dd);
             }
             return date;
+        }
+        function doBlock(trs, index) {
+            var ctr = $(trs[index++]); // current row
+            var cTpUid = ctr.attr('data-tp_uid');
+            // блок должен начинаться со строки спецификации
+            if (cTpUid) {
+                var ntr = $(trs[index]); //  берём следующую строку в блоке пока не двигаем индекс
+                var nTpUid = ntr.attr('data-tp_uid');
+                // она должна быть строкой из 1с (нет tp)
+                if (!nTpUid) {
+                    // это строка 1с
+                    // Вроде всё в порядке, пока пропускаем, но надо проверить на соответствие предыдущей.
+                    index++;
+                } else {
+                    // это строка не 1с - ошибка
+                    ctr.addClass('err-bg'); // красим предыдущую
+                    // переход на следующий блок
+                }
+            } else { // первая строка это не строка из специфакации
+                ctr.addClass('err-bg'); // красим
+            }
+            return index;
         }
 
         parsInputs.keyup(function () {
@@ -679,6 +734,8 @@
                 var trs = shdl.find('tr');
                 trs.each(function (i, e) {
                     var tr = $(e);
+                    var tp_uid = tr.attr('data-tp_uid');
+                    //alert(tp_uid);
                     if (i == 0) {
                         var input = $('<input type="text" name="' + n + '" value="' + d + '" data-modified="0" class="date-selector" />');
                         input.datepicker({
@@ -710,22 +767,33 @@
                         tr.find('th').last().replaceWith(th);
                         //tr.append('<th onclick="OrderF3Index.addColumn()">&nbsp;*&nbsp;</th>');
                     } else {
-                        var input = $('<input type="text" name="' + n + '" value="" data-modified="0" />');
-                        input.change(function () {
-                            this.setAttribute('data-modified', '1');
-                            Nskd.Validator.nNorm(this, 0);
-                            calcToDo(this);
-                            checkForm();
-                        });
-                        input.keyup(function () {
-                            this.setAttribute('data-modified', '1');
-                            calcToDo(this);
-                            checkForm();
-                        });
-                        tr.find('td').last().append(input);
-                        //tr.append('<td>');
+                        if (tp_uid) {
+                            var input = $('<input type="text" name="' + n + '" value="" data-modified="0" />');
+                            input.change(function () {
+                                this.setAttribute('data-modified', '1');
+                                Nskd.Validator.nNorm(this, 0);
+                                calcToDo(this);
+                                checkForm();
+                            });
+                            input.keyup(function () {
+                                this.setAttribute('data-modified', '1');
+                                calcToDo(this);
+                                checkForm();
+                            });
+                            tr.find('td').last().append(input);
+                            //tr.append('<td>');
+                        } else { tr.find('td').last().append('&nbsp;'); }
                     }
                 });
+            },
+            show1cRows: function (show) {
+                if (show.checked) {
+                    shdl.find('tr._1c').show();
+                    doFormFormat();
+                } else {
+                    shdl.find('tr.fnet').removeClass('err-bg');
+                    shdl.find('tr._1c').hide();
+                }
             }
         };
     })();
