@@ -135,7 +135,7 @@
                     <td style="border: 1px solid black; padding: 4px;">
                         <div style="margin-bottom: 2px">
                             <span style="font-weight: bold; font-size: 12pt">Основные параметры&nbsp;&nbsp;&nbsp;</span>
-                            <input type="button" class="save_button" value="Сохранить" disabled="disabled" onclick="OrderF3Index.save()" />
+                            <input type="button" class="save_button" value="Сохранить" disabled="disabled" onclick="DeliveryScheduleViewsF3Index.save()" />
                             <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Расчитать новый график</span>
                             <input type="checkbox" name="расчитать_новый_график" data-modified="0" />
                         </div>
@@ -304,10 +304,10 @@
                         <span style="font-weight: bold; font-size: 12pt">Действия для выделенных строк</span>
                         <br />
                         <br />
-                        <input type="button" value="Объединить в группу" />
+                        <input type="button" value="Объединить в группу" onclick="DeliveryScheduleViewsF3Index.execGroup();" />
                         <br />
                         <br />
-                        <input type="button" value="Выполнить зачёт" />
+                        <input type="button" value="Выполнить зачёт" onclick="DeliveryScheduleViewsF3Index.execCorr();" />
                     </td>
                 </tr>
             </table>
@@ -322,9 +322,9 @@
                     <td style="border: 1px solid black; padding: 4px;">
                         <div style="margin-bottom: 2px">
                             <span style="font-weight: bold; font-size: 12pt">График&nbsp;&nbsp;&nbsp;</span>
-                            <input type="button" class="save2_button" value="Сохранить" onclick="OrderF3Index.save2()" disabled="disabled" />
+                            <input type="button" class="save2_button" value="Сохранить" onclick="DeliveryScheduleViewsF3Index.save2()" disabled="disabled" />
                             <span>&nbsp;&nbsp;&nbsp;Накладные 1с&nbsp;&nbsp;&nbsp;</span>
-                            <input type="checkbox" class="_1c-show" onclick="OrderF3Index.show1cRows(this)">
+                            <input type="checkbox" class="_1c-show" onclick="DeliveryScheduleViewsF3Index.show1cRows(this)">
                         </div>
                         <table class="shedule_rows" style="background-color: #ffd">
                             <colgroup>
@@ -393,7 +393,7 @@
                                         </th>
                                     }
                                 }
-                                <th onclick="OrderF3Index.addColumn()">&nbsp;*&nbsp;</th>
+                                <th onclick="DeliveryScheduleViewsF3Index.addColumn()">&nbsp;*&nbsp;</th>
                             </tr>
                             @foreach (DataRowView dr in tableView)
                             {
@@ -403,7 +403,7 @@
                                     <tr data-tp_uid="@tp_id" class="fnet">
                                         <td style="text-align: right">@dr["номер_строки"]</td>
                                         <td>@dr["descr"]</td>
-                                        <td><input type="checkbox" /></td>
+                                        <td><input type="checkbox" class="row-flag" /></td>
                                         <td style="text-align: right">
                                             <input type="text" name="s1" value="@dr["срок_исполнения_заявка_склад"]"
                                                    data-modified="0" style="width: 30px" />
@@ -461,7 +461,7 @@
                                     <tr data-tp_uid="" class="_1c" style="display: none">
                                         <td>1c</td>
                                         <td>@dr["descr"]</td>
-                                        <td><input type="checkbox" /></td>
+                                        <td><input type="checkbox" class="row-flag" /></td>
                                         <td colspan="3" style="text-align: right">Количество по накладным:</td>
                                         <td style="text-align: right">@(((Decimal)dr["количество"]).ToString("n0"))</td>
                                     </tr>
@@ -496,13 +496,13 @@
             </table>
             <br />
             <div style="text-align: center">
-                <input type="button" value="OK" onclick="OrderF3Index.ftypeSelected();" />
+                <input type="button" value="OK" onclick="DeliveryScheduleViewsF3Index.ftypeSelected();" />
             </div>
         </div>
     </div>
 </div>
 <script type="text/javascript">
-    var OrderF3Index = (function () {
+    var DeliveryScheduleViewsF3Index = (function () {
         var mainDiv = $('#deliveryschedule_views_f3_index');
         var specId = mainDiv.find('input[name="SpecId"]').val();
         var pars = mainDiv.find('table.pars');
@@ -765,7 +765,7 @@
                         if (t == 2) th.append('<span>Поставка по</span><br /><span>протоколу</span><br />');
                         th.append(input);
                         tr.find('th').last().replaceWith(th);
-                        //tr.append('<th onclick="OrderF3Index.addColumn()">&nbsp;*&nbsp;</th>');
+                        //tr.append('<th onclick="DeliveryScheduleViewsF3Index.addColumn()">&nbsp;*&nbsp;</th>');
                     } else {
                         if (tp_uid) {
                             var input = $('<input type="text" name="' + n + '" value="" data-modified="0" />');
@@ -793,6 +793,24 @@
                 } else {
                     shdl.find('tr.fnet').removeClass('err-bg');
                     shdl.find('tr._1c').hide();
+                }
+            },
+            execCorr: function () {
+                var checkedRowFlags = shdl.find('input.row-flag:checked');
+                if (checkedRowFlags.length > 1) {
+                    checkedRowFlags.prop('checked', false);
+                    alert('Строк добавленных в журнал "Зачёты": ' + checkedRowFlags.length);
+                } else {
+                    alert('Ошибка. Строк добавленных в журнал "Зачёты" нет.');
+                }
+            },
+            execGroup: function () {
+                var checkedRowFlags = shdl.find('input.row-flag:checked');
+                if (checkedRowFlags.length > 1) {
+                    checkedRowFlags.prop('checked', false);
+                    alert('Строк добавленных в журнал "Группы": ' + checkedRowFlags.length);
+                } else {
+                    alert('Ошибка. Строк добавленных в журнал "Группы" нет.');
                 }
             }
         };
