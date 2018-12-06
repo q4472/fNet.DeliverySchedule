@@ -31,5 +31,13 @@ namespace DeliverySchedule.Controllers
             PartialViewResult pvr = PartialView("~/Views/F3/Index.cshtml", m);
             return pvr;
         }
+        public Object Corr()
+        {
+            Object v = "DeliverySchedule.Controllers.F3Controller.Corr()";
+            RequestPackage rqp = RequestPackage.ParseRequest(Request.InputStream, Request.ContentEncoding);
+            F3Model m = new F3Model(rqp);
+            m.Corr(rqp);
+            return v;
+        }
     }
 }

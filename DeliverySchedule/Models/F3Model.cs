@@ -12,6 +12,13 @@ namespace DeliverySchedule.Models
         public DataTable Head;
         public DataTable Table;
         public DataTable Shedule;
+        public String sSiop;
+        public String sDpo;
+        public String sSiso;
+        public String sDps;
+        public String sSizs;
+        public String sDozp;
+
         public F3Model(RequestPackage rqp)
         {
             SessionId = rqp.SessionId;
@@ -125,6 +132,12 @@ namespace DeliverySchedule.Models
             // обновить данные для страницы
             SpecGet();
         }
+        public void Corr(RequestPackage rqp)
+        {
+            rqp.AddSessionIdToParameters();
+            rqp.Command = "[Pharm-Sib].[dbo].[спецификации_зачёт_журнал_add]";
+            ResponsePackage rsp = rqp.GetResponse("http://127.0.0.1:11012");
+        }
         private void SpecGet()
         {
             RequestPackage rqp = new RequestPackage()
@@ -146,6 +159,47 @@ namespace DeliverySchedule.Models
                     if (rsp.Data.Tables.Count > 2)
                     {
                         Shedule = rsp.Data.Tables[2];
+                    }
+                }
+            }
+            if (Head != null && Head.Rows.Count > 0)
+            {
+                Object o = Head.Rows[0]["дата_первой_поставки"];
+
+                Object oSiop = Head.Rows[0]["срок_исполнения_отгрузка_покупатель"];
+                
+                DateTime? dDpo = null;
+                if (oSiop != DBNull.Value)
+                {
+                    sSiop = ((Int32)oSiop).ToString();
+                    if (o != DBNull.Value)
+                    {
+                        dDpo = ((DateTime)o).AddDays(-(Int32)oSiop);
+                        sDpo = ((DateTime)dDpo).ToString("dd.MM.yy");
+                    }
+                }
+
+                Object oSiso = Head.Rows[0]["срок_исполнения_склад_отгрузка"];
+                DateTime? dDps = null;
+                if (oSiso != DBNull.Value)
+                {
+                    sSiso = ((Int32)oSiso).ToString();
+                    if (dDpo != null)
+                    {
+                        dDps = ((DateTime)dDpo).AddDays(-(Int32)oSiso);
+                        sDps = ((DateTime)dDps).ToString("dd.MM.yy");
+                    }
+                }
+
+                Object oSizs = Head.Rows[0]["срок_исполнения_заявка_склад"];
+                DateTime? dDozp = null;
+                if (oSizs != DBNull.Value)
+                {
+                    sSizs = ((Int32)oSizs).ToString();
+                    if (dDps != null)
+                    {
+                        dDozp = ((DateTime)dDps).AddDays(-(Int32)oSizs);
+                        sDozp = ((DateTime)dDozp).ToString("dd.MM.yy");
                     }
                 }
             }

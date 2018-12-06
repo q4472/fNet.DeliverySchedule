@@ -85,50 +85,6 @@
         <input type="hidden" name="SpecId" value="@Model.SpecId" />
         if (Model.Head != null && Model.Head.Rows.Count > 0)
         {
-            Object o = Model.Head.Rows[0]["дата_первой_поставки"];
-
-            Object oSiop = Model.Head.Rows[0]["срок_исполнения_отгрузка_покупатель"];
-            String sSiop = String.Empty;
-            DateTime? dDpo = null;
-            String sDpo = String.Empty;
-            if (oSiop != DBNull.Value)
-            {
-                sSiop = ((Int32)oSiop).ToString();
-                if (o != DBNull.Value)
-                {
-                    dDpo = ((DateTime)o).AddDays(-(Int32)oSiop);
-                    sDpo = ((DateTime)dDpo).ToString("dd.MM.yy");
-                }
-            }
-
-            Object oSiso = Model.Head.Rows[0]["срок_исполнения_склад_отгрузка"];
-            String sSiso = String.Empty;
-            DateTime? dDps = null;
-            String sDps = String.Empty;
-            if (oSiso != DBNull.Value)
-            {
-                sSiso = ((Int32)oSiso).ToString();
-                if (dDpo != null)
-                {
-                    dDps = ((DateTime)dDpo).AddDays(-(Int32)oSiso);
-                    sDps = ((DateTime)dDps).ToString("dd.MM.yy");
-                }
-            }
-
-            Object oSizs = Model.Head.Rows[0]["срок_исполнения_заявка_склад"];
-            String sSizs = String.Empty;
-            DateTime? dDozp = null;
-            String sDozp = String.Empty;
-            if (oSizs != DBNull.Value)
-            {
-                sSizs = ((Int32)oSizs).ToString();
-                if (dDps != null)
-                {
-                    dDozp = ((DateTime)dDps).AddDays(-(Int32)oSizs);
-                    sDozp = ((DateTime)dDozp).ToString("dd.MM.yy");
-                }
-            }
-
             <div style="margin: 4px">Идентификатор спецификации: @Model.SpecId</div>
             <table style="margin-left: 4px; margin-top: 4px; background-color: #cfc">
                 <tr>
@@ -190,23 +146,23 @@
                                         <tr>
                                             <td style="text-align: right; padding-right: 4px">Срок от отгрузки до получения покупателем:</td>
                                             <td>
-                                                @sSiop
+                                                @Model.sSiop
                                             </td>
-                                            <td>&nbsp;=> Дата первой отгрузки: <span>@sDpo</span></td>
+                                            <td>&nbsp;=> Дата первой отгрузки: <span>@Model.sDpo</span></td>
                                         </tr>
                                         <tr>
                                             <td style="text-align: right; padding-right: 4px">Срок от поставки к нам до отгрузки покупателю:</td>
                                             <td>
-                                                @sSiso
+                                                @Model.sSiso
                                             </td>
-                                            <td>&nbsp;=> К нам на склад первая партия должна поступить: <span>@sDps</span></td>
+                                            <td>&nbsp;=> К нам на склад первая партия должна поступить: <span>@Model.sDps</span></td>
                                         </tr>
                                         <tr>
                                             <td style="text-align: right; padding-right: 4px">Срок от заявки на покупку до поставки к нам:</td>
                                             <td>
-                                                @sSizs
+                                                @Model.sSizs
                                             </td>
-                                            <td>&nbsp;=> Дата отправки заявки поставщику на первую партию: <span>@sDozp</span></td>
+                                            <td>&nbsp;=> Дата отправки заявки поставщику на первую партию: <span>@Model.sDozp</span></td>
                                         </tr>
                                         <tr>
                                             <td style="text-align: right; padding-right: 4px">Дата окончания поставок: </td>
@@ -397,10 +353,11 @@
                             </tr>
                             @foreach (DataRowView dr in tableView)
                             {
+                                String row_id = (dr["id"] == DBNull.Value) ? "" : dr["id"].ToString();
                                 String tp_id = (dr["tp_id"] == DBNull.Value) ? "" : ((Guid)dr["tp_id"]).ToString();
                                 if (tp_id != "")
                                 {
-                                    <tr data-tp_uid="@tp_id" class="fnet">
+                                    <tr data-row_id="@row_id" data-tp_uid="@tp_id" class="fnet">
                                         <td style="text-align: right">@dr["номер_строки"]</td>
                                         <td>@dr["descr"]</td>
                                         <td><input type="checkbox" class="row-flag" /></td>
@@ -458,12 +415,12 @@
                                 }
                                 else
                                 {
-                                    <tr data-tp_uid="" class="_1c" style="display: none">
+                                    <tr data-row_id="@row_id" data-tp_uid="" class="_1c" style="display: none">
                                         <td>1c</td>
                                         <td>@dr["descr"]</td>
                                         <td><input type="checkbox" class="row-flag" /></td>
                                         <td colspan="3" style="text-align: right">Количество по накладным:</td>
-                                        <td style="text-align: right">@(((Decimal)dr["количество"]).ToString("n0"))</td>
+                                        <td class="row-qty" style="text-align: right">@(((Decimal)dr["количество"]).ToString("n0"))</td>
                                     </tr>
                                 }
                             }
@@ -798,8 +755,34 @@
             execCorr: function () {
                 var checkedRowFlags = shdl.find('input.row-flag:checked');
                 if (checkedRowFlags.length > 1) {
+                    // todo добавить проверку - мин 1 строка из спец и мин 1 из 1с
+                    // если строк > 2 - предупреждение "делать зачёты по одному"
                     checkedRowFlags.prop('checked', false);
-                    alert('Строк добавленных в журнал "Зачёты": ' + checkedRowFlags.length);
+                    var rqp = {
+                        SessionId: Nskd.Server.SessionId,
+                        Command: 'DeliverySchedule.F3.Corr',
+                        Parameters: [{ Name: 'spec_id', Value: specId }]
+                    };
+                    var row_ids = '';
+                    checkedRowFlags.each(function () {
+                        var tr = $(this).closest('tr');
+                        var row_id = tr.attr('data-row_id');
+                        var row_qty = tr.find('td.row-qty').text();
+                        row_ids += row_id + ',' + row_qty + ';'
+                    });
+                    rqp.Parameters.push({ Name: 'row_ids', Value: row_ids.substr(0, row_ids.length - 1) });
+                    //alert(Nskd.Json.toString(rqp));
+                    Nskd.Http.post({
+                        url: '/deliveryschedule/f3/corr',
+                        rqp: rqp,
+                        done: function (data) {
+                            //alert(data);
+                            alert('Строк добавленных в журнал "Зачёты": ' + checkedRowFlags.length);
+                        },
+                        fail: function () {
+                            alert('Что-то не так.');
+                        }
+                    });
                 } else {
                     alert('Ошибка. Строк добавленных в журнал "Зачёты" нет.');
                 }
