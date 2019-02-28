@@ -698,7 +698,8 @@
                         input.datepicker({
                             dateFormat: 'dd.mm.y',
                             firstDay: 1,
-                            defaultDate: 0
+                            defaultDate: '0',
+                            minDate: '0'
                         });
                         input.change(function () {
                             this.setAttribute('data-modified', '1');
