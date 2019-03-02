@@ -95,7 +95,7 @@ namespace DeliverySchedule.Models
                             new RequestParameter { Name = "код_спецификации", Value = SpecId },
                             new RequestParameter { Name = "tp_id", Value = tpId },
                             new RequestParameter { Name = "дата", Value = date },
-                            new RequestParameter { Name = "количество", Value = value },
+                            new RequestParameter { Name = "количество", Value = ToDecimalOrNull(value) },
                             new RequestParameter { Name = "тип_формирования", Value = ftype }
                         }
                     };
@@ -203,6 +203,36 @@ namespace DeliverySchedule.Models
                     }
                 }
             }
+        }
+        private static Decimal? ToDecimalOrNull(Object value)
+        {
+            Decimal? d = null;
+            var ic = System.Globalization.CultureInfo.InvariantCulture;
+            if (value.GetType() == typeof(String))
+            {
+                String temp = value as String;
+                if (!String.IsNullOrWhiteSpace(temp))
+                {
+                    // убрать всё лишнее
+                    temp = (new Regex(@"[^\d\.\,\+\-eE]")).Replace(temp, "");
+                    if (temp.IndexOf('.') < 0)
+                    {
+                        // точки нет - значит запятая, если она есть, это разделитель дробной части и её надо заменить на точку
+                        value = temp.Replace(',', '.');
+                    }
+                    else
+                    {
+                        // точка уже есть - значит запятые это разделители груп и их надо убрать
+                        value = temp.Replace(",", "");
+                    }
+                }
+            }
+            try
+            {
+                d = System.Convert.ToDecimal(value, ic);
+            }
+            catch (Exception) { }
+            return d;
         }
     }
 }
