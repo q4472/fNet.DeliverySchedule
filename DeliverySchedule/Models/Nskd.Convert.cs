@@ -57,6 +57,36 @@ namespace Nskd
             }
             return result;
         }
+        public static Decimal? ToDecimalOrNull(Object value)
+        {
+            Decimal? d = null;
+            var ic = System.Globalization.CultureInfo.InvariantCulture;
+            if (value.GetType() == typeof(String))
+            {
+                String temp = value as String;
+                if (!String.IsNullOrWhiteSpace(temp))
+                {
+                    // убрать всё лишнее
+                    temp = (new Regex(@"[^\d\.\,\+\-eE]")).Replace(temp, "");
+                    if (temp.IndexOf('.') < 0)
+                    {
+                        // точки нет - значит запятая, если она есть, это разделитель дробной части и её надо заменить на точку
+                        value = temp.Replace(',', '.');
+                    }
+                    else
+                    {
+                        // точка уже есть - значит запятые это разделители груп и их надо убрать
+                        value = temp.Replace(",", "");
+                    }
+                }
+            }
+            try
+            {
+                d = System.Convert.ToDecimal(value, ic);
+            }
+            catch (Exception) { }
+            return d;
+        }
         public static Double? ToDoubleOrNull(Object obj)
         {
             Double? result = null;
@@ -182,18 +212,18 @@ namespace Nskd
             return result;
         }
         /// <summary>
-        /// Convert seconds from base date and base date to DateTime 
+        /// Add seconds to base date 
         /// </summary>
-        /// <param name="obj">seconds from base date</param>
+        /// <param name="seconds">seconds from base date</param>
         /// <param name="baseDate">base date</param>
         /// <returns></returns>
-        public static DateTime? ToDateTimeOrNull(Object obj, DateTime baseDate)
+        public static DateTime? ToDateTimeOrNull(Object seconds, DateTime baseDate)
         {
             DateTime? result = null;
-            Double? seconds = ToDoubleOrNull(obj);
-            if (seconds != null)
+            Double? ss = ToDoubleOrNull(seconds);
+            if (ss != null)
             {
-                result = (baseDate).AddSeconds((Double)seconds);
+                result = (baseDate).AddSeconds((Double)ss);
             }
             return result;
         }
