@@ -81,7 +81,7 @@ namespace DeliverySchedule.Models
             {
                 String name = p.Name;
                 String value = p.Value as String;
-                if (name.Length == 48 && value != null && (new Regex(@"_[0-9a-f-]{36}_\d\d\.\d\d\.\d\d \d")).IsMatch(name))
+                if (name.Length >= 48 && value != null && (new Regex(@"_[0-9a-f-]{36}_\d\d\.\d\d\.\d\d \d")).IsMatch(name))
                 {
                     Guid.TryParse(name.Substring(1, 36), out Guid tpId);
                     DateTime.TryParse(name.Substring(38, 8), out DateTime date);
@@ -306,14 +306,17 @@ namespace DeliverySchedule.Models
             for (int ri = 0; ri < График.RowsCount; ri++)
             {
                 var items = График[ri];
-                String colName = $"{items.дата} {items.тип_формирования}";
-                if (!dt.Columns.Contains(colName))
+                String colNameQty = $"{items.дата} {items.тип_формирования} q";
+                String colNameExp = $"{items.дата} {items.тип_формирования} e";
+                if (!dt.Columns.Contains(colNameQty))
                 {
-                    dt.Columns.Add(colName, typeof(String));
+                    dt.Columns.Add(colNameQty, typeof(String));
+                    dt.Columns.Add(colNameExp, typeof(String));
                 }
                 DataRow dr = dt.NewRow();
                 dr["tp_id"] = items.tp_id;
-                dr[colName] = items.количество;
+                dr[colNameQty] = items.количество;
+                dr[colNameExp] = items.срок_годности;
                 dt.Rows.Add(dr);
             }
 

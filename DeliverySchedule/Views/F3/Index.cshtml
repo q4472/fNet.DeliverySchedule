@@ -314,7 +314,7 @@
                                 <th><span>Остаток по</span><br /><span>заявкам</span></th>
                                 @if (Model.Shedule != null && Model.Shedule.Columns.Count > 1)
                                 {
-                                    for (Int32 ci = 1; ci < Model.Shedule.Columns.Count; ci++)
+                                    for (Int32 ci = 1; ci < Model.Shedule.Columns.Count; ci += 2)
                                     {
                                         DataColumn dc = Model.Shedule.Columns[ci];
                                         String cn = String.Empty;
@@ -327,7 +327,7 @@
                                                 ct = dc.ColumnName.Substring(9, 1);
                                             }
                                         }
-                                        <th>
+                                        <th colspan="2">
                                             @if (ct == "0")
                                             {
                                                 <span>Поставка по</span><br />
@@ -352,7 +352,8 @@
                                                    name="@dc.ColumnName"
                                                    value="@cn"
                                                    data-modified="0"
-                                                   class="date-selector" />
+                                                   class="date-selector" /><br />
+                                            <span>Кол-во</span><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><input type="checkbox" />
                                         </th>
                                     }
                                 }
@@ -384,7 +385,7 @@
                                         <td class="todo" style="text-align: right"></td>
                                         @if (Model.Shedule != null && Model.Shedule.Columns.Count > 1)
                                         {
-                                            for (Int32 ci = 1; ci < Model.Shedule.Columns.Count; ci++)
+                                            for (Int32 ci = 1; ci < Model.Shedule.Columns.Count; ci += 2)
                                             {
                                                 DataColumn dc = Model.Shedule.Columns[ci];
                                                 String cn = String.Empty;
@@ -397,20 +398,28 @@
                                                         ct = dc.ColumnName.Substring(9, 1);
                                                     }
                                                 }
-                                                String v = String.Empty;
+                                                String q = String.Empty;
+                                                String e = String.Empty;
                                                 foreach (DataRow sdr in Model.Shedule.Rows)
                                                 {
                                                     if ((String)sdr["tp_id"] == tp_id &&
                                                         sdr[ci] != DBNull.Value)
                                                     {
-                                                        v = (String)sdr[ci];
+                                                        q = (String)sdr[ci];
+                                                        e = (String)sdr[ci + 1];
                                                         break;
                                                     }
                                                 }
                                                 <td>
                                                     <input type="text"
                                                            name="@dc.ColumnName"
-                                                           value="@v"
+                                                           value="@q"
+                                                           data-modified="0" />
+                                                </td>
+                                                <td>
+                                                    <input type="text"
+                                                           name="@Model.Shedule.Columns[ci + 1].ColumnName"
+                                                           value="@e"
                                                            data-modified="0" />
                                                 </td>
                                             }
