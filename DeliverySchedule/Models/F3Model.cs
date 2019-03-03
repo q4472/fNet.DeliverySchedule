@@ -18,6 +18,7 @@ namespace DeliverySchedule.Models
         public String sDps;
         public String sSizs;
         public String sDozp;
+        public СпецификацииТаблицаГрафик График;
 
         public F3Model(RequestPackage rqp)
         {
@@ -80,11 +81,11 @@ namespace DeliverySchedule.Models
             {
                 String name = p.Name;
                 String value = p.Value as String;
-                if (name.Length == 50 && value != null && (new Regex(@"_[0-9a-f-]{36}_\d\d\d\d\-\d\d\-\d\d \d")).IsMatch(name))
+                if (name.Length == 48 && value != null && (new Regex(@"_[0-9a-f-]{36}_\d\d\.\d\d\.\d\d \d")).IsMatch(name))
                 {
                     Guid.TryParse(name.Substring(1, 36), out Guid tpId);
-                    DateTime.TryParse(name.Substring(38, 10), out DateTime date);
-                    Int32.TryParse(name.Substring(49, 1), out Int32 ftype);
+                    DateTime.TryParse(name.Substring(38, 8), out DateTime date);
+                    Int32.TryParse(name.Substring(47, 1), out Int32 ftype);
                     RequestPackage rqp1 = new RequestPackage
                     {
                         SessionId = rqp.SessionId,
@@ -158,7 +159,9 @@ namespace DeliverySchedule.Models
                     Table = rsp.Data.Tables[1];
                     if (rsp.Data.Tables.Count > 2)
                     {
-                        Shedule = rsp.Data.Tables[2];
+                        //Shedule = rsp.Data.Tables[2];
+                        График = new СпецификацииТаблицаГрафик(rsp.Data.Tables[2]);
+                        Shedule = CreateSheduleTable();
                     }
                 }
             }
@@ -203,6 +206,118 @@ namespace DeliverySchedule.Models
                     }
                 }
             }
+        }
+
+        public class СпецификацииТаблицаГрафик
+        {
+            private DataTable dt;
+            public Int32 RowsCount { get => (dt == null) ? 0 : dt.Rows.Count; }
+            public class ItemArray
+            {
+                public String id;
+                public String код_спецификации;
+                public String дата;
+                public String количество;
+                public String tp_id;
+                public String тип_формирования;
+                public String срок_годности;
+
+                public String this[String fieldName]
+                {
+                    get
+                    {
+                        String s = null;
+                        var field = typeof(ItemArray).GetField(fieldName);
+                        if (field != null)
+                        {
+                            s = (String)field.GetValue(this);
+                        }
+                        return s;
+                    }
+                }
+            }
+            public ItemArray this[Int32 index]
+            {
+                get
+                {
+                    ItemArray items = null;
+                    if (dt != null && index >= 0 && index < dt.Rows.Count)
+                    {
+                        DataRow dr = dt.Rows[index];
+                        items = new ItemArray
+                        {
+                            id = ConvertToString(dr["id"]),
+                            код_спецификации = ConvertToString(dr["код_спецификации"]),
+                            дата = ConvertToString(dr["дата"]),
+                            количество = ConvertToString(dr["количество"]),
+                            tp_id = ConvertToString(dr["tp_id"]),
+                            тип_формирования = ConvertToString(dr["тип_формирования"]),
+                            срок_годности = ConvertToString(dr["срок_годности"])
+                        };
+                        if (items.количество.Length > 4) { items.количество = items.количество.Substring(0, items.количество.Length - 4); }
+                        if (items.срок_годности.Length == 8) { items.срок_годности = items.срок_годности.Substring(3, 5); }
+                    }
+                    return items;
+                }
+            }
+            public СпецификацииТаблицаГрафик(DataTable dt)
+            {
+                this.dt = dt;
+            }
+            private static String ConvertToString(Object v)
+            {
+                String s = String.Empty;
+                if (v != null && v != DBNull.Value)
+                {
+                    String tfn = v.GetType().FullName;
+                    switch (tfn)
+                    {
+                        case "System.Guid":
+                            s = ((Guid)v).ToString();
+                            break;
+                        case "System.Int32":
+                            s = ((Int32)v).ToString();
+                            break;
+                        case "System.Boolean":
+                            s = ((Boolean)v).ToString();
+                            break;
+                        case "System.String":
+                            s = (String)v;
+                            break;
+                        case "System.Decimal":
+                            s = ((Decimal)v).ToString("n3");
+                            break;
+                        case "System.DateTime":
+                            s = ((DateTime)v).ToString("dd.MM.yy");
+                            break;
+                        default:
+                            s = "FNet.Supply.Models.F0Model.ConvertToString() result: " + tfn;
+                            break;
+                    }
+                }
+                return s;
+            }
+        }
+        private DataTable CreateSheduleTable()
+        {
+            DataTable dt = new DataTable();
+            dt.Columns.Add("tp_id", typeof(String));
+
+            for (int ri = 0; ri < График.RowsCount; ri++)
+            {
+                var items = График[ri];
+                String colName = $"{items.дата} {items.тип_формирования}";
+                if (!dt.Columns.Contains(colName))
+                {
+                    dt.Columns.Add(colName, typeof(String));
+                }
+                DataRow dr = dt.NewRow();
+                dr["tp_id"] = items.tp_id;
+                dr[colName] = items.количество;
+                dt.Rows.Add(dr);
+            }
+
+            return dt;
         }
     }
 }

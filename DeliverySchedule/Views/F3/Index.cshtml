@@ -257,6 +257,12 @@
                         </table>
                     </td>
                     <td>
+                        <input type="button" value="Выделить все строки" onclick="DeliveryScheduleViewsF3Index.selectAllRows();" />
+                        <br />
+                        <br />
+                        <input type="button" value="Снять выделение строк" onclick="DeliveryScheduleViewsF3Index.unselectAllRows();" />
+                        <br />
+                        <br />
                         <span style="font-weight: bold; font-size: 12pt">Действия для выделенных строк</span>
                         <br />
                         <br />
@@ -264,6 +270,9 @@
                         <br />
                         <br />
                         <input type="button" value="Выполнить зачёт" onclick="DeliveryScheduleViewsF3Index.execCorr();" />
+                        <br />
+                        <br />
+                        <input type="button" value="Установить срок годности" onclick="DeliveryScheduleViewsF3Index.setSG();" />
                     </td>
                 </tr>
             </table>
@@ -303,21 +312,19 @@
                                 <th>О -> П</th>
                                 <th>Кол-во</th>
                                 <th><span>Остаток по</span><br /><span>заявкам</span></th>
-                                @if (Model.Shedule != null && Model.Shedule.Columns.Count > 3)
+                                @if (Model.Shedule != null && Model.Shedule.Columns.Count > 1)
                                 {
-                                    for (Int32 ci = 3; ci < Model.Shedule.Columns.Count; ci++)
+                                    for (Int32 ci = 1; ci < Model.Shedule.Columns.Count; ci++)
                                     {
                                         DataColumn dc = Model.Shedule.Columns[ci];
                                         String cn = String.Empty;
                                         String ct = String.Empty;
-                                        if (dc.ColumnName.Length >= 10)
+                                        if (dc.ColumnName.Length >= 8)
                                         {
-                                            cn = dc.ColumnName.Substring(8, 2)
-                                                + "." + dc.ColumnName.Substring(5, 2)
-                                                + "." + dc.ColumnName.Substring(2, 2);
-                                            if (dc.ColumnName.Length >= 12)
+                                            cn = dc.ColumnName.Substring(0, 8);
+                                            if (dc.ColumnName.Length >= 10)
                                             {
-                                                ct = dc.ColumnName.Substring(11, 1);
+                                                ct = dc.ColumnName.Substring(9, 1);
                                             }
                                         }
                                         <th>
@@ -375,39 +382,37 @@
                                         </td>
                                         <td class="row-qty" style="text-align: right">@(((Decimal)dr["количество"]).ToString("n0"))</td>
                                         <td class="todo" style="text-align: right"></td>
-                                        @if (Model.Shedule != null && Model.Shedule.Rows.Count > 0)
+                                        @if (Model.Shedule != null && Model.Shedule.Columns.Count > 1)
                                         {
-                                            foreach (DataRow sdr in Model.Shedule.Rows)
+                                            for (Int32 ci = 1; ci < Model.Shedule.Columns.Count; ci++)
                                             {
-                                                if (((Guid)sdr["tp_id"]).ToString() == tp_id)
+                                                DataColumn dc = Model.Shedule.Columns[ci];
+                                                String cn = String.Empty;
+                                                String ct = String.Empty;
+                                                if (dc.ColumnName.Length >= 8)
                                                 {
-                                                    if (Model.Shedule.Columns.Count > 3)
+                                                    cn = dc.ColumnName.Substring(0, 8);
+                                                    if (dc.ColumnName.Length >= 10)
                                                     {
-                                                        for (Int32 ci = 3; ci < Model.Shedule.Columns.Count; ci++)
-                                                        {
-                                                            DataColumn dc = Model.Shedule.Columns[ci];
-                                                            String cn = dc.ColumnName;
-                                                            String ct = String.Empty;
-                                                            if (cn.Length >= 10)
-                                                            {
-                                                                cn = cn.Substring(8, 2)
-                                                                    + "." + cn.Substring(5, 2)
-                                                                    + "." + cn.Substring(2, 2);
-                                                                if (dc.ColumnName.Length >= 12)
-                                                                {
-                                                                    ct = dc.ColumnName.Substring(11, 1);
-                                                                }
-                                                            }
-                                                            <td>
-                                                                <input type="text"
-                                                                       name="@dc.ColumnName"
-                                                                       value="@sdr[ci]"
-                                                                       data-modified="0" />
-                                                            </td>
-                                                        }
+                                                        ct = dc.ColumnName.Substring(9, 1);
                                                     }
-                                                    break;
                                                 }
+                                                String v = String.Empty;
+                                                foreach (DataRow sdr in Model.Shedule.Rows)
+                                                {
+                                                    if ((String)sdr["tp_id"] == tp_id &&
+                                                        sdr[ci] != DBNull.Value)
+                                                    {
+                                                        v = (String)sdr[ci];
+                                                        break;
+                                                    }
+                                                }
+                                                <td>
+                                                    <input type="text"
+                                                           name="@dc.ColumnName"
+                                                           value="@v"
+                                                           data-modified="0" />
+                                                </td>
                                             }
                                         }
                                         <td></td>
@@ -668,7 +673,7 @@
                         name += e.name;
                         rqp.Parameters.push({ Name: name, Value: e.value });
                     });
-                    //alert(Nskd.Json.toString(rqp)); return;
+                    //console.log(rqp); return;
                     Nskd.Http.post({
                         url: '/DeliverySchedule/F3/Save2',
                         rqp: rqp,
@@ -796,6 +801,15 @@
                 } else {
                     alert('Ошибка. Строк добавленных в журнал "Группы" нет.');
                 }
+            },
+            selectAllRows: function () {
+                alert('selectAllRows');
+            },
+            unselectAllRows: function () {
+                alert('unselectAllRows');
+            },
+            setSG: function () {
+                alert('setSG');
             }
         };
     })();
