@@ -80,26 +80,50 @@ namespace DeliverySchedule.Models
             foreach (RequestParameter p in rqp.Parameters)
             {
                 String name = p.Name;
-                String value = p.Value as String;
-                if (name.Length >= 48 && value != null && (new Regex(@"_[0-9a-f-]{36}_\d\d\.\d\d\.\d\d \d")).IsMatch(name))
+                if (!String.IsNullOrWhiteSpace(name)
+                    && name.Length == 50
+                    && (new Regex(@"_[0-9a-f-]{36}_\d\d\.\d\d\.\d\d \d [qe]")).IsMatch(name))
                 {
                     Guid.TryParse(name.Substring(1, 36), out Guid tpId);
                     DateTime.TryParse(name.Substring(38, 8), out DateTime date);
                     Int32.TryParse(name.Substring(47, 1), out Int32 ftype);
-                    RequestPackage rqp1 = new RequestPackage
+                    String field = name.Substring(49, 1);
+                    String value = p.Value as String;
+                    RequestPackage rqp1;
+                    if (field == "q")
                     {
-                        SessionId = rqp.SessionId,
-                        Command = "dbo.[спецификации_график_изменить_количество]",
-                        Parameters = new RequestParameter[]
+                        rqp1 = new RequestPackage
                         {
-                            new RequestParameter { Name = "session_id", Value = rqp.SessionId },
-                            new RequestParameter { Name = "код_спецификации", Value = SpecId },
-                            new RequestParameter { Name = "tp_id", Value = tpId },
-                            new RequestParameter { Name = "дата", Value = date },
-                            new RequestParameter { Name = "количество", Value = Nskd.Convert.ToDecimalOrNull(value) },
-                            new RequestParameter { Name = "тип_формирования", Value = ftype }
-                        }
-                    };
+                            SessionId = rqp.SessionId,
+                            Command = "dbo.[спецификации_график_изменить_количество]",
+                            Parameters = new RequestParameter[]
+                            {
+                                new RequestParameter { Name = "session_id", Value = rqp.SessionId },
+                                new RequestParameter { Name = "код_спецификации", Value = SpecId },
+                                new RequestParameter { Name = "дата", Value = date },
+                                new RequestParameter { Name = "количество", Value = Nskd.Convert.ToDecimalOrNull(value) },
+                                new RequestParameter { Name = "tp_id", Value = tpId },
+                                new RequestParameter { Name = "тип_формирования", Value = ftype }
+                            }
+                        };
+                    }
+                    else // field == "e"
+                    {
+                        value = (value.Length == 5) ? $"20{value.Substring(3, 2)}-{value.Substring(0, 2)}-01" : null;
+                        rqp1 = new RequestPackage
+                        {
+                            SessionId = rqp.SessionId,
+                            Command = "dbo.[спецификации_график_изменить_срок_годности]",
+                            Parameters = new RequestParameter[]
+                            {
+                                new RequestParameter { Name = "session_id", Value = rqp.SessionId },
+                                new RequestParameter { Name = "tp_id", Value = tpId },
+                                new RequestParameter { Name = "дата", Value = date },
+                                new RequestParameter { Name = "тип_формирования", Value = ftype },
+                                new RequestParameter { Name = "срок_годности", Value = value }
+                            }
+                        };
+                    }
                     rqp1.GetResponse("http://127.0.0.1:11012/");
                 }
             }
@@ -170,7 +194,7 @@ namespace DeliverySchedule.Models
                 Object o = Head.Rows[0]["дата_первой_поставки"];
 
                 Object oSiop = Head.Rows[0]["срок_исполнения_отгрузка_покупатель"];
-                
+
                 DateTime? dDpo = null;
                 if (oSiop != DBNull.Value)
                 {

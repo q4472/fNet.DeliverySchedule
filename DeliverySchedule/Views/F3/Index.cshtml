@@ -353,7 +353,9 @@
                                                    value="@cn"
                                                    data-modified="0"
                                                    class="date-selector" /><br />
-                                            <span>Кол-во</span><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><input type="checkbox" />
+                                            <span onclick="alert('Перенести из остатков');">Кол-во</span>
+                                            <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                            <span onclick="alert('Установить срок годности для незаполненных полей');">Срок</span>
                                         </th>
                                     }
                                 }
@@ -387,17 +389,8 @@
                                         {
                                             for (Int32 ci = 1; ci < Model.Shedule.Columns.Count; ci += 2)
                                             {
-                                                DataColumn dc = Model.Shedule.Columns[ci];
-                                                String cn = String.Empty;
-                                                String ct = String.Empty;
-                                                if (dc.ColumnName.Length >= 8)
-                                                {
-                                                    cn = dc.ColumnName.Substring(0, 8);
-                                                    if (dc.ColumnName.Length >= 10)
-                                                    {
-                                                        ct = dc.ColumnName.Substring(9, 1);
-                                                    }
-                                                }
+                                                DataColumn dc1 = Model.Shedule.Columns[ci];
+                                                DataColumn dc2 = Model.Shedule.Columns[ci + 1];
                                                 String q = String.Empty;
                                                 String e = String.Empty;
                                                 foreach (DataRow sdr in Model.Shedule.Rows)
@@ -410,15 +403,15 @@
                                                         break;
                                                     }
                                                 }
-                                                <td>
+                                                <td class="q">
                                                     <input type="text"
-                                                           name="@dc.ColumnName"
+                                                           name="@dc1.ColumnName"
                                                            value="@q"
                                                            data-modified="0" />
                                                 </td>
-                                                <td>
+                                                <td class="e">
                                                     <input type="text"
-                                                           name="@Model.Shedule.Columns[ci + 1].ColumnName"
+                                                           name="@dc2.ColumnName"
                                                            value="@e"
                                                            data-modified="0" />
                                                 </td>
@@ -492,14 +485,12 @@
         }
         function calcRowToDo(tr) {
             var td = tr.find('td.todo');
-            var inps = tr.find('input[type="text"]');
             var s = parseInt(tr.find('td.row-qty').text().replace(/[^\d-]/g, ''));
+            var inps = tr.find('td.q input[type="text"]');
             inps.each(function (i, e) {
-                if (i > 2) {
-                    var v = parseInt($(e).val().replace(/[^\d-]/g, ''));
-                    if (isNaN(v)) v = 0;
-                    s -= v;
-                }
+                var v = parseInt($(e).val().replace(/[^\d-]/g, ''));
+                if (isNaN(v)) v = 0;
+                s -= v;
             });
             if (s < 0) {
                 td.addClass('err-color');
@@ -603,7 +594,6 @@
 
         parsInputs.keyup(function () {
             this.setAttribute('data-modified', '1');
-            checkForm();
         });
         parsInputs.change(function () {
             this.setAttribute('data-modified', '1');
@@ -611,23 +601,24 @@
         });
         sheduleInputs.keyup(function () {
             this.setAttribute('data-modified', '1');
-            calcToDo(this);
-            checkForm();
         });
         sheduleInputs.change(function () {
             this.setAttribute('data-modified', '1');
-            if (!$(this).hasClass('date-selector')) {
+            if ($(this).parent().hasClass('q')) {
                 Nskd.Validator.nNorm(this, 0);
-                calcToDo(this);
             }
+            calcToDo(this);
             checkForm();
         });
         dateSelectors.datepicker({
             dateFormat: 'dd.mm.y',
-            firstDay: 1,
-            defaultDate: 0
+            firstDay: 1
         });
         dateSelectors.change(checkForm);
+        mainDiv.find('td.e input').datepicker({
+            dateFormat: 'mm.y',
+            firstDay: 1
+        });
 
         // При загрузке с сервера сразу проверяем.
         todoTds.each(function (i, e) {
