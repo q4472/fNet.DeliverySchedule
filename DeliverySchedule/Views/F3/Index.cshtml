@@ -625,8 +625,8 @@
             firstDay: 1
         });
         dateSelectors.change(checkForm);
-        mainDiv.find('td.e input').datepicker({ dateFormat: 'mm.y', firstDay: 1 });
-        modalDiv.find('div.body2 input[type="text"]').datepicker({ dateFormat: 'mm.y', firstDay: 1 });
+        mainDiv.find('td.e input').datepicker({ dateFormat: 'mm.y', firstDay: 1, changeYear: true });
+        modalDiv.find('div.body2 input[type="text"]').datepicker({ dateFormat: 'mm.y', firstDay: 1, changeYear: true });
 
         // При загрузке с сервера сразу проверяем.
         todoTds.each(function (i, e) {
