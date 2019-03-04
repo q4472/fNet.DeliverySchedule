@@ -257,12 +257,14 @@
                         </table>
                     </td>
                     <td>
+                        <!--
                         <input type="button" value="Выделить все строки" onclick="DeliveryScheduleViewsF3Index.selectAllRows();" />
                         <br />
                         <br />
                         <input type="button" value="Снять выделение строк" onclick="DeliveryScheduleViewsF3Index.unselectAllRows();" />
                         <br />
                         <br />
+                        -->
                         <span style="font-weight: bold; font-size: 12pt">Действия для выделенных строк</span>
                         <br />
                         <br />
@@ -270,9 +272,11 @@
                         <br />
                         <br />
                         <input type="button" value="Выполнить зачёт" onclick="DeliveryScheduleViewsF3Index.execCorr();" />
+                        <!--
                         <br />
                         <br />
-                        <input type="button" value="Установить срок годности" onclick="DeliveryScheduleViewsF3Index.setSG();" />
+                        <input type="button" value="Установить срок годности" onclick="DeliveryScheduleViewsF3Index.setE();" />
+                        -->
                     </td>
                 </tr>
             </table>
@@ -355,7 +359,7 @@
                                                    class="date-selector" /><br />
                                             <span onclick="alert('Перенести из остатков');">Кол-во</span>
                                             <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                            <span onclick="alert('Установить срок годности для незаполненных полей');">Срок</span>
+                                            <span onclick="DeliveryScheduleViewsF3Index.setE();">Срок</span>
                                         </th>
                                     }
                                 }
@@ -441,54 +445,60 @@
     <div class="modal">
         <div class="content">
             <div class="header">
-                <span onclick="$(this).parent().parent().parent().hide();">&times;</span>
+                <span onclick="$(this).closest('div.modal').hide();">&times;</span>
                 <h2>&nbsp;</h2>
             </div>
-            <table>
-                <tr>
-                    <td style="text-align: right">Поставка по графику:&nbsp;</td>
-                    <td><input type="radio" name="ftype" value="0" checked="checked"></td>
-                </tr>
-                <tr>
-                    <td style="text-align: right">Поставка по заявкам:&nbsp;</td>
-                    <td><input type="radio" name="ftype" value="1"></td>
-                </tr>
-                <tr>
-                    <td style="text-align: right">Поставка по протоколу:&nbsp;</td>
-                    <td><input type="radio" name="ftype" value="2"></td>
-                </tr>
-            </table>
-            <br />
-            <div style="text-align: center">
-                <input type="button" value="OK" onclick="DeliveryScheduleViewsF3Index.ftypeSelected();" />
+            <div class="body1" style="display: none;">
+                <table>
+                    <tr>
+                        <td style="text-align: right">Поставка по графику:&nbsp;</td>
+                        <td><input type="radio" name="ftype" value="0" checked="checked"></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: right">Поставка по заявкам:&nbsp;</td>
+                        <td><input type="radio" name="ftype" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: right">Поставка по протоколу:&nbsp;</td>
+                        <td><input type="radio" name="ftype" value="2"></td>
+                    </tr>
+                </table>
+                <br />
+                <div style="text-align: center">
+                    <input type="button" value="OK" onclick="DeliveryScheduleViewsF3Index.addColumn_();" />
+                </div>
+            </div>
+            <div class="body2" style="display: none;">
+                <input type="text" /><br />
+                <input type="button" value="OK" onclick="DeliveryScheduleViewsF3Index.setE_();" />
             </div>
         </div>
     </div>
 </div>
 <script type="text/javascript">
     var DeliveryScheduleViewsF3Index = (function () {
-        var mainDiv = $('#deliveryschedule_views_f3_index');
-        var specId = mainDiv.find('input[name="SpecId"]').val();
-        var pars = mainDiv.find('table.pars');
-        var parsInputs = pars.find('input[type="text"], input[type="checkbox"]');
-        var saveButton = mainDiv.find('input[type="button"].save_button');
-        var shdl = mainDiv.find('table.shedule_rows');
-        var save2Button = mainDiv.find('input[type="button"].save2_button');
-        var sheduleInputs = shdl.find('input[type="text"]');
-        var todoTds = shdl.find('td.todo');
-        var dateSelectors = mainDiv.find('input.date-selector');
-        var modalDiv = mainDiv.find('div.modal');
+        let mainDiv = $('#deliveryschedule_views_f3_index');
+        let specId = mainDiv.find('input[name="SpecId"]').val();
+        let pars = mainDiv.find('table.pars');
+        let parsInputs = pars.find('input[type="text"], input[type="checkbox"]');
+        let saveButton = mainDiv.find('input[type="button"].save_button');
+        let shdl = mainDiv.find('table.shedule_rows');
+        let save2Button = mainDiv.find('input[type="button"].save2_button');
+        let sheduleInputs = shdl.find('input[type="text"]');
+        let todoTds = shdl.find('td.todo');
+        let dateSelectors = mainDiv.find('input.date-selector');
+        let modalDiv = mainDiv.find('div.modal');
 
         function calcToDo(e) {
-            var tr = $(e).closest('tr');
+            let tr = $(e).closest('tr');
             calcRowToDo(tr);
         }
         function calcRowToDo(tr) {
-            var td = tr.find('td.todo');
-            var s = parseInt(tr.find('td.row-qty').text().replace(/[^\d-]/g, ''));
-            var inps = tr.find('td.q input[type="text"]');
+            let td = tr.find('td.todo');
+            let s = parseInt(tr.find('td.row-qty').text().replace(/[^\d-]/g, ''));
+            let inps = tr.find('td.q input[type="text"]');
             inps.each(function (i, e) {
-                var v = parseInt($(e).val().replace(/[^\d-]/g, ''));
+                let v = parseInt($(e).val().replace(/[^\d-]/g, ''));
                 if (isNaN(v)) v = 0;
                 s -= v;
             });
@@ -504,30 +514,30 @@
             }
         }
         function checkForm() {
-            var errs = checkFormForErrors();
+            let errs = checkFormForErrors();
             saveButton.prop('disabled', errs.parsError || pars.find('input[data-modified="1"]').length == 0);
             save2Button.prop('disabled', errs.shdlError || shdl.find('input[data-modified="1"]').length == 0);
         }
         function checkFormForErrors() {
             // Проверяем шапку на ошибку в датах
-            var parsError = false;
-            var d1 = $('input[name="дата_контракта"]');
-            var d2 = $('input[name="дата_первой_поставки"]');
-            var d3 = $('input[name="дата_окончания_поставок"]');
-            var d4 = $('input[name="дата_окончания_действия_контракта"]');
+            let parsError = false;
+            let d1 = $('input[name="дата_контракта"]');
+            let d2 = $('input[name="дата_первой_поставки"]');
+            let d3 = $('input[name="дата_окончания_поставок"]');
+            let d4 = $('input[name="дата_окончания_действия_контракта"]');
             if (d2.datepicker('getDate') < d1.datepicker('getDate')) { d2.addClass('err-bg'); parsError = true; } else d2.removeClass('err-bg');
             if (d3.datepicker('getDate') < d2.datepicker('getDate')) { d3.addClass('err-bg'); parsError = true; } else d3.removeClass('err-bg');
             if (d4.datepicker('getDate') < d3.datepicker('getDate')) { d4.addClass('err-bg'); parsError = true; } else d4.removeClass('err-bg');
             // Проверяем таблицу на ошибку в датах
-            var shdlError = false;
-            var ds = shdl.find('input.date-selector');
+            let shdlError = false;
+            let ds = shdl.find('input.date-selector');
             ds.each(function (i, e) {
                 e = $(e);
-                var d = e.datepicker('getDate');
+                let d = e.datepicker('getDate');
                 if (d < d2.datepicker('getDate') || d > d3.datepicker('getDate')) { e.addClass('err-bg'); shdlError = true; } else e.removeClass('err-bg');
             });
             // Прверяем таблицу на ошибки в столбце "по заявкам"
-            var isOrd = pars.find('input[type="checkbox"][name="поставка_по_заявкам"]').prop('checked');
+            let isOrd = pars.find('input[type="checkbox"][name="поставка_по_заявкам"]').prop('checked');
             todoTds.each(function (i, e) {
                 e = $(e);
                 // 1. все ячейки должны быть пустыми при отсутствии галки "по заявкам"
@@ -548,20 +558,20 @@
             return { 'parsError': parsError, 'shdlError': shdlError };
         }
         function doFormFormat() {
-            var trs = shdl.find('tr');
+            let trs = shdl.find('tr');
             //alert(trs.length);
             // пропускаем заголовок и последнюю строку
-            for (var index = 1; index < trs.length - 1;) {
+            for (let index = 1; index < trs.length - 1;) {
                 // проверка блока
                 index = doBlock(trs, index);
             }
         }
         function currDate(format) {
-            var date = new Date();
-            var yyyy = date.getFullYear();
-            var yy = '' + (yyyy - 2000);
-            var mm = '' + (date.getMonth() + 1); if (mm.length == 1) mm = '0' + mm;
-            var dd = '' + (date.getDate()); if (dd.length == 1) dd = '0' + dd;
+            let date = new Date();
+            let yyyy = date.getFullYear();
+            let yy = '' + (yyyy - 2000);
+            let mm = '' + (date.getMonth() + 1); if (mm.length == 1) mm = '0' + mm;
+            let dd = '' + (date.getDate()); if (dd.length == 1) dd = '0' + dd;
             if (format && format == 'ru') {
                 date = (dd + '.' + mm + '.' + yy);
             } else {
@@ -570,12 +580,12 @@
             return date;
         }
         function doBlock(trs, index) {
-            var ctr = $(trs[index++]); // current row
-            var cTpUid = ctr.attr('data-tp_uid');
+            let ctr = $(trs[index++]); // current row
+            let cTpUid = ctr.attr('data-tp_uid');
             // блок должен начинаться со строки спецификации
             if (cTpUid) {
-                var ntr = $(trs[index]); //  берём следующую строку в блоке пока не двигаем индекс
-                var nTpUid = ntr.attr('data-tp_uid');
+                let ntr = $(trs[index]); //  берём следующую строку в блоке пока не двигаем индекс
+                let nTpUid = ntr.attr('data-tp_uid');
                 // она должна быть строкой из 1с (нет tp)
                 if (!nTpUid) {
                     // это строка 1с
@@ -615,10 +625,8 @@
             firstDay: 1
         });
         dateSelectors.change(checkForm);
-        mainDiv.find('td.e input').datepicker({
-            dateFormat: 'mm.y',
-            firstDay: 1
-        });
+        mainDiv.find('td.e input').datepicker({ dateFormat: 'mm.y', firstDay: 1 });
+        modalDiv.find('div.body2 input[type="text"]').datepicker({ dateFormat: 'mm.y', firstDay: 1 });
 
         // При загрузке с сервера сразу проверяем.
         todoTds.each(function (i, e) {
@@ -628,9 +636,9 @@
 
         return {
             save: function () {
-                var inputs = pars.find('input[data-modified="1"]');
+                let inputs = pars.find('input[data-modified="1"]');
                 if (inputs.length > 0) {
-                    var rqp = {
+                    let rqp = {
                         SessionId: Nskd.Server.SessionId,
                         Command: 'DeliverySchedule.F3.Save',
                         Parameters: [{ Name: "id", Value: specId }]
@@ -658,17 +666,17 @@
             },
             save2: function () {
                 save2Button.prop('disabled', true);
-                var inputs = shdl.find('input[data-modified="1"]');
+                let inputs = shdl.find('input[data-modified="1"]');
                 if (inputs.length > 0) {
-                    var rqp = {
+                    let rqp = {
                         SessionId: Nskd.Server.SessionId,
                         Command: 'DeliverySchedule.F3.Save2',
                         Parameters: [{ Name: "id", Value: specId }]
                     };
                     inputs.each(function (i, e) {
-                        var tr = $(e).closest('tr');
-                        var name = '';
-                        var tpUid = tr.attr('data-tp_uid');
+                        let tr = $(e).closest('tr');
+                        let name = '';
+                        let tpUid = tr.attr('data-tp_uid');
                         if (tpUid) { name = '_' + tpUid + '_'; }
                         name += e.name;
                         rqp.Parameters.push({ Name: name, Value: e.value });
@@ -686,20 +694,22 @@
             },
             addColumn: function () {
                 // select Ftype
+                modalDiv.find('div.body1').show();
+                modalDiv.find('div.body2').hide();
                 modalDiv.show();
             },
-            ftypeSelected: function () {
+            addColumn_: function () {
                 modalDiv.hide();
-                var t = modalDiv.find('input[name="ftype"]:checked').val();
-                var d = currDate('ru');
-                var n = currDate() + ' ' + t;
-                var trs = shdl.find('tr');
+                let t = modalDiv.find('input[name="ftype"]:checked').val();
+                let d = currDate('ru');
+                let n = currDate() + ' ' + t;
+                let trs = shdl.find('tr');
                 trs.each(function (i, e) {
-                    var tr = $(e);
-                    var tp_uid = tr.attr('data-tp_uid');
+                    let tr = $(e);
+                    let tp_uid = tr.attr('data-tp_uid');
                     //alert(tp_uid);
                     if (i == 0) {
-                        var input = $('<input type="text" name="' + n + '" value="' + d + '" data-modified="0" class="date-selector" />');
+                        let input = $('<input type="text" name="' + n + '" value="' + d + '" data-modified="0" class="date-selector" />');
                         input.datepicker({
                             dateFormat: 'dd.mm.y',
                             firstDay: 1,
@@ -708,11 +718,11 @@
                         });
                         input.change(function () {
                             this.setAttribute('data-modified', '1');
-                            var input = $(this);
-                            var th = input.closest('th');
-                            var tr = th.closest('tr');
-                            var ths = tr.find('th');
-                            var index = ths.index(th);
+                            let input = $(this);
+                            let th = input.closest('th');
+                            let tr = th.closest('tr');
+                            let ths = tr.find('th');
+                            let index = ths.index(th);
                             trs.each(function (i, e) {
                                 if (i != 0) $(e).find('td').eq(index).find('input').name = $(this).val();
                             });
@@ -722,7 +732,7 @@
                             this.setAttribute('data-modified', '1');
                             checkForm();
                         });
-                        var th = $('<th>');
+                        let th = $('<th>');
                         if (t == 0) th.append('<span>Поставка по</span><br /><span>графику</span><br />');
                         if (t == 1) th.append('<span>Поставка по</span><br /><span>заявкам</span><br />');
                         if (t == 2) th.append('<span>Поставка по</span><br /><span>протоколу</span><br />');
@@ -731,7 +741,7 @@
                         //tr.append('<th onclick="DeliveryScheduleViewsF3Index.addColumn()">&nbsp;*&nbsp;</th>');
                     } else {
                         if (tp_uid) {
-                            var input = $('<input type="text" name="' + n + '" value="" data-modified="0" />');
+                            let input = $('<input type="text" name="' + n + '" value="" data-modified="0" />');
                             input.change(function () {
                                 this.setAttribute('data-modified', '1');
                                 Nskd.Validator.nNorm(this, 0);
@@ -759,21 +769,21 @@
                 }
             },
             execCorr: function () {
-                var checkedRowFlags = shdl.find('input.row-flag:checked');
+                let checkedRowFlags = shdl.find('input.row-flag:checked');
                 if (checkedRowFlags.length > 1) {
                     // todo добавить проверку - мин 1 строка из спец и мин 1 из 1с
                     // если строк > 2 - предупреждение "делать зачёты по одному"
                     checkedRowFlags.prop('checked', false);
-                    var rqp = {
+                    let rqp = {
                         SessionId: Nskd.Server.SessionId,
                         Command: 'DeliverySchedule.F3.Corr',
                         Parameters: [{ Name: 'spec_id', Value: specId }]
                     };
-                    var row_ids = '';
+                    let row_ids = '';
                     checkedRowFlags.each(function () {
-                        var tr = $(this).closest('tr');
-                        var row_id = tr.attr('data-row_id');
-                        var row_qty = tr.find('td.row-qty').text();
+                        let tr = $(this).closest('tr');
+                        let row_id = tr.attr('data-row_id');
+                        let row_qty = tr.find('td.row-qty').text();
                         row_ids += row_id + ',' + row_qty + ';'
                     });
                     rqp.Parameters.push({ Name: 'row_ids', Value: row_ids.substr(0, row_ids.length - 1) });
@@ -794,7 +804,7 @@
                 }
             },
             execGroup: function () {
-                var checkedRowFlags = shdl.find('input.row-flag:checked');
+                let checkedRowFlags = shdl.find('input.row-flag:checked');
                 if (checkedRowFlags.length > 1) {
                     checkedRowFlags.prop('checked', false);
                     alert('Строк добавленных в журнал "Группы": ' + checkedRowFlags.length);
@@ -808,8 +818,23 @@
             unselectAllRows: function () {
                 alert('unselectAllRows');
             },
-            setSG: function () {
-                alert('setSG');
+            setE: function () {
+                if (confirm('Установить срок годности для незаполненных полей?')) {
+                    modalDiv.find('div.body1').hide();
+                    modalDiv.find('div.body2').show();
+                    modalDiv.show();
+                }
+            },
+            setE_: function () {
+                modalDiv.hide();
+                let v = modalDiv.find('div.body2 input[type="text"]').val();
+                if (v) {
+                    shdl.find('td.e input').each(function (index, element) {
+                        if (!element.value) {
+                            element.value = v;
+                        }
+                    });
+                }
             }
         };
     })();
