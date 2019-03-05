@@ -23,7 +23,8 @@ namespace DeliverySchedule.Models
         public F3Model(RequestPackage rqp)
         {
             SessionId = rqp.SessionId;
-            Int32.TryParse(rqp["id"] as String, out SpecId);
+            if (Int32.TryParse(rqp["id"] as String, out SpecId)) { }
+            else { Int32.TryParse(rqp["код_спецификации"] as String, out SpecId); }
         }
         public void Load(RequestPackage rqp)
         {
@@ -163,6 +164,24 @@ namespace DeliverySchedule.Models
             rqp.Command = "[Pharm-Sib].[dbo].[спецификации_зачёт_журнал_add]";
             ResponsePackage rsp = rqp.GetResponse("http://127.0.0.1:11012");
         }
+
+        public void AddColumn(RequestPackage rqp)
+        {
+            if (rqp == null) { throw new ArgumentException(); }
+
+            String specId = rqp["код_спецификации"] as String;
+            if (String.IsNullOrWhiteSpace(specId)
+                || !Int32.TryParse(specId, out Int32 temp)) { throw new ArgumentException(); }
+
+            String fType = rqp["тип_формирования"] as String;
+            if (String.IsNullOrWhiteSpace(fType)
+                || !(fType == "0" || fType == "1" || fType == "2")) { throw new ArgumentException(); }
+
+            rqp.Command = "[Pharm-Sib].[dbo].[спецификации_график__добавить_колонку]";
+            rqp.AddSessionIdToParameters();
+            var rsp = rqp.GetResponse("http://127.0.0.1:11012/");
+        }
+
         private void SpecGet()
         {
             RequestPackage rqp = new RequestPackage()

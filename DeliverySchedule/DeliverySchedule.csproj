@@ -48,6 +48,10 @@
     <Reference Include="Http">
       <HintPath>Z:\Source\Projects\ClassLibrary\Nskd\Http\bin\Debug\Http.dll</HintPath>
     </Reference>
+    <Reference Include="Json, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\ClassLibrary\Nskd\Json\bin\Debug\Json.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -251,6 +255,7 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Shared\LeftSection.cshtml" />
     <Content Include="Views\F3\Index.cshtml" />
+    <Content Include="Views\F3\Table.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

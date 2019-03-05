@@ -1,0 +1,216 @@
+﻿@using System.Data
+@model DeliverySchedule.Models.F3Model
+<div id="deliveryschedule_views_f3_table">
+    @if (Model.Table != null && Model.Table.Rows.Count > 0)
+    {
+        DataView tableView = Model.Table.DefaultView;
+        //tableView.RowFilter = "[tp_id] is null";
+        tableView.Sort = "[гр_наименование], [гр_форма_выпуска], [гр_дозировка], [количество], [номер_строки] desc";
+        <table style="margin-left: 4px; margin-top: 4px; background-color: #cfc">
+            <tr>
+                <td style="border: 1px solid black; padding: 4px;">
+                    <div style="margin-bottom: 2px">
+                        <span style="font-weight: bold; font-size: 12pt">График&nbsp;&nbsp;&nbsp;</span>
+                        <input type="button" class="save2_button" value="Сохранить" onclick="DeliveryScheduleViewsF3Index.save2()" disabled="disabled" />
+                        <span>&nbsp;&nbsp;&nbsp;Накладные 1с&nbsp;&nbsp;&nbsp;</span>
+                        <input type="checkbox" class="_1c-show" onclick="DeliveryScheduleViewsF3Index.show1cRows(this)">
+                    </div>
+                    <table class="shedule_rows" style="background-color: #ffd">
+                        <colgroup>
+                            <col width="30" /> <!-- № -->
+                            <col width="700" /><!-- Описание -->
+                            <col width="20" /> <!-- Галка сопоставления строк -->
+                            <col width="50" /> <!-- З -> С -->
+                            <col width="50" /> <!-- С -> О -->
+                            <col width="50" /> <!-- О -> П -->
+                            <col width="80" /> <!-- Кол-во -->
+                            <col width="80" /> <!-- Остаток по заявкам -->
+                            <!-- колонки по графику, заявкам, протоколу -->
+                        </colgroup>
+                        <tr>
+                            <th>№</th>
+                            <th>Описание</th>
+                            <th>&nbsp;</th>
+                            <th>З -> С</th>
+                            <th>С -> О</th>
+                            <th>О -> П</th>
+                            <th>Кол-во</th>
+                            <th><span>Остаток по</span><br /><span>заявкам</span></th>
+                            @if (Model.Shedule != null && Model.Shedule.Columns.Count > 1)
+                            {
+                                for (Int32 ci = 1; ci < Model.Shedule.Columns.Count; ci += 2)
+                                {
+                                    DataColumn dc = Model.Shedule.Columns[ci];
+                                    String cn = String.Empty;
+                                    String ct = String.Empty;
+                                    if (dc.ColumnName.Length >= 8)
+                                    {
+                                        cn = dc.ColumnName.Substring(0, 8);
+                                        if (dc.ColumnName.Length >= 10)
+                                        {
+                                            ct = dc.ColumnName.Substring(9, 1);
+                                        }
+                                    }
+                                    <th colspan="2">
+                                        @if (ct == "0")
+                                        {
+                                            <span>Поставка по</span><br />
+                                            <span>графику</span><br />
+                                        }
+                                        else if (ct == "1")
+                                        {
+                                            <span>Поставка по</span><br />
+                                            <span>заявке</span><br />
+                                        }
+                                        else if (ct == "2")
+                                        {
+                                            <span>Поставка по</span><br />
+                                            <span>протоколу</span><br />
+                                        }
+                                        else
+                                        {
+                                            <span>Поставка по</span><br />
+                                            <span>?</span><br />
+                                        }
+                                        <input type="text"
+                                               name="@dc.ColumnName"
+                                               value="@cn"
+                                               data-modified="0"
+                                               class="date-selector" />
+                                        <span title="Передать в отдел закупок" onclick="">&nbsp;&gt;&gt;З</span><br />
+                                        <span onclick="alert('Перенести из остатков');">Кол-во</span>
+                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <span title="Установить срок годности для незаполненных полей" onclick="DeliveryScheduleViewsF3Index.setE();">Срок</span>
+                                    </th>
+                                }
+                            }
+                            <th onclick="DeliveryScheduleViewsF3Index.addColumn()">&nbsp;*&nbsp;</th>
+                        </tr>
+                        @foreach (DataRowView dr in tableView)
+                        {
+                            String row_id = (dr["id"] == DBNull.Value) ? "" : dr["id"].ToString();
+                            String tp_id = (dr["tp_id"] == DBNull.Value) ? "" : ((Guid)dr["tp_id"]).ToString();
+                            if (tp_id != "")
+                            {
+                                <tr data-row_id="@row_id" data-tp_uid="@tp_id" class="fnet">
+                                    <td style="text-align: right">@dr["номер_строки"]</td>
+                                    <td>@dr["descr"]</td>
+                                    <td><input type="checkbox" class="row-flag" /></td>
+                                    <td style="text-align: right">
+                                        <input type="text" name="s1" value="@dr["срок_исполнения_заявка_склад"]"
+                                               data-modified="0" style="width: 30px" />
+                                    </td>
+                                    <td style="text-align: right">
+                                        <input type="text" name="s2" value="@dr["срок_исполнения_склад_отгрузка"]"
+                                               data-modified="0" style="width: 30px" />
+                                    </td>
+                                    <td style="text-align: right">
+                                        <input type="text" name="s3" value="@dr["срок_исполнения_отгрузка_покупатель"]"
+                                               data-modified="0" style="width: 30px" />
+                                    </td>
+                                    <td class="row-qty" style="text-align: right">@(((Decimal)dr["количество"]).ToString("n0"))</td>
+                                    <td class="todo" style="text-align: right"></td>
+                                    @if (Model.Shedule != null && Model.Shedule.Columns.Count > 1)
+                                    {
+                                        for (Int32 ci = 1; ci < Model.Shedule.Columns.Count; ci += 2)
+                                        {
+                                            DataColumn dc1 = Model.Shedule.Columns[ci];
+                                            DataColumn dc2 = Model.Shedule.Columns[ci + 1];
+                                            String q = String.Empty;
+                                            String e = String.Empty;
+                                            foreach (DataRow sdr in Model.Shedule.Rows)
+                                            {
+                                                if ((String)sdr["tp_id"] == tp_id &&
+                                                    sdr[ci] != DBNull.Value)
+                                                {
+                                                    q = (String)sdr[ci];
+                                                    e = (String)sdr[ci + 1];
+                                                    break;
+                                                }
+                                            }
+                                            <td class="q">
+                                                <input type="text"
+                                                       name="@dc1.ColumnName"
+                                                       value="@q"
+                                                       data-modified="0" />
+                                            </td>
+                                            <td class="e">
+                                                <input type="text"
+                                                       name="@dc2.ColumnName"
+                                                       value="@e"
+                                                       data-modified="0" />
+                                            </td>
+                                        }
+                                    }
+                                    <td></td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr data-row_id="@row_id" data-tp_uid="" class="_1c" style="display: none">
+                                    <td>1c</td>
+                                    <td>@dr["descr"]</td>
+                                    <td><input type="checkbox" class="row-flag" /></td>
+                                    <td colspan="3" style="text-align: right">Количество по накладным:</td>
+                                    <td class="row-qty" style="text-align: right">@(((Decimal)dr["количество"]).ToString("n0"))</td>
+                                </tr>
+                            }
+                        }
+                    </table>
+                </td>
+            </tr>
+        </table>
+    }
+</div>
+<script type="text/javascript">
+    var DeliveryScheduleViewsF3Table = (function () {
+        let mainDiv = $('#deliveryschedule_views_f3_table');
+        let shdl = mainDiv.find('table.shedule_rows');
+        let sheduleInputs = shdl.find('input[type="text"]');
+        let todoTds = shdl.find('td.todo');
+
+        sheduleInputs.keyup(function () {
+            this.setAttribute('data-modified', '1');
+        });
+        sheduleInputs.change(function () {
+            this.setAttribute('data-modified', '1');
+            if ($(this).parent().hasClass('q')) {
+                Nskd.Validator.nNorm(this, 0);
+            }
+            calcToDo(this);
+            DeliveryScheduleViewsF3Index.checkForm();
+        });
+
+        // При загрузке с сервера сразу проверяем.
+        todoTds.each(function (i, e) {
+            calcRowToDo($(e).closest('tr'));
+        });
+
+        function calcToDo(e) {
+            let tr = $(e).closest('tr');
+            calcRowToDo(tr);
+        }
+        function calcRowToDo(tr) {
+            let td = tr.find('td.todo');
+            let s = parseInt(tr.find('td.row-qty').text().replace(/[^\d-]/g, ''));
+            let inps = tr.find('td.q input[type="text"]');
+            inps.each(function (i, e) {
+                let v = parseInt($(e).val().replace(/[^\d-]/g, ''));
+                if (isNaN(v)) v = 0;
+                s -= v;
+            });
+            if (s < 0) {
+                td.addClass('err-color');
+                td.text(s.toString());
+            } else if (s == 0) {
+                td.removeClass('err-color');
+                td.text('');
+            } else {
+                td.removeClass('err-color');
+                td.text(s.toString());
+            }
+        }
+
+        return {};
+    })();
+</script>

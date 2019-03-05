@@ -9,11 +9,25 @@ namespace DeliverySchedule.Controllers
     {
         public Object Index()
         {
+            Object v = "DeliverySchedule.Controllers.F3Controller.Index()\n";
             RequestPackage rqp = RequestPackage.ParseRequest(Request.InputStream, Request.ContentEncoding);
-            F3Model m = new F3Model(rqp);
-            m.Load(rqp);
-            PartialViewResult pvr = PartialView("~/Views/F3/Index.cshtml", m);
-            return pvr;
+            if (rqp != null && !String.IsNullOrWhiteSpace(rqp.Command))
+            {
+                F3Model m = new F3Model(rqp);
+                switch (rqp.Command)
+                {
+                    case "DeliverySchedule.F3.Index.AddColumn":
+                        m.AddColumn(rqp);
+                        m.Load(rqp);
+                        v = PartialView("~/Views/F3/Table.cshtml", m);
+                        break;
+                    default:
+                        m.Load(rqp);
+                        v = PartialView("~/Views/F3/Index.cshtml", m);
+                        break;
+                }
+            }
+            return v;
         }
         public Object Save()
         {
