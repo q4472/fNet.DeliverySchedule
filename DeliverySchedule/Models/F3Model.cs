@@ -164,7 +164,6 @@ namespace DeliverySchedule.Models
             rqp.Command = "[Pharm-Sib].[dbo].[спецификации_зачёт_журнал_add]";
             ResponsePackage rsp = rqp.GetResponse("http://127.0.0.1:11012");
         }
-
         public void AddColumn(RequestPackage rqp)
         {
             if (rqp == null) { throw new ArgumentException(); }
@@ -178,6 +177,13 @@ namespace DeliverySchedule.Models
                 || !(fType == "0" || fType == "1" || fType == "2")) { throw new ArgumentException(); }
 
             rqp.Command = "[Pharm-Sib].[dbo].[спецификации_график__добавить_колонку]";
+            rqp.AddSessionIdToParameters();
+            var rsp = rqp.GetResponse("http://127.0.0.1:11012/");
+        }
+        public void Send(RequestPackage rqp)
+        {
+            if (rqp == null) { throw new ArgumentException(); }
+            rqp.Command = "[Pharm-Sib].[dbo].[спецификации_график__передать_в_отдел_снабжения]";
             rqp.AddSessionIdToParameters();
             var rsp = rqp.GetResponse("http://127.0.0.1:11012/");
         }

@@ -400,6 +400,25 @@
             },
             checkForm: function () {
                 checkForm();
+            },
+            send: function (cn, ct) {
+                let rqp = {
+                    SessionId: Nskd.Server.SessionId,
+                    Command: 'DeliverySchedule.F3.Index.Send',
+                    Parameters: [
+                        { Name: "код_спецификации", Value: specId },
+                        { Name: "дата", Value: cn },
+                        { Name: "тип_формирования", Value: ct }]
+                };
+                //console.log(rqp); return;
+                Nskd.Http.post({
+                    url: '/deliveryschedule/f3',
+                    rqp: rqp,
+                    done: function (data) {
+                        mainDiv.find('div.table').html(data);
+                    }
+                });
+                mainDiv.find('div.table').html('');
             }
         };
     })();

@@ -16,6 +16,11 @@ namespace DeliverySchedule.Controllers
                 F3Model m = new F3Model(rqp);
                 switch (rqp.Command)
                 {
+                    case "DeliverySchedule.F3.Index.Send":
+                        m.Send(rqp);
+                        m.Load(rqp);
+                        v = PartialView("~/Views/F3/Table.cshtml", m);
+                        break;
                     case "DeliverySchedule.F3.Index.Save2":
                         m.Update2(rqp);
                         m.Load(rqp);
