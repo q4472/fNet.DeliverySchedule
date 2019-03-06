@@ -117,6 +117,7 @@
                 </div>
             </div>
             <div class="body2" style="display: none;">
+                <input type="hidden" value="" />
                 <input type="text" /><br />
                 <input type="button" value="OK" onclick="DeliveryScheduleViewsF3Index.setE_();" />
             </div>
@@ -374,18 +375,21 @@
             unselectAllRows: function () {
                 alert('unselectAllRows');
             },
-            setE: function () {
+            setE: function (element) {
+                let ci = $(element).closest('th').attr('data-column-index');
                 if (confirm('Установить срок годности для незаполненных полей?')) {
                     modalDiv.find('div.body1').hide();
                     modalDiv.find('div.body2').show();
+                    modalDiv.find('div.body2 input[type="hidden"]').val(ci);
                     modalDiv.show();
                 }
             },
             setE_: function () {
                 modalDiv.hide();
+                let ci = parseInt(modalDiv.find('div.body2 input[type="hidden"]').val());
                 let v = modalDiv.find('div.body2 input[type="text"]').val();
                 if (v) {
-                    tableDiv.find('td.e input').each(function (index, element) {
+                    tableDiv.find('td.e[data-column-index="' + (ci + 1) + '"] input').each(function (index, element) {
                         if (!element.value) {
                             element.value = v;
                             element.setAttribute('data-modified', '1');

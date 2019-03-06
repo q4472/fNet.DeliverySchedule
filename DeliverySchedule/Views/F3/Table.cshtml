@@ -51,7 +51,7 @@
                                             ct = dc.ColumnName.Substring(9, 1);
                                         }
                                     }
-                                    <th colspan="2">
+                                    <th colspan="2" data-column-index="@(7 + ci)">
                                         @if (ct == "0")
                                         {
                                             <span>Поставка по</span><br />
@@ -80,7 +80,7 @@
                                         <span title="Передать в отдел закупок" onclick="">&nbsp;&gt;&gt;З</span><br />
                                         <span onclick="alert('Перенести из остатков');">Кол-во</span>
                                         <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                        <span title="Установить срок годности для незаполненных полей" onclick="DeliveryScheduleViewsF3Index.setE();">Срок</span>
+                                        <span title="Установить срок годности для незаполненных полей" onclick="DeliveryScheduleViewsF3Index.setE(this);">Срок</span>
                                     </th>
                                 }
                             }
@@ -128,13 +128,13 @@
                                                     break;
                                                 }
                                             }
-                                            <td class="q">
+                                            <td class="q" data-column-index="@(7 + ci)">
                                                 <input type="text"
                                                        name="@dc1.ColumnName"
                                                        value="@q"
                                                        data-modified="0" />
                                             </td>
-                                            <td class="e">
+                                            <td class="e" data-column-index="@(8 + ci)">
                                                 <input type="text"
                                                        name="@dc2.ColumnName"
                                                        value="@e"
