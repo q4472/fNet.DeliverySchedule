@@ -133,12 +133,12 @@ namespace DeliverySchedule.Models
             {
                 String name = p.Name;
                 String value = p.Value as String;
-                if (name.Length == 12 && (new Regex(@"\d\d\d\d\-\d\d\-\d\d \d")).IsMatch(name)
+                if (name.Length == 12 && (new Regex(@"\d\d\.\d\d\.\d\d \d [qe]")).IsMatch(name)
                     && value != null && (new Regex(@"\d\d\.\d\d\.\d\d")).IsMatch(value))
                 {
-                    DateTime.TryParse(name.Substring(0, 10), out DateTime oldDate);
-                    DateTime.TryParse("20" + value.Substring(6, 2) + "-" + value.Substring(3, 2) + "-" + value.Substring(0, 2), out DateTime newDate);
-                    Int32.TryParse(name.Substring(11, 1), out Int32 ftype);
+                    DateTime.TryParse(name.Substring(0, 8), out DateTime oldDate);
+                    DateTime.TryParse(value, out DateTime newDate);
+                    Int32.TryParse(name.Substring(9, 1), out Int32 ftype);
                     RequestPackage rqp1 = new RequestPackage
                     {
                         SessionId = rqp.SessionId,

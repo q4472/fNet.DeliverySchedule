@@ -1,0 +1,225 @@
+﻿@using System.Data
+@model DeliverySchedule.Models.F3Model
+<div id="deliveryschedule_views_f3_header">
+    @if (Model.Head != null && Model.Head.Rows.Count > 0)
+    {
+        <div style="margin: 4px">Идентификатор спецификации: @Model.SpecId</div>
+        <table style="margin-left: 4px; margin-top: 4px; background-color: #cfc">
+            <tr>
+                <td style="border: 1px solid black; padding: 4px;">
+                    <div style="margin-bottom: 2px">
+                        <span style="font-weight: bold; font-size: 12pt">Основные параметры&nbsp;&nbsp;&nbsp;</span>
+                        <input type="button" class="save_button" value="Сохранить" disabled="disabled" onclick="DeliveryScheduleViewsF3Index.save()" />
+                        <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Расчитать новый график</span>
+                        <input type="checkbox" name="расчитать_новый_график" data-modified="0" />
+                    </div>
+                    <table class="pars" style="background-color: #ffd">
+                        <tr>
+                            <td>
+                                <table>
+                                    <tr>
+                                        <td style="text-align: right; padding-right: 4px">Дата контракта:</td>
+                                        <td>
+                                            <input type="text"
+                                                   name="дата_контракта"
+                                                   value="@Nskd.Convert.ToString(Model.Head.Rows[0]["дата_контракта"])"
+                                                   data-modified="0"
+                                                   class="date-selector" />
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align: right; padding-right: 4px">Количество поставок:</td>
+                                        <td>
+                                            <input type="text"
+                                                   name="количество_поставок"
+                                                   value="@Model.Head.Rows[0]["количество_поставок"]"
+                                                   data-modified="0"
+                                                   onchange="this.value = Nskd.Validator.numberNorm(this.value, 1, 36)" />
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align: right; padding-right: 4px">Период поставок:</td>
+                                        <td>
+                                            <input type="text"
+                                                   name="период_поставок"
+                                                   value="@Model.Head.Rows[0]["период_поставок"]"
+                                                   data-modified="0"
+                                                   onchange="this.value = Nskd.Validator.numberNorm(this.value, 0, 365)" />
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align: right; padding-right: 4px">Дата первой поставки (получения покупателем):</td>
+                                        <td>
+                                            <input type="text"
+                                                   name="дата_первой_поставки"
+                                                   value="@Nskd.Convert.ToString(Model.Head.Rows[0]["дата_первой_поставки"])"
+                                                   data-modified="0"
+                                                   class="date-selector" />
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align: right; padding-right: 4px">Срок от отгрузки до получения покупателем:</td>
+                                        <td>
+                                            @Model.sSiop
+                                        </td>
+                                        <td>&nbsp;=> Дата первой отгрузки: <span>@Model.sDpo</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align: right; padding-right: 4px">Срок от поставки к нам до отгрузки покупателю:</td>
+                                        <td>
+                                            @Model.sSiso
+                                        </td>
+                                        <td>&nbsp;=> К нам на склад первая партия должна поступить: <span>@Model.sDps</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align: right; padding-right: 4px">Срок от заявки на покупку до поставки к нам:</td>
+                                        <td>
+                                            @Model.sSizs
+                                        </td>
+                                        <td>&nbsp;=> Дата отправки заявки поставщику на первую партию: <span>@Model.sDozp</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align: right; padding-right: 4px">Дата окончания поставок: </td>
+                                        <td>
+                                            <input type="text"
+                                                   name="дата_окончания_поставок"
+                                                   value="@Nskd.Convert.ToString(Model.Head.Rows[0]["дата_окончания_поставок"])"
+                                                   data-modified="0"
+                                                   class="date-selector" />
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align: right; padding-right: 4px">Дата окончания действия контракта: </td>
+                                        <td>
+                                            <input type="text"
+                                                   name="дата_окончания_действия_контракта"
+                                                   value="@Nskd.Convert.ToString(Model.Head.Rows[0]["дата_окончания_действия_контракта"])"
+                                                   data-modified="0"
+                                                   class="date-selector" />
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td>
+                                <table>
+                                    <tr>
+                                        <td>Поставка по графику</td>
+                                        @if ((Boolean)Model.Head.Rows[0]["поставка_по_графику"])
+                                        {
+                                            <td><input type="checkbox" name="поставка_по_графику" data-modified="0" checked="checked" /></td>
+                                        }
+                                        else
+                                        {
+                                            <td><input type="checkbox" name="поставка_по_графику" data-modified="0" /></td>
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <td>Поставка по заявкам</td>
+                                        @if ((Boolean)Model.Head.Rows[0]["поставка_по_заявкам"])
+                                        {
+                                            <td><input type="checkbox" name="поставка_по_заявкам" data-modified="0" checked="checked" /></td>
+                                        }
+                                        else
+                                        {
+                                            <td><input type="checkbox" name="поставка_по_заявкам" data-modified="0" /></td>
+                                        }
+                                    </tr>
+                                    <tr><td style="border: none">&nbsp;</td><td style="border: none">&nbsp;</td></tr>
+                                    <tr>
+                                        <td>Поставка по протоколу</td>
+                                        @if ((Boolean)Model.Head.Rows[0]["поставка_по_протоколу"])
+                                        {
+                                            <td><input type="checkbox" name="поставка_по_протоколу" data-modified="0" checked="checked" /></td>
+                                        }
+                                        else
+                                        {
+                                            <td><input type="checkbox" name="поставка_по_протоколу" data-modified="0" /></td>
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <td>Разрешена поставка по протоколу</td>
+                                        <td><input type="checkbox" name="разрешена_поставка_по_протоколу" data-modified="0" disabled="disabled" /></td>
+                                    </tr>
+                                    <tr><td style="border: none">&nbsp;</td><td style="border: none">&nbsp;</td></tr>
+                                    <tr>
+                                        <td>Готово для отд. закупок</td>
+                                        @if ((Boolean)Model.Head.Rows[0]["готово_для_отдела_закупок"])
+                                        {
+                                            <td><input type="checkbox" name="готово_для_отдела_закупок" data-modified="0" checked="checked" /></td>
+                                        }
+                                        else
+                                        {
+                                            <td><input type="checkbox" name="готово_для_отдела_закупок" data-modified="0" /></td>
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <td>Принято отд. закупок</td>
+                                        @if ((Boolean)Model.Head.Rows[0]["принято_отделом_закупок"])
+                                        {
+                                            <td><input type="checkbox" name="принято_отделом_закупок" data-modified="0" disabled="disabled" checked="checked" /></td>
+                                        }
+                                        else
+                                        {
+                                            <td><input type="checkbox" name="принято_отделом_закупок" data-modified="0" disabled="disabled" /></td>
+                                        }
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <!--
+                    <input type="button" value="Выделить все строки" onclick="DeliveryScheduleViewsF3Index.selectAllRows();" />
+                    <br />
+                    <br />
+                    <input type="button" value="Снять выделение строк" onclick="DeliveryScheduleViewsF3Index.unselectAllRows();" />
+                    <br />
+                    <br />
+                    -->
+                    <span style="font-weight: bold; font-size: 12pt">Действия для выделенных строк</span>
+                    <br />
+                    <br />
+                    <input type="button" value="Объединить в группу" onclick="DeliveryScheduleViewsF3Index.execGroup();" />
+                    <br />
+                    <br />
+                    <input type="button" value="Выполнить зачёт" onclick="DeliveryScheduleViewsF3Index.execCorr();" />
+                    <!--
+                    <br />
+                    <br />
+                    <input type="button" value="Установить срок годности" onclick="DeliveryScheduleViewsF3Index.setE();" />
+                    -->
+                </td>
+            </tr>
+        </table>
+    }
+</div>
+<script type="text/javascript">
+    var DeliveryScheduleViewsF3Header = (function () {
+        let mainDiv = $('#deliveryschedule_views_f3_header');
+        let pars = mainDiv.find('table.pars');
+        let parsInputs = pars.find('input[type="text"], input[type="checkbox"]');
+        let dateSelectors = mainDiv.find('input.date-selector');
+
+        dateSelectors.datepicker({ dateFormat: 'dd.mm.y', firstDay: 1, changeYear: true });
+        dateSelectors.change(checkForm);
+
+        parsInputs.keyup(function () {
+            this.setAttribute('data-modified', '1');
+        });
+        parsInputs.change(function () {
+            this.setAttribute('data-modified', '1');
+            checkForm();
+        });
+
+        function checkForm() {
+            DeliveryScheduleViewsF3Index.checkForm();
+        }
+    })();
+</script>

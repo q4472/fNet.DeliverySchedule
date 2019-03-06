@@ -168,6 +168,12 @@
         let shdl = mainDiv.find('table.shedule_rows');
         let sheduleInputs = shdl.find('input[type="text"]');
         let todoTds = shdl.find('td.todo');
+        let dateSelectors = mainDiv.find('input.date-selector');
+
+        dateSelectors.datepicker({ dateFormat: 'dd.mm.y', firstDay: 1, changeYear: true });
+        dateSelectors.change(checkForm);
+
+        mainDiv.find('td.e input').datepicker({ dateFormat: 'mm.y', firstDay: 1, changeYear: true });
 
         sheduleInputs.keyup(function () {
             this.setAttribute('data-modified', '1');
@@ -178,7 +184,7 @@
                 Nskd.Validator.nNorm(this, 0);
             }
             calcToDo(this);
-            DeliveryScheduleViewsF3Index.checkForm();
+            checkForm();
         });
 
         // При загрузке с сервера сразу проверяем.
@@ -209,6 +215,9 @@
                 td.removeClass('err-color');
                 td.text(s.toString());
             }
+        }
+        function checkForm() {
+            DeliveryScheduleViewsF3Index.checkForm();
         }
 
         return {};

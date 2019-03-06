@@ -256,6 +256,7 @@
     <Content Include="Views\Shared\LeftSection.cshtml" />
     <Content Include="Views\F3\Index.cshtml" />
     <Content Include="Views\F3\Table.cshtml" />
+    <Content Include="Views\F3\Header.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
