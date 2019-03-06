@@ -9,7 +9,7 @@ namespace DeliverySchedule.Controllers
     {
         public Object Index()
         {
-            Object v = "DeliverySchedule.Controllers.F3Controller.Index()\n";
+            Object v = "DeliverySchedule.Controllers.F3Controller.Index()<br />";
             RequestPackage rqp = RequestPackage.ParseRequest(Request.InputStream, Request.ContentEncoding);
             if (rqp != null && !String.IsNullOrWhiteSpace(rqp.Command))
             {
@@ -26,11 +26,12 @@ namespace DeliverySchedule.Controllers
                         m.Load(rqp);
                         v = PartialView("~/Views/F3/Table.cshtml", m);
                         break;
-                    case "GoToDeliverySchedulePage":
+                    case "GoToDeliverySchedule":
                         m.Load(rqp);
                         v = PartialView("~/Views/F3/Index.cshtml", m);
                         break;
                     default:
+                        v += $"Не известная команда: '{rqp.Command}'<br />";
                         break;
                 }
             }
