@@ -19,6 +19,7 @@ namespace DeliverySchedule.Models
         public String sSizs;
         public String sDozp;
         public СпецификацииТаблицаГрафик График;
+        public DataTable Заявки;
 
         public F3Model(RequestPackage rqp)
         {
@@ -192,7 +193,7 @@ namespace DeliverySchedule.Models
         {
             RequestPackage rqp = new RequestPackage()
             {
-                Command = "[dbo].[спецификации_get]",
+                Command = "[Pharm-Sib].[dbo].[спецификации_get]",
                 Parameters = new RequestParameter[]
                 {
                     new RequestParameter() { Name = "session_id", Value = SessionId },
@@ -211,6 +212,10 @@ namespace DeliverySchedule.Models
                         //Shedule = rsp.Data.Tables[2];
                         График = new СпецификацииТаблицаГрафик(rsp.Data.Tables[2]);
                         Shedule = CreateSheduleTable();
+                        if(rsp.Data.Tables.Count> 3)
+                        {
+                            Заявки = rsp.Data.Tables[3];
+                        }
                     }
                 }
             }

@@ -402,23 +402,25 @@
                 checkForm();
             },
             send: function (cn, ct) {
-                let rqp = {
-                    SessionId: Nskd.Server.SessionId,
-                    Command: 'DeliverySchedule.F3.Index.Send',
-                    Parameters: [
-                        { Name: "код_спецификации", Value: specId },
-                        { Name: "дата", Value: cn },
-                        { Name: "тип_формирования", Value: ct }]
-                };
-                //console.log(rqp); return;
-                Nskd.Http.post({
-                    url: '/deliveryschedule/f3',
-                    rqp: rqp,
-                    done: function (data) {
-                        mainDiv.find('div.table').html(data);
-                    }
-                });
-                mainDiv.find('div.table').html('');
+                if (confirm('Передать заявку в отдел снабжения и заблокировать столбец?')) {
+                    let rqp = {
+                        SessionId: Nskd.Server.SessionId,
+                        Command: 'DeliverySchedule.F3.Index.Send',
+                        Parameters: [
+                            { Name: "код_спецификации", Value: specId },
+                            { Name: "дата", Value: ('20' + cn.substr(6, 2) + '-' + cn.substr(3, 2) + '-' + cn.substr(0, 2)) },
+                            { Name: "тип_формирования", Value: ct }]
+                    };
+                    //console.log(rqp); return;
+                    Nskd.Http.post({
+                        url: '/deliveryschedule/f3',
+                        rqp: rqp,
+                        done: function (data) {
+                            mainDiv.find('div.table').html(data);
+                        }
+                    });
+                    mainDiv.find('div.table').html('');
+                }
             }
         };
     })();
