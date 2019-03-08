@@ -82,18 +82,20 @@
                                             <span>Поставка по</span><br />
                                             <span>?</span><br />
                                         }
-                                        <input type="text"
-                                               name="@dc.ColumnName"
-                                               value="@cn"
-                                               data-modified="0"
-                                               class="date-selector" />
                                         @if (переданоВЗакупку)
                                         {
+                                            <span>@cn</span>
                                             <br />
                                         }
                                         else
                                         {
-                                            <span title="Передать в отдел закупок" onclick="DeliveryScheduleViewsF3Index.send('@cn', '@ct');">&nbsp;&gt;&gt;З</span><br />
+                                            <input type="text"
+                                                   name="@dc.ColumnName"
+                                                   value="@cn"
+                                                   data-modified="0"
+                                                   class="date-selector" />
+                                            <span title="Передать в отдел закупок" onclick="DeliveryScheduleViewsF3Index.send('@cn', '@ct');">&nbsp;&gt;&gt;З</span>
+                                            <br />
                                         }
                                         <span onclick="alert('Перенести из остатков');">Кол-во</span>
                                         <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
