@@ -97,7 +97,7 @@ namespace DeliverySchedule.Models
                         rqp1 = new RequestPackage
                         {
                             SessionId = rqp.SessionId,
-                            Command = "dbo.[спецификации_график_изменить_количество]",
+                            Command = "[Pharm-Sib].[dbo].[спецификации_график_изменить_количество]",
                             Parameters = new RequestParameter[]
                             {
                                 new RequestParameter { Name = "session_id", Value = rqp.SessionId },
@@ -126,7 +126,7 @@ namespace DeliverySchedule.Models
                             }
                         };
                     }
-                    rqp1.GetResponse("http://127.0.0.1:11012/");
+                    var rsp = rqp1.GetResponse("http://127.0.0.1:11012/");
                 }
             }
             // изменяем дату
