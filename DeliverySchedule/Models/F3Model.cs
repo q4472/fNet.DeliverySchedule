@@ -1,6 +1,8 @@
 ﻿using Nskd;
 using System;
 using System.Data;
+using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace DeliverySchedule.Models
@@ -212,7 +214,7 @@ namespace DeliverySchedule.Models
                         //Shedule = rsp.Data.Tables[2];
                         График = new СпецификацииТаблицаГрафик(rsp.Data.Tables[2]);
                         Shedule = CreateSheduleTable();
-                        if(rsp.Data.Tables.Count> 3)
+                        if (rsp.Data.Tables.Count > 3)
                         {
                             Заявки = rsp.Data.Tables[3];
                         }
@@ -355,8 +357,9 @@ namespace DeliverySchedule.Models
         private DataTable CreateSheduleTable()
         {
             DataTable dt = new DataTable();
+            StringBuilder sql = new StringBuilder();
             dt.Columns.Add("tp_id", typeof(String));
-
+            sql.Append("SELECT [tp_id]");
             for (int ri = 0; ri < График.RowsCount; ri++)
             {
                 var items = График[ri];
@@ -365,7 +368,9 @@ namespace DeliverySchedule.Models
                 if (!dt.Columns.Contains(colNameQty))
                 {
                     dt.Columns.Add(colNameQty, typeof(String));
+                    sql.Append($", SUM([{colNameQty}] as [{colNameQty}])");
                     dt.Columns.Add(colNameExp, typeof(String));
+                    sql.Append($", Max([{colNameExp}]) as [{colNameExp}]");
                 }
                 DataRow dr = dt.NewRow();
                 dr["tp_id"] = items.tp_id;
@@ -373,8 +378,36 @@ namespace DeliverySchedule.Models
                 dr[colNameExp] = items.срок_годности;
                 dt.Rows.Add(dr);
             }
+            sql.Append($" GROUP BY [tp_id]");
+            var newDt = dt.AsEnumerable()
+                          .GroupBy(r => r.Field<String>("tp_id"))
+                          .Select(g =>
+                          {
+                              var row = dt.NewRow();
 
-            return dt;
+                              row["tp_id"] = g.Key;
+                              for (int ci = 1; ci < dt.Columns.Count; ci += 2)
+                              {
+                                  Decimal sum = 0;
+                                  Int32 max = 0;
+                                  foreach (var r in g)
+                                  {
+                                      if (Decimal.TryParse(r[ci] as String, out Decimal q))
+                                      {
+                                          sum += q;
+                                      }
+                                      String e = r[ci + 1] as String;
+                                      if (!String.IsNullOrWhiteSpace(e) && e.Length == 5)
+                                      {
+                                          max = Math.Max(max, Int32.Parse(e.Substring(3, 2) + e.Substring(0, 2)));
+                                      }
+                                  }
+                                  row[ci] = (sum != 0) ? sum.ToString() : String.Empty;
+                                  row[ci + 1] = (max != 0) ? (max % 100).ToString("00") + "." + (max / 100).ToString("00") : String.Empty;
+                              }
+                              return row;
+                          }).CopyToDataTable();
+            return newDt;
         }
     }
 }
