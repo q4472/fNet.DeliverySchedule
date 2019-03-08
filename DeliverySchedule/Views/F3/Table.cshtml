@@ -138,16 +138,10 @@
                                             String e = String.Empty;
                                             foreach (DataRow sdr in Model.Shedule.Rows)
                                             {
-                                                if ((String)sdr["tp_id"] == tp_id && (sdr[ci] != DBNull.Value || sdr[ci + 1] != DBNull.Value))
+                                                if ((String)sdr["tp_id"] == tp_id)
                                                 {
-                                                    if (sdr[ci] != DBNull.Value)
-                                                    {
-                                                        q = (String)sdr[ci];
-                                                    }
-                                                    if (sdr[ci + 1] != DBNull.Value)
-                                                    {
-                                                        e = (String)sdr[ci + 1];
-                                                    }
+                                                    q = (String)sdr[ci];
+                                                    e = (String)sdr[ci + 1];
                                                     break;
                                                 }
                                             }
