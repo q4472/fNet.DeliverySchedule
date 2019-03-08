@@ -138,7 +138,7 @@
                                             String e = String.Empty;
                                             foreach (DataRow sdr in Model.Shedule.Rows)
                                             {
-                                                if ((String)sdr["tp_id"] == tp_id)
+                                                if ((String)sdr["tp_id"] == tp_id && (sdr[ci] != DBNull.Value || sdr[ci + 1] != DBNull.Value))
                                                 {
                                                     if (sdr[ci] != DBNull.Value)
                                                     {
