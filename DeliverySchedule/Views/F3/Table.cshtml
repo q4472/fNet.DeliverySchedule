@@ -168,11 +168,11 @@
                                             }
                                             if (переданоВЗакупку)
                                             {
-                                                <td class="q" data-column-index="@(7 + ci)">
-                                                    @q
+                                                <td class="q" data-column-index="@(7 + ci)" style="text-align: right;">
+                                                    <span>@q</span>
                                                 </td>
-                                                <td class="e" data-column-index="@(8 + ci)">
-                                                    @e
+                                                <td class="e" data-column-index="@(8 + ci)" style="text-align: right;">
+                                                    <span>@e</span>
                                                 </td>
                                             }
                                             else
@@ -249,9 +249,16 @@
         function calcRowToDo(tr) {
             let td = tr.find('td.todo');
             let s = parseInt(tr.find('td.row-qty').text().replace(/[^\d-]/g, ''));
-            let inps = tr.find('td.q input[type="text"]');
-            inps.each(function (i, e) {
-                let v = parseInt($(e).val().replace(/[^\d-]/g, ''));
+            let qs = tr.find('td.q');
+            qs.each(function (index, element) {
+                let e = $(element);
+                let input = e.find('input');
+                let v = 0;
+                if (input.length == 0) {
+                    v = parseInt(e.text().replace(/[^\d-]/g, ''));
+                } else {
+                    v = parseInt(input.val().replace(/[^\d-]/g, ''));
+                }
                 if (isNaN(v)) v = 0;
                 s -= v;
             });
