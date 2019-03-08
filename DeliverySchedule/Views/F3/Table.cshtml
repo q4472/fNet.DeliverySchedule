@@ -55,10 +55,9 @@
                                     foreach (DataRow dr in Model.Заявки.Rows)
                                     {
                                         if ((DateTime)dr["дата"] == DateTime.Parse(cn)
-                                            && ((Int32)dr["тип_формирования"]).ToString() == ct
-                                            && (Boolean)dr["передано_в_закупку"])
+                                            && ((Int32)dr["тип_формирования"]).ToString() == ct)
                                         {
-                                            переданоВЗакупку = true;
+                                            переданоВЗакупку = (Boolean)dr["передано_в_закупку"];
                                             break;
                                         }
                                     }
@@ -145,18 +144,50 @@
                                                     break;
                                                 }
                                             }
-                                            <td class="q" data-column-index="@(7 + ci)">
-                                                <input type="text"
-                                                       name="@dc1.ColumnName"
-                                                       value="@q"
-                                                       data-modified="0" />
-                                            </td>
-                                            <td class="e" data-column-index="@(8 + ci)">
-                                                <input type="text"
-                                                       name="@dc2.ColumnName"
-                                                       value="@e"
-                                                       data-modified="0" />
-                                            </td>
+                                            String cn = String.Empty;
+                                            String ct = String.Empty;
+                                            if (dc1.ColumnName.Length >= 8)
+                                            {
+                                                cn = dc1.ColumnName.Substring(0, 8);
+                                                if (dc1.ColumnName.Length >= 10)
+                                                {
+                                                    ct = dc1.ColumnName.Substring(9, 1);
+                                                }
+                                            }
+                                            Boolean переданоВЗакупку = false;
+                                            foreach (DataRow dr1 in Model.Заявки.Rows)
+                                            {
+                                                if ((DateTime)dr1["дата"] == DateTime.Parse(cn)
+                                                    && ((Int32)dr1["тип_формирования"]).ToString() == ct)
+                                                {
+                                                    переданоВЗакупку = (Boolean)dr1["передано_в_закупку"];
+                                                    break;
+                                                }
+                                            }
+                                            if (переданоВЗакупку)
+                                            {
+                                                <td class="q" data-column-index="@(7 + ci)">
+                                                    @q
+                                                </td>
+                                                <td class="e" data-column-index="@(8 + ci)">
+                                                    @e
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                                <td class="q" data-column-index="@(7 + ci)">
+                                                    <input type="text"
+                                                           name="@dc1.ColumnName"
+                                                           value="@q"
+                                                           data-modified="0" />
+                                                </td>
+                                                <td class="e" data-column-index="@(8 + ci)">
+                                                    <input type="text"
+                                                           name="@dc2.ColumnName"
+                                                           value="@e"
+                                                           data-modified="0" />
+                                                </td>
+                                            }
                                         }
                                     }
                                     <td></td>
