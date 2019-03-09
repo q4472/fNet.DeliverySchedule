@@ -144,20 +144,24 @@
         function checkFormForErrors() {
             // Проверяем шапку на ошибку в датах
             let parsError = false;
-            let d1 = $('input[name="дата_контракта"]');
-            let d2 = $('input[name="дата_первой_поставки"]');
-            let d3 = $('input[name="дата_окончания_поставок"]');
-            let d4 = $('input[name="дата_окончания_действия_контракта"]');
-            if (d2.datepicker('getDate') < d1.datepicker('getDate')) { d2.addClass('err-bg'); parsError = true; } else d2.removeClass('err-bg');
-            if (d3.datepicker('getDate') < d2.datepicker('getDate')) { d3.addClass('err-bg'); parsError = true; } else d3.removeClass('err-bg');
-            if (d4.datepicker('getDate') < d3.datepicker('getDate')) { d4.addClass('err-bg'); parsError = true; } else d4.removeClass('err-bg');
+            let d0 = new Date();
+            let e1 = $('input[name="дата_контракта"]');
+            let d1 = e1.datepicker('getDate');
+            let e2 = $('input[name="дата_первой_поставки"]');
+            let d2 = e2.datepicker('getDate');
+            let e3 = $('input[name="дата_окончания_поставок"]');
+            let d3 = e3.datepicker('getDate');
+            let e4 = $('input[name="дата_окончания_действия_контракта"]');
+            let d4 = e4.datepicker('getDate');
+            if (d2 < d1) { e2.addClass('err-bg'); parsError = true; } else e2.removeClass('err-bg');
+            if (d3 < d2) { e3.addClass('err-bg'); parsError = true; } else e3.removeClass('err-bg');
+            if (d4 < d3) { e4.addClass('err-bg'); parsError = true; } else e4.removeClass('err-bg');
             // Проверяем таблицу на ошибку в датах
             let shdlError = false;
-            let ds = tableDiv.find('input.date-selector');
-            ds.each(function (i, e) {
+            tableDiv.find('input.date-selector').each(function (i, e) {
                 e = $(e);
                 let d = e.datepicker('getDate');
-                if (d < d2.datepicker('getDate') || d > d3.datepicker('getDate')) { e.addClass('err-bg'); shdlError = true; } else e.removeClass('err-bg');
+                if (d < d2 || d > d3 || d < d0) { e.addClass('err-bg'); shdlError = true; } else e.removeClass('err-bg');
             });
             // Прверяем таблицу на ошибки в столбце "по заявкам"
             let isOrd = headerDiv.find('input[type="checkbox"][name="поставка_по_заявкам"]').prop('checked');
