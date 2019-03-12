@@ -384,6 +384,7 @@ namespace DeliverySchedule.Models
                     {
                         dr[colNameQty] = items.количество;
                         dr[colNameExp] = items.срок_годности;
+                        break;
                     }
                 }
             }
