@@ -320,45 +320,51 @@ namespace DeliverySchedule.Models
             {
                 this.dt = dt;
             }
-            private static String ConvertToString(Object v)
+        }
+        private static String ConvertToString(Object v)
+        {
+            String s = String.Empty;
+            if (v != null && v != DBNull.Value)
             {
-                String s = String.Empty;
-                if (v != null && v != DBNull.Value)
+                String tfn = v.GetType().FullName;
+                switch (tfn)
                 {
-                    String tfn = v.GetType().FullName;
-                    switch (tfn)
-                    {
-                        case "System.Guid":
-                            s = ((Guid)v).ToString();
-                            break;
-                        case "System.Int32":
-                            s = ((Int32)v).ToString();
-                            break;
-                        case "System.Boolean":
-                            s = ((Boolean)v).ToString();
-                            break;
-                        case "System.String":
-                            s = (String)v;
-                            break;
-                        case "System.Decimal":
-                            s = ((Decimal)v).ToString("n3");
-                            break;
-                        case "System.DateTime":
-                            s = ((DateTime)v).ToString("dd.MM.yy");
-                            break;
-                        default:
-                            s = "FNet.Supply.Models.F0Model.ConvertToString() result: " + tfn;
-                            break;
-                    }
+                    case "System.Guid":
+                        s = ((Guid)v).ToString();
+                        break;
+                    case "System.Int32":
+                        s = ((Int32)v).ToString();
+                        break;
+                    case "System.Boolean":
+                        s = ((Boolean)v).ToString();
+                        break;
+                    case "System.String":
+                        s = (String)v;
+                        break;
+                    case "System.Decimal":
+                        s = ((Decimal)v).ToString("n3");
+                        break;
+                    case "System.DateTime":
+                        s = ((DateTime)v).ToString("dd.MM.yy");
+                        break;
+                    default:
+                        s = "FNet.Supply.Models.F0Model.ConvertToString() result: " + tfn;
+                        break;
                 }
-                return s;
             }
+            return s;
         }
         private DataTable CreateSheduleTable()
         {
             DataTable dt = new DataTable();
-            StringBuilder sql = new StringBuilder();
             dt.Columns.Add("tp_id", typeof(String));
+            foreach (DataRow sdr in Table.Rows)
+            {
+                DataRow ddr = dt.NewRow();
+                ddr["tp_id"] = ConvertToString(sdr["tp_id"]);
+                dt.Rows.Add(ddr);
+            }
+            StringBuilder sql = new StringBuilder();
             sql.Append("SELECT [tp_id]");
             for (int ri = 0; ri < График.RowsCount; ri++)
             {
@@ -372,11 +378,14 @@ namespace DeliverySchedule.Models
                     dt.Columns.Add(colNameExp, typeof(String));
                     sql.Append($", Max([{colNameExp}]) as [{colNameExp}]");
                 }
-                DataRow dr = dt.NewRow();
-                dr["tp_id"] = items.tp_id;
-                dr[colNameQty] = items.количество;
-                dr[colNameExp] = items.срок_годности;
-                dt.Rows.Add(dr);
+                foreach (DataRow dr in dt.Rows)
+                {
+                    if ((String)dr["tp_id"] == items.tp_id)
+                    {
+                        dr[colNameQty] = items.количество;
+                        dr[colNameExp] = items.срок_годности;
+                    }
+                }
             }
             sql.Append($" GROUP BY [tp_id]");
             var newDt = dt.AsEnumerable()
