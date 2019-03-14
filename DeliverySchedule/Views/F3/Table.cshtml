@@ -54,7 +54,7 @@
                                     Boolean переданоВЗакупку = false;
                                     foreach (DataRow dr in Model.Заявки.Rows)
                                     {
-                                        if ((DateTime)dr["дата"] == DateTime.Parse(cn)
+                                        if ((DateTime)dr["дата_поставки_покупателю"] == DateTime.Parse(cn)
                                             && ((Int32)dr["тип_формирования"]).ToString() == ct)
                                         {
                                             переданоВЗакупку = (Boolean)dr["передано_в_закупку"];
@@ -159,7 +159,7 @@
                                             Boolean переданоВЗакупку = false;
                                             foreach (DataRow dr1 in Model.Заявки.Rows)
                                             {
-                                                if ((DateTime)dr1["дата"] == DateTime.Parse(cn)
+                                                if ((DateTime)dr1["дата_поставки_покупателю"] == DateTime.Parse(cn)
                                                     && ((Int32)dr1["тип_формирования"]).ToString() == ct)
                                                 {
                                                     переданоВЗакупку = (Boolean)dr1["передано_в_закупку"];
