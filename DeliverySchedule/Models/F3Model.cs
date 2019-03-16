@@ -149,7 +149,7 @@ namespace DeliverySchedule.Models
                         Parameters = new RequestParameter[]
                         {
                             new RequestParameter { Name = "session_id", Value = rqp.SessionId },
-                            new RequestParameter { Name = "id", Value = SpecId },
+                            new RequestParameter { Name = "код_спецификации", Value = SpecId },
                             new RequestParameter { Name = "old_date", Value = oldDate },
                             new RequestParameter { Name = "new_date", Value = newDate },
                             new RequestParameter { Name = "тип_формирования", Value = ftype }
@@ -360,9 +360,13 @@ namespace DeliverySchedule.Models
             dt.Columns.Add("tp_id", typeof(String));
             foreach (DataRow sdr in Table.Rows)
             {
-                DataRow ddr = dt.NewRow();
-                ddr["tp_id"] = ConvertToString(sdr["tp_id"]);
-                dt.Rows.Add(ddr);
+                String tpId = ConvertToString(sdr["tp_id"]);
+                if (!String.IsNullOrWhiteSpace(tpId))
+                {
+                    DataRow ddr = dt.NewRow();
+                    ddr["tp_id"] = tpId;
+                    dt.Rows.Add(ddr);
+                }
             }
             StringBuilder sql = new StringBuilder();
             sql.Append("SELECT [tp_id]");
