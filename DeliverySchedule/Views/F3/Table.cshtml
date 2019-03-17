@@ -62,26 +62,28 @@
                                         }
                                     }
                                     <th colspan="2" data-column-index="@(7 + ci)">
-                                        @if (ct == "0")
-                                        {
-                                            <span>Поставка по</span><br />
-                                            <span>графику</span><br />
-                                        }
-                                        else if (ct == "1")
-                                        {
-                                            <span>Поставка по</span><br />
-                                            <span>заявке</span><br />
-                                        }
-                                        else if (ct == "2")
-                                        {
-                                            <span>Поставка по</span><br />
-                                            <span>протоколу</span><br />
-                                        }
-                                        else
-                                        {
-                                            <span>Поставка по</span><br />
-                                            <span>?</span><br />
-                                        }
+                                        <div onclick="DeliveryScheduleViewsF3Table.delColumn('@cn', '@ct');">
+                                            @if (ct == "0")
+                                            {
+                                                <span>Поставка по</span><br />
+                                                <span>графику</span><br />
+                                            }
+                                            else if (ct == "1")
+                                            {
+                                                <span>Поставка по</span><br />
+                                                <span>заявке</span><br />
+                                            }
+                                            else if (ct == "2")
+                                            {
+                                                <span>Поставка по</span><br />
+                                                <span>протоколу</span><br />
+                                            }
+                                            else
+                                            {
+                                                <span>Поставка по</span><br />
+                                                <span>?</span><br />
+                                            }
+                                        </div>
                                         @if (переданоВЗакупку)
                                         {
                                             <span>@cn</span>
@@ -277,6 +279,30 @@
             DeliveryScheduleViewsF3Index.checkForm();
         }
 
-        return {};
+        return {
+            delColumn: function (cn, ct) {
+                if (confirm('Удалить колонку?')) {
+                    let specId = DeliveryScheduleViewsF3Index.getSpecId();
+                    let rqp = {
+                        SessionId: Nskd.Server.SessionId,
+                        Command: 'DeliverySchedule.F3.Table.DelColumn',
+                        Parameters: [
+                            { Name: "код_спецификации", Value: specId },
+                            { Name: "дата_поставки_покупателю", Value: cn },
+                            { Name: "тип_формирования", Value: ct }]
+                    };
+                    //console.log(rqp); return;
+                    DeliveryScheduleViewsF3Index.setTableDivHtml('');
+                    Nskd.Http.post({
+                        url: '/deliveryschedule/f3',
+                        rqp: rqp,
+                        done: function (data) {
+                            DeliveryScheduleViewsF3Index.setTableDivHtml(data);
+                            DeliveryScheduleViewsF3Index.checkForm();
+                        }
+                    });
+                }
+            }
+        };
     })();
 </script>

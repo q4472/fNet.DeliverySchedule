@@ -9,6 +9,7 @@ namespace DeliverySchedule.Models
 {
     public class F3Model
     {
+        private RequestPackage Rqp;
         public Guid SessionId;
         public Int32 SpecId;
         public DataTable Head;
@@ -25,26 +26,27 @@ namespace DeliverySchedule.Models
 
         public F3Model(RequestPackage rqp)
         {
+            Rqp = rqp;
             SessionId = rqp.SessionId;
             if (Int32.TryParse(rqp["id"] as String, out SpecId)) { }
             else { Int32.TryParse(rqp["код_спецификации"] as String, out SpecId); }
         }
-        public void Load(RequestPackage rqp)
+        public void Load()
         {
             SpecGet();
         }
-        public void Update(RequestPackage rqp)
+        public void Update()
         {
-            rqp.Command = "[dbo].[спецификации_шапка_update_from_not_null_values]";
-            rqp.AddSessionIdToParameters();
-            rqp.GetResponse("http://127.0.0.1:11012/");
+            Rqp.Command = "[dbo].[спецификации_шапка_update_from_not_null_values]";
+            Rqp.AddSessionIdToParameters();
+            Rqp.GetResponse("http://127.0.0.1:11012/");
 
             SpecGet();
         }
-        public void Update2(RequestPackage rqp)
+        public void Update2()
         {
             // исправляем сроки исполнения
-            foreach (RequestParameter p in rqp.Parameters)
+            foreach (RequestParameter p in Rqp.Parameters)
             {
                 String name = p.Name;
                 String value = p.Value as String;
@@ -54,11 +56,11 @@ namespace DeliverySchedule.Models
                     String fieldName = name.Substring(38, 2);
                     RequestPackage rqp1 = new RequestPackage
                     {
-                        SessionId = rqp.SessionId,
+                        SessionId = SessionId,
                         Command = "dbo.[спецификации_график_параметры_тп_изменить]",
                         Parameters = new RequestParameter[]
                         {
-                            new RequestParameter { Name = "session_id", Value = rqp.SessionId },
+                            new RequestParameter { Name = "session_id", Value = SessionId },
                             new RequestParameter { Name = "tp_uid", Value = tpId },
                             null // Parameters[2]
                         }
@@ -81,7 +83,7 @@ namespace DeliverySchedule.Models
                 }
             }
             // исправляем количество со старой датой
-            foreach (RequestParameter p in rqp.Parameters)
+            foreach (RequestParameter p in Rqp.Parameters)
             {
                 String name = p.Name;
                 if (!String.IsNullOrWhiteSpace(name)
@@ -98,11 +100,11 @@ namespace DeliverySchedule.Models
                     {
                         rqp1 = new RequestPackage
                         {
-                            SessionId = rqp.SessionId,
+                            SessionId = SessionId,
                             Command = "[Pharm-Sib].[dbo].[спецификации_график_изменить_количество]",
                             Parameters = new RequestParameter[]
                             {
-                                new RequestParameter { Name = "session_id", Value = rqp.SessionId },
+                                new RequestParameter { Name = "session_id", Value = SessionId },
                                 new RequestParameter { Name = "код_спецификации", Value = SpecId },
                                 new RequestParameter { Name = "дата", Value = date },
                                 new RequestParameter { Name = "количество", Value = Nskd.Convert.ToDecimalOrNull(value) },
@@ -116,11 +118,11 @@ namespace DeliverySchedule.Models
                         value = (value.Length == 5) ? $"20{value.Substring(3, 2)}-{value.Substring(0, 2)}-01" : null;
                         rqp1 = new RequestPackage
                         {
-                            SessionId = rqp.SessionId,
+                            SessionId = SessionId,
                             Command = "dbo.[спецификации_график_изменить_срок_годности]",
                             Parameters = new RequestParameter[]
                             {
-                                new RequestParameter { Name = "session_id", Value = rqp.SessionId },
+                                new RequestParameter { Name = "session_id", Value = SessionId },
                                 new RequestParameter { Name = "tp_id", Value = tpId },
                                 new RequestParameter { Name = "дата", Value = date },
                                 new RequestParameter { Name = "тип_формирования", Value = ftype },
@@ -132,7 +134,7 @@ namespace DeliverySchedule.Models
                 }
             }
             // изменяем дату
-            foreach (RequestParameter p in rqp.Parameters)
+            foreach (RequestParameter p in Rqp.Parameters)
             {
                 String name = p.Name;
                 String value = p.Value as String;
@@ -144,11 +146,11 @@ namespace DeliverySchedule.Models
                     Int32.TryParse(name.Substring(9, 1), out Int32 ftype);
                     RequestPackage rqp1 = new RequestPackage
                     {
-                        SessionId = rqp.SessionId,
+                        SessionId = SessionId,
                         Command = "dbo.[спецификации_график_изменить_дату]",
                         Parameters = new RequestParameter[]
                         {
-                            new RequestParameter { Name = "session_id", Value = rqp.SessionId },
+                            new RequestParameter { Name = "session_id", Value = SessionId },
                             new RequestParameter { Name = "код_спецификации", Value = SpecId },
                             new RequestParameter { Name = "old_date", Value = oldDate },
                             new RequestParameter { Name = "new_date", Value = newDate },
@@ -161,34 +163,39 @@ namespace DeliverySchedule.Models
             // обновить данные для страницы
             SpecGet();
         }
-        public void Corr(RequestPackage rqp)
+        public void Corr()
         {
-            rqp.AddSessionIdToParameters();
-            rqp.Command = "[Pharm-Sib].[dbo].[спецификации_зачёт_журнал_add]";
-            ResponsePackage rsp = rqp.GetResponse("http://127.0.0.1:11012");
+            Rqp.AddSessionIdToParameters();
+            Rqp.Command = "[Pharm-Sib].[dbo].[спецификации_зачёт_журнал_add]";
+            ResponsePackage rsp = Rqp.GetResponse("http://127.0.0.1:11012");
         }
-        public void AddColumn(RequestPackage rqp)
+        public void AddColumn()
         {
-            if (rqp == null) { throw new ArgumentException(); }
-
-            String specId = rqp["код_спецификации"] as String;
-            if (String.IsNullOrWhiteSpace(specId)
-                || !Int32.TryParse(specId, out Int32 temp)) { throw new ArgumentException(); }
-
-            String fType = rqp["тип_формирования"] as String;
+            if (Rqp == null) { throw new ArgumentException(); }
+            if (SpecId == 0) { throw new ArgumentException(); }
+            String fType = Rqp["тип_формирования"] as String;
             if (String.IsNullOrWhiteSpace(fType)
                 || !(fType == "0" || fType == "1" || fType == "2")) { throw new ArgumentException(); }
 
-            rqp.Command = "[Pharm-Sib].[dbo].[спецификации_график__добавить_колонку]";
-            rqp.AddSessionIdToParameters();
-            var rsp = rqp.GetResponse("http://127.0.0.1:11012/");
+            Rqp.Command = "[Pharm-Sib].[dbo].[спецификации_график__добавить_колонку]";
+            Rqp.AddSessionIdToParameters();
+            var rsp = Rqp.GetResponse("http://127.0.0.1:11012/");
         }
-        public void Send(RequestPackage rqp)
+        public void DelColumn()
         {
-            if (rqp == null) { throw new ArgumentException(); }
-            rqp.Command = "[Pharm-Sib].[dbo].[спецификации_график__передать_в_отдел_снабжения]";
-            rqp.AddSessionIdToParameters();
-            var rsp = rqp.GetResponse("http://127.0.0.1:11012/");
+            if (Rqp == null || SpecId == 0) { throw new ArgumentException(); }
+            if(!DateTime.TryParse(Rqp["дата_поставки_покупателю"] as String, out DateTime dpp)) { throw new ArgumentException(); }
+            Rqp["дата_поставки_покупателю"] = dpp;
+            Rqp.Command = "[DeliverySchedule].[dbo].[заявка_на_закупку__удалить]";
+            Rqp.AddSessionIdToParameters();
+            var rsp = Rqp.GetResponse("http://127.0.0.1:11012/");
+        }
+        public void Send()
+        {
+            if (Rqp == null) { throw new ArgumentException(); }
+            Rqp.Command = "[Pharm-Sib].[dbo].[спецификации_график__передать_в_отдел_снабжения]";
+            Rqp.AddSessionIdToParameters();
+            var rsp = Rqp.GetResponse("http://127.0.0.1:11012/");
         }
 
         private void SpecGet()

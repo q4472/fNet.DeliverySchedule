@@ -16,27 +16,32 @@ namespace DeliverySchedule.Controllers
                 F3Model m = new F3Model(rqp);
                 switch (rqp.Command)
                 {
+                    case "DeliverySchedule.F3.Table.DelColumn":
+                        m.DelColumn();
+                        m.Load();
+                        v = PartialView("~/Views/F3/Table.cshtml", m);
+                        break;
                     case "DeliverySchedule.F3.Index.Send":
-                        m.Send(rqp);
-                        m.Load(rqp);
+                        m.Send();
+                        m.Load();
                         v = PartialView("~/Views/F3/Table.cshtml", m);
                         break;
                     case "DeliverySchedule.F3.Index.Save2":
-                        m.Update2(rqp);
-                        m.Load(rqp);
+                        m.Update2();
+                        m.Load();
                         v = PartialView("~/Views/F3/Table.cshtml", m);
                         break;
                     case "DeliverySchedule.F3.Index.AddColumn":
-                        m.AddColumn(rqp);
-                        m.Load(rqp);
+                        m.AddColumn();
+                        m.Load();
                         v = PartialView("~/Views/F3/Table.cshtml", m);
                         break;
                     case "GoToDeliverySchedule":
-                        m.Load(rqp);
+                        m.Load();
                         v = PartialView("~/Views/F3/Index.cshtml", m);
                         break;
                     default:
-                        v += $"Не известная команда: '{rqp.Command}'<br />";
+                        v += $"Неизвестная команда: '{rqp.Command}'<br />";
                         break;
                 }
             }
@@ -46,7 +51,7 @@ namespace DeliverySchedule.Controllers
         {
             RequestPackage rqp = RequestPackage.ParseRequest(Request.InputStream, Request.ContentEncoding);
             F3Model m = new F3Model(rqp);
-            m.Update(rqp);
+            m.Update();
             PartialViewResult pvr = PartialView("~/Views/F3/Index.cshtml", m);
             return pvr;
         }
@@ -55,7 +60,7 @@ namespace DeliverySchedule.Controllers
             Object v = "DeliverySchedule.Controllers.F3Controller.Corr()";
             RequestPackage rqp = RequestPackage.ParseRequest(Request.InputStream, Request.ContentEncoding);
             F3Model m = new F3Model(rqp);
-            m.Corr(rqp);
+            m.Corr();
             return v;
         }
     }
