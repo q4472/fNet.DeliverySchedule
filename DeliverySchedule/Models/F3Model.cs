@@ -184,9 +184,9 @@ namespace DeliverySchedule.Models
         public void DelColumn()
         {
             if (Rqp == null || SpecId == 0) { throw new ArgumentException(); }
-            if(!DateTime.TryParse(Rqp["дата_поставки_покупателю"] as String, out DateTime dpp)) { throw new ArgumentException(); }
+            if (!DateTime.TryParse(Rqp["дата_поставки_покупателю"] as String, out DateTime dpp)) { throw new ArgumentException(); }
             Rqp["дата_поставки_покупателю"] = dpp;
-            Rqp.Command = "[DeliverySchedule].[dbo].[заявка_на_закупку__удалить]";
+            Rqp.Command = "[DeliverySchedule].[dbo].[заявки_на_закупку__удалить]";
             Rqp.AddSessionIdToParameters();
             var rsp = Rqp.GetResponse("http://127.0.0.1:11012/");
         }
@@ -195,7 +195,42 @@ namespace DeliverySchedule.Models
             if (Rqp == null) { throw new ArgumentException(); }
             Rqp.Command = "[Pharm-Sib].[dbo].[спецификации_график__передать_в_отдел_снабжения]";
             Rqp.AddSessionIdToParameters();
-            var rsp = Rqp.GetResponse("http://127.0.0.1:11012/");
+            ResponsePackage rsp = Rqp.GetResponse("http://127.0.0.1:11012/");
+
+            String address = "sokolov_ea@farmsib.ru";
+            String subject = "Заявка на закупку";
+            String body = Nskd.JsonV3.ToString(Rqp); ;
+            String attachment = $@"
+                <!DOCTYPE HTML>
+                <html>
+                 <head>
+                  <meta http-equiv=""Content-Type"" content=""text/html; charset=utf-8"">
+                  <title>DeliverySchedule</title>
+                 </head>
+                 <body>
+                  <div>{body}</div>
+                 </body>
+                </html>";
+            RequestPackage rqp1 = new RequestPackage()
+            {
+                SessionId = Rqp.SessionId,
+                Command = "Prep.F4.SendEmail",
+                Parameters = new RequestParameter[]
+                {
+                    new RequestParameter(){ Name = "session_id", Value = Rqp.SessionId },
+                    new RequestParameter(){ Name = "address", Value = address },
+                    new RequestParameter(){ Name = "subject", Value = subject },
+                    new RequestParameter(){ Name = "body", Value = body },
+                    new RequestParameter(){ Name = "attachment", Value = attachment }
+                }
+            };
+            rqp1.GetResponse("http://127.0.0.1:11007/");
+
+            rqp1["address"] = "grshanin@farmsib.ru";
+            rqp1.GetResponse("http://127.0.0.1:11007/");
+
+            rqp1["address"] = "dm@farmsib.ru";
+            rqp1.GetResponse("http://127.0.0.1:11007/");
         }
 
         private void SpecGet()

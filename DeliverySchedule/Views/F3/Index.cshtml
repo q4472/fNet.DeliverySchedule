@@ -416,14 +416,14 @@
                             { Name: "тип_формирования", Value: ct }]
                     };
                     //console.log(rqp); return;
+                    tableDiv.html('');
                     Nskd.Http.post({
                         url: '/deliveryschedule/f3',
                         rqp: rqp,
                         done: function (data) {
-                            mainDiv.find('div.table').html(data);
+                            tableDiv.html(data);
                         }
                     });
-                    mainDiv.find('div.table').html('');
                 }
             },
             getSpecId: function () {
