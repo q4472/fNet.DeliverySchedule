@@ -13,7 +13,7 @@ namespace DeliverySchedule.Controllers
             RequestPackage rqp = RequestPackage.ParseRequest(Request.InputStream, Request.ContentEncoding);
             if (rqp != null && !String.IsNullOrWhiteSpace(rqp.Command))
             {
-                F3Model m = new F3Model(rqp);
+                F3Model m = new F3Model(rqp, HttpContext.IsDebuggingEnabled);
                 switch (rqp.Command)
                 {
                     case "DeliverySchedule.F3.Table.DelColumn":
@@ -50,7 +50,7 @@ namespace DeliverySchedule.Controllers
         public Object Save()
         {
             RequestPackage rqp = RequestPackage.ParseRequest(Request.InputStream, Request.ContentEncoding);
-            F3Model m = new F3Model(rqp);
+            F3Model m = new F3Model(rqp, HttpContext.IsDebuggingEnabled);
             m.Update();
             PartialViewResult pvr = PartialView("~/Views/F3/Index.cshtml", m);
             return pvr;
@@ -59,7 +59,7 @@ namespace DeliverySchedule.Controllers
         {
             Object v = "DeliverySchedule.Controllers.F3Controller.Corr()";
             RequestPackage rqp = RequestPackage.ParseRequest(Request.InputStream, Request.ContentEncoding);
-            F3Model m = new F3Model(rqp);
+            F3Model m = new F3Model(rqp, HttpContext.IsDebuggingEnabled);
             m.Corr();
             return v;
         }

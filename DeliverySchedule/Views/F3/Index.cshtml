@@ -278,7 +278,7 @@
                         let tr = $(e).closest('tr');
                         let name = '';
                         let tpUid = tr.attr('data-tp_uid');
-                        if (tpUid) { name = '_' + tpUid + '_'; }
+                        if (tpUid) { name = tpUid + ' '; }
                         name += e.name;
                         rqp.Parameters.push({ Name: name, Value: e.value });
                     });

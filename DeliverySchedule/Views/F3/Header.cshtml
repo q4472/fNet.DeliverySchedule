@@ -1,7 +1,7 @@
 ﻿@using System.Data
 @model DeliverySchedule.Models.F3Model
 <div id="deliveryschedule_views_f3_header">
-    @if (Model.Head != null && Model.Head.Rows.Count > 0)
+    @if (Model.СпецификацияШапка != null && Model.СпецификацияШапка.RowsCount > 0)
     {
         <div style="margin: 4px">Идентификатор спецификации: @Model.SpecId</div>
         <table style="margin-left: 4px; margin-top: 4px; background-color: #cfc">
@@ -22,7 +22,7 @@
                                         <td>
                                             <input type="text"
                                                    name="дата_контракта"
-                                                   value="@Nskd.Convert.ToString(Model.Head.Rows[0]["дата_контракта"])"
+                                                   value="@Nskd.Convert.ToString(Model.СпецификацияШапка[0]["дата_контракта"])"
                                                    data-modified="0"
                                                    class="date-selector" />
                                         </td>
@@ -33,7 +33,7 @@
                                         <td>
                                             <input type="text"
                                                    name="количество_поставок"
-                                                   value="@Model.Head.Rows[0]["количество_поставок"]"
+                                                   value="@Model.СпецификацияШапка[0]["количество_поставок"]"
                                                    data-modified="0"
                                                    onchange="this.value = Nskd.Validator.numberNorm(this.value, 1, 36)" />
                                         </td>
@@ -44,7 +44,7 @@
                                         <td>
                                             <input type="text"
                                                    name="период_поставок"
-                                                   value="@Model.Head.Rows[0]["период_поставок"]"
+                                                   value="@Model.СпецификацияШапка[0]["период_поставок"]"
                                                    data-modified="0"
                                                    onchange="this.value = Nskd.Validator.numberNorm(this.value, 0, 365)" />
                                         </td>
@@ -55,7 +55,7 @@
                                         <td>
                                             <input type="text"
                                                    name="дата_первой_поставки"
-                                                   value="@Nskd.Convert.ToString(Model.Head.Rows[0]["дата_первой_поставки"])"
+                                                   value="@Nskd.Convert.ToString(Model.СпецификацияШапка[0]["дата_первой_поставки"])"
                                                    data-modified="0"
                                                    class="date-selector" />
                                         </td>
@@ -63,9 +63,7 @@
                                     </tr>
                                     <tr>
                                         <td style="text-align: right; padding-right: 4px">Срок от отгрузки до получения покупателем:</td>
-                                        <td>
-                                            @Model.sSiop
-                                        </td>
+                                        <td>@Model.СпецификацияШапка[0]["срок_исполнения_отгрузка_покупатель"]</td>
                                         <td>&nbsp;=> Дата первой отгрузки: <span>@Model.sDpo</span></td>
                                     </tr>
                                     <tr>
@@ -87,7 +85,7 @@
                                         <td>
                                             <input type="text"
                                                    name="дата_окончания_поставок"
-                                                   value="@Nskd.Convert.ToString(Model.Head.Rows[0]["дата_окончания_поставок"])"
+                                                   value="@Nskd.Convert.ToString(Model.СпецификацияШапка[0]["дата_окончания_поставок"])"
                                                    data-modified="0"
                                                    class="date-selector" />
                                         </td>
@@ -98,7 +96,7 @@
                                         <td>
                                             <input type="text"
                                                    name="дата_окончания_действия_контракта"
-                                                   value="@Nskd.Convert.ToString(Model.Head.Rows[0]["дата_окончания_действия_контракта"])"
+                                                   value="@Nskd.Convert.ToString(Model.СпецификацияШапка[0]["дата_окончания_действия_контракта"])"
                                                    data-modified="0"
                                                    class="date-selector" />
                                         </td>
@@ -110,7 +108,7 @@
                                 <table>
                                     <tr>
                                         <td>Поставка по графику</td>
-                                        @if ((Boolean)Model.Head.Rows[0]["поставка_по_графику"])
+                                        @if (Model.СпецификацияШапка[0]["поставка_по_графику"] == "True")
                                         {
                                             <td><input type="checkbox" name="поставка_по_графику" data-modified="0" checked="checked" /></td>
                                         }
@@ -121,7 +119,7 @@
                                     </tr>
                                     <tr>
                                         <td>Поставка по заявкам</td>
-                                        @if ((Boolean)Model.Head.Rows[0]["поставка_по_заявкам"])
+                                        @if (Model.СпецификацияШапка[0]["поставка_по_заявкам"] == "True")
                                         {
                                             <td><input type="checkbox" name="поставка_по_заявкам" data-modified="0" checked="checked" /></td>
                                         }
@@ -133,7 +131,7 @@
                                     <tr><td style="border: none">&nbsp;</td><td style="border: none">&nbsp;</td></tr>
                                     <tr>
                                         <td>Поставка по протоколу</td>
-                                        @if ((Boolean)Model.Head.Rows[0]["поставка_по_протоколу"])
+                                        @if (Model.СпецификацияШапка[0]["поставка_по_протоколу"] == "True")
                                         {
                                             <td><input type="checkbox" name="поставка_по_протоколу" data-modified="0" checked="checked" /></td>
                                         }
@@ -149,7 +147,7 @@
                                     <tr><td style="border: none">&nbsp;</td><td style="border: none">&nbsp;</td></tr>
                                     <tr>
                                         <td>Готово для отд. закупок</td>
-                                        @if ((Boolean)Model.Head.Rows[0]["готово_для_отдела_закупок"])
+                                        @if (Model.СпецификацияШапка[0]["готово_для_отдела_закупок"] == "True")
                                         {
                                             <td><input type="checkbox" name="готово_для_отдела_закупок" data-modified="0" checked="checked" /></td>
                                         }
@@ -160,7 +158,7 @@
                                     </tr>
                                     <tr>
                                         <td>Принято отд. закупок</td>
-                                        @if ((Boolean)Model.Head.Rows[0]["принято_отделом_закупок"])
+                                        @if (Model.СпецификацияШапка[0]["принято_отделом_закупок"] == "True")
                                         {
                                             <td><input type="checkbox" name="принято_отделом_закупок" data-modified="0" disabled="disabled" checked="checked" /></td>
                                         }
