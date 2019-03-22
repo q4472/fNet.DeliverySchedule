@@ -123,13 +123,13 @@
                                             String pz = dc1.ColumnName.Substring(48, 1);
                                             if (pz == "1")
                                             {
-                                                <td class="q" data-column-index="@(4 + ci)" style="text-align: right;">
+                                                <td class="q" data-column-index="@(4 + ci)" style="text-align: right; width: 50px;">
                                                     <span>@q.Replace(".000", "")</span>
                                                 </td>
-                                                <td class="e" data-column-index="@(5 + ci)" style="text-align: right;">
+                                                <td class="e" data-column-index="@(5 + ci)" style="text-align: right; width: 50px;">
                                                     <span>@((e == "") ? "" : e.Substring(3, 5))</span>
                                                 </td>
-                                                <td class="e" data-column-index="@(6 + ci)" style="text-align: right;">
+                                                <td class="e" data-column-index="@(6 + ci)" style="text-align: right; width: 50px;">
                                                     <span>@l</span>
                                                 </td>
                                             }
