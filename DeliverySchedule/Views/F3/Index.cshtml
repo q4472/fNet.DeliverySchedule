@@ -405,15 +405,14 @@
             checkForm: function () {
                 checkForm();
             },
-            send: function (cn, ct) {
+            send: function (uid) {
                 if (confirm('Передать заявку в отдел снабжения и заблокировать столбец?')) {
                     let rqp = {
                         SessionId: Nskd.Server.SessionId,
                         Command: 'DeliverySchedule.F3.Index.Send',
                         Parameters: [
                             { Name: "код_спецификации", Value: specId },
-                            { Name: "дата", Value: ('20' + cn.substr(6, 2) + '-' + cn.substr(3, 2) + '-' + cn.substr(0, 2)) },
-                            { Name: "тип_формирования", Value: ct }]
+                            { Name: "uid", Value: uid }]
                     };
                     //console.log(rqp); return;
                     tableDiv.html('');

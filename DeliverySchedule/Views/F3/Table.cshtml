@@ -17,7 +17,6 @@
                             <col width="30" /> <!-- № -->
                             <col width="700" /><!-- Описание -->
                             <col width="20" /> <!-- Галка сопоставления строк -->
-                            <col width="50" /> <!-- О -> П -->
                             <col width="70" /> <!-- Кол-во -->
                             <col width="70" /> <!-- Остаток по заявкам -->
                             <!-- колонки по графику, заявкам, протоколу -->
@@ -26,19 +25,18 @@
                             <th>№</th>
                             <th>Описание</th>
                             <th>&nbsp;</th>
-                            <th>О -> П</th>
                             <th>Кол-во</th>
                             <th><span>Остаток по</span><br /><span>заявкам</span></th>
                             @if (Model.Shedule != null && Model.Shedule.Columns.Count > 1)
                             {
-                                for (Int32 ci = 1; ci < Model.Shedule.Columns.Count; ci += 2)
+                                for (Int32 ci = 1; ci < Model.Shedule.Columns.Count; ci += 3)
                                 {
                                     DataColumn dc = Model.Shedule.Columns[ci];
                                     String uid = dc.ColumnName.Substring(0, 36);
                                     String cn = dc.ColumnName.Substring(37, 8);
                                     String ct = dc.ColumnName.Substring(46, 1);
                                     String pz = dc.ColumnName.Substring(48, 1);
-                                    <th colspan="2" data-column-index="@(5 + ci)">
+                                    <th colspan="3" data-column-index="@(4 + ci)">
                                         <div onclick="DeliveryScheduleViewsF3Table.delColumn('@cn', '@ct');">
                                             @if (ct == "0")
                                             {
@@ -73,12 +71,14 @@
                                                    value="@cn"
                                                    data-modified="0"
                                                    class="date-selector" />
-                                            <span title="Передать в отдел закупок" onclick="DeliveryScheduleViewsF3Index.send('@cn', '@ct');">&nbsp;&gt;&gt;З</span>
+                                            <span title="Передать в отдел закупок" onclick="DeliveryScheduleViewsF3Index.send('@uid');">&nbsp;&gt;&gt;З</span>
                                             <br />
                                         }
                                         <span onclick="alert('Перенести из остатков');">Кол-во</span>
                                         <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                         <span title="Установить срок годности для незаполненных полей" onclick="DeliveryScheduleViewsF3Index.setE(this);">Срок</span>
+                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <span>О -> П</span>
                                     </th>
                                 }
                             }
@@ -95,26 +95,25 @@
                                     <td style="text-align: right">@dr["номер_строки"]</td>
                                     <td>@(dr["наименование"] + "; " + dr["лекарственная_форма_и_дозировка"] + "; " + dr["производитель"] + "; " + dr["страна"])</td>
                                     <td><input type="checkbox" class="row-flag" /></td>
-                                    <td style="text-align: right">
-                                        <input type="text" name="s3" value="7"
-                                               data-modified="0" style="width: 30px" />
-                                    </td>
                                     <td class="row-qty" style="text-align: right">@dr["количество"].Replace(".000", "")</td>
                                     <td class="todo" style="text-align: right"></td>
                                     @if (Model.Shedule != null && Model.Shedule.Columns.Count > 1)
                                     {
-                                        for (Int32 ci = 1; ci < Model.Shedule.Columns.Count; ci += 2)
+                                        for (Int32 ci = 1; ci < Model.Shedule.Columns.Count; ci += 3)
                                         {
                                             DataColumn dc1 = Model.Shedule.Columns[ci];
                                             DataColumn dc2 = Model.Shedule.Columns[ci + 1];
+                                            DataColumn dc3 = Model.Shedule.Columns[ci + 2];
                                             String q = String.Empty;
                                             String e = String.Empty;
+                                            String l = String.Empty;
                                             foreach (DataRow sdr in Model.Shedule.Rows)
                                             {
                                                 if ((String)sdr["tp_id"] == tp_id)
                                                 {
                                                     q = (String)sdr[ci];
                                                     e = (String)sdr[ci + 1];
+                                                    l = (String)sdr[ci + 2];
                                                     break;
                                                 }
                                             }
@@ -124,26 +123,38 @@
                                             String pz = dc1.ColumnName.Substring(48, 1);
                                             if (pz == "1")
                                             {
-                                                <td class="q" data-column-index="@(5 + ci)" style="text-align: right;">
+                                                <td class="q" data-column-index="@(4 + ci)" style="text-align: right;">
                                                     <span>@q.Replace(".000", "")</span>
                                                 </td>
-                                                <td class="e" data-column-index="@(6 + ci)" style="text-align: right;">
+                                                <td class="e" data-column-index="@(5 + ci)" style="text-align: right;">
                                                     <span>@((e == "") ? "" : e.Substring(3, 5))</span>
+                                                </td>
+                                                <td class="e" data-column-index="@(6 + ci)" style="text-align: right;">
+                                                    <span>@l</span>
                                                 </td>
                                             }
                                             else
                                             {
-                                                <td class="q" data-column-index="@(5 + ci)">
+                                                <td class="q" data-column-index="@(4 + ci)">
                                                     <input type="text"
                                                            name="@dc1.ColumnName"
                                                            value="@q.Replace(".000", "")"
-                                                           data-modified="0" />
+                                                           data-modified="0"
+                                                           style="width: 50px" />
                                                 </td>
-                                                <td class="e" data-column-index="@(6 + ci)">
+                                                <td class="e" data-column-index="@(5 + ci)">
                                                     <input type="text"
                                                            name="@dc2.ColumnName"
                                                            value="@((e == "") ? "" : e.Substring(3, 5))"
-                                                           data-modified="0" />
+                                                           data-modified="0"
+                                                           style="width: 50px" />
+                                                </td>
+                                                <td class="l" data-column-index="@(6 + ci)">
+                                                    <input type="text"
+                                                           name="@dc3.ColumnName"
+                                                           value="@l"
+                                                           data-modified="0"
+                                                           style="width: 40px" />
                                                 </td>
                                             }
                                         }
@@ -186,7 +197,7 @@
         });
         sheduleInputs.change(function () {
             this.setAttribute('data-modified', '1');
-            if ($(this).parent().hasClass('q')) {
+            if ($(this).parent().hasClass('q') || $(this).parent().hasClass('l')) {
                 Nskd.Validator.nNorm(this, 0);
             }
             calcToDo(this);

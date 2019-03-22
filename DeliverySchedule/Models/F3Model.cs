@@ -127,58 +127,19 @@ namespace DeliverySchedule.Models
         }
         public void Update2()
         {
-            // исправляем сроки исполнения
-            /*
-            foreach (RequestParameter p in Rqp.Parameters)
-            {
-                String name = p.Name;
-                String value = p.Value as String;
-                if (name.Length == 40 && value != null && (new Regex(@"_[0-9a-f-]{36}_s\d")).IsMatch(name))
-                {
-                    Guid.TryParse(name.Substring(1, 36), out Guid tpId);
-                    String fieldName = name.Substring(38, 2);
-                    RequestPackage rqp1 = new RequestPackage
-                    {
-                        SessionId = SessionId,
-                        Command = "dbo.[спецификации_график_параметры_тп_изменить]",
-                        Parameters = new RequestParameter[]
-                        {
-                            new RequestParameter { Name = "session_id", Value = SessionId },
-                            new RequestParameter { Name = "tp_uid", Value = tpId },
-                            null // Parameters[2]
-                        }
-                    };
-                    switch (fieldName)
-                    {
-                        case "s1":
-                            rqp1.Parameters[2] = new RequestParameter { Name = "срок_исполнения_заявка_склад", Value = value };
-                            break;
-                        case "s2":
-                            rqp1.Parameters[2] = new RequestParameter { Name = "срок_исполнения_склад_отгрузка", Value = value };
-                            break;
-                        case "s3":
-                            rqp1.Parameters[2] = new RequestParameter { Name = "срок_исполнения_отгрузка_покупатель", Value = value };
-                            break;
-                        default:
-                            break;
-                    }
-                    rqp1.GetResponse("http://127.0.0.1:11012/");
-                }
-            }
-            */
             // исправляем количество со старой датой
             foreach (RequestParameter p in Rqp.Parameters)
             {
                 String name = p.Name;
                 if (!String.IsNullOrWhiteSpace(name)
                     && name.Length == 88
-                    && (new Regex(@"[0-9a-f-]{36} [0-9a-f-]{36} \d\d\.\d\d\.\d\d \d \d [qe]")).IsMatch(name))
+                    && (new Regex(@"[0-9a-f-]{36} [0-9a-f-]{36} \d\d\.\d\d\.\d\d \d \d [qel]")).IsMatch(name))
                 {
                     Guid.TryParse(name.Substring(0, 36), out Guid tpId);
                     Guid.TryParse(name.Substring(37, 36), out Guid uid);
                     String field = name.Substring(87, 1);
                     String value = p.Value as String;
-                    RequestPackage rqp1;
+                    RequestPackage rqp1 = null;
                     if (field == "q")
                     {
                         rqp1 = new RequestPackage
@@ -194,7 +155,7 @@ namespace DeliverySchedule.Models
                             }
                         };
                     }
-                    else // field == "e"
+                    else if (field == "e")
                     {
                         value = (value.Length == 5) ? $"20{value.Substring(3, 2)}-{value.Substring(0, 2)}-01" : null;
                         rqp1 = new RequestPackage
@@ -210,7 +171,25 @@ namespace DeliverySchedule.Models
                             }
                         };
                     }
-                    var rsp = rqp1.GetResponse("http://127.0.0.1:11012/");
+                    else if (field == "l")
+                    {
+                        rqp1 = new RequestPackage
+                        {
+                            SessionId = SessionId,
+                            Command = "[DeliverySchedule].[dbo].[заявки_на_закупку_таблица__изменить_срок_исполнения]",
+                            Parameters = new RequestParameter[]
+                            {
+                                new RequestParameter { Name = "session_id", Value = SessionId },
+                                new RequestParameter { Name = "tp_id", Value = tpId },
+                                new RequestParameter { Name = "uid", Value = uid },
+                                new RequestParameter { Name = "срок_исполнения_отгрузка_покупатель", Value = Nskd.Convert.ToDecimalOrNull(value) }
+                            }
+                        };
+                    }
+                    if (rqp1 != null)
+                    {
+                        var rsp = rqp1.GetResponse("http://127.0.0.1:11012/");
+                    }
                 }
             }
             // изменяем дату
@@ -281,7 +260,7 @@ namespace DeliverySchedule.Models
         public void Send()
         {
             if (Rqp == null) { throw new ArgumentException(); }
-            Rqp.Command = "[Pharm-Sib].[dbo].[спецификации_график__передать_в_отдел_снабжения]";
+            Rqp.Command = "[DeliverySchedule].[dbo].[заявки_на_закупку__передать_в_отдел_снабжения]";
             Rqp.AddSessionIdToParameters();
             ResponsePackage rsp = Rqp.GetResponse("http://127.0.0.1:11012/");
 
@@ -544,8 +523,10 @@ namespace DeliverySchedule.Models
                 String pz = (ConvertToString(row["передано_в_закупку"]) == "True") ? "1" : "0";
                 String colNameQty = $"{uid} {cn} {ct} {pz} q";
                 String colNameExp = $"{uid} {cn} {ct} {pz} e";
+                String colNameLag = $"{uid} {cn} {ct} {pz} l";
                 dt.Columns.Add(colNameQty, typeof(String));
                 dt.Columns.Add(colNameExp, typeof(String));
+                dt.Columns.Add(colNameLag, typeof(String));
             }
 
             for (int ri = 0; ri < СпецификацияТаблица.RowsCount; ri++)
@@ -580,11 +561,13 @@ namespace DeliverySchedule.Models
                 }
                 String colNameQty = $"{uid} {cn} {ct} {pz} q";
                 String colNameExp = $"{uid} {cn} {ct} {pz} e";
+                String colNameLag = $"{uid} {cn} {ct} {pz} l";
                 DataRow[] drs = dt.Select($"[tp_id] = '{row["tp_id"]}'");
                 if (drs.Length > 0)
                 {
                     drs[0][colNameQty] = row["количество"];
                     drs[0][colNameExp] = row["срок_годности"];
+                    drs[0][colNameLag] = row["срок_исполнения_отгрузка_покупатель"];
                 }
             }
             return dt;
