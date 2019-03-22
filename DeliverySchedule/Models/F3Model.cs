@@ -2,7 +2,6 @@
 using System;
 using System.Data;
 using System.Globalization;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace DeliverySchedule.Models
@@ -51,6 +50,7 @@ namespace DeliverySchedule.Models
                 if (rsp.Data.Tables.Count > 1)
                 {
                     СпецификацияТаблица = new Спецификация.Таблица(rsp.Data.Tables[1]);
+                    СпецификацияТаблица.Sort("[номер_строки]");
                 }
             }
 
@@ -108,6 +108,7 @@ namespace DeliverySchedule.Models
             if (rsp != null && rsp.Data != null && rsp.Data.Tables.Count > 0)
             {
                 ЗаявкиНаЗакупкуШапка = new ЗаявкиНаЗакупку.Шапка(rsp.Data.Tables[0]);
+                ЗаявкиНаЗакупкуШапка.Sort("[дата_поставки_покупателю], [тип_формирования]");
                 if (rsp.Data.Tables.Count > 1)
                 {
                     ЗаявкиНаЗакупкуТаблица = new ЗаявкиНаЗакупку.Таблица(rsp.Data.Tables[1]);
@@ -402,6 +403,11 @@ namespace DeliverySchedule.Models
                         }
                     }
                 }
+                public void Sort(String expression)
+                {
+                    dt.DefaultView.Sort = expression;
+                    dt = dt.DefaultView.ToTable();
+                }
             }
         }
         public class ЗаявкиНаЗакупку
@@ -444,13 +450,10 @@ namespace DeliverySchedule.Models
                         }
                     }
                 }
-                public DataView DataViewSortedByDateAndType
+                public void Sort(String expression)
                 {
-                    get
-                    {
-                        dt.DefaultView.Sort = "[дата_поставки_покупателю], [тип_формирования]";
-                        return dt.DefaultView;
-                    }
+                        dt.DefaultView.Sort = expression;
+                        dt = dt.DefaultView.ToTable();
                 }
             }
             public class Таблица
@@ -532,22 +535,23 @@ namespace DeliverySchedule.Models
         {
             DataTable dt = new DataTable();
             dt.Columns.Add("tp_id", typeof(String));
-            DataView h = ЗаявкиНаЗакупкуШапка.DataViewSortedByDateAndType;
-            foreach (DataRowView dr in h)
+            for (int ri = 0; ri < ЗаявкиНаЗакупкуШапка.RowsCount; ri++)
             {
-                String uid = ConvertToString(dr["uid"]);
-                String cn = ConvertToString(dr["дата_поставки_покупателю"]);
-                String ct = ConvertToString(dr["тип_формирования"]);
-                String pz = (ConvertToString(dr["передано_в_закупку"]) == "True") ? "1" : "0";
+                var row = ЗаявкиНаЗакупкуШапка[ri];
+                String uid = ConvertToString(row["uid"]);
+                String cn = ConvertToString(row["дата_поставки_покупателю"]);
+                String ct = ConvertToString(row["тип_формирования"]);
+                String pz = (ConvertToString(row["передано_в_закупку"]) == "True") ? "1" : "0";
                 String colNameQty = $"{uid} {cn} {ct} {pz} q";
                 String colNameExp = $"{uid} {cn} {ct} {pz} e";
                 dt.Columns.Add(colNameQty, typeof(String));
                 dt.Columns.Add(colNameExp, typeof(String));
             }
+
             for (int ri = 0; ri < СпецификацияТаблица.RowsCount; ri++)
             {
-                Спецификация.Таблица.СтрокаДанных row = СпецификацияТаблица[ri];
-                String tpId = row["tp_id"];
+                var row = СпецификацияТаблица[ri];
+                String tpId = ConvertToString(row["tp_id"]);
                 if (!String.IsNullOrWhiteSpace(tpId))
                 {
                     DataRow ddr = dt.NewRow();
