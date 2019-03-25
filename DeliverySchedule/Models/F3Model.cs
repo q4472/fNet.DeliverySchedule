@@ -2,6 +2,7 @@
 using System;
 using System.Data;
 using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace DeliverySchedule.Models
@@ -264,10 +265,20 @@ namespace DeliverySchedule.Models
             Rqp.AddSessionIdToParameters();
             ResponsePackage rsp = Rqp.GetResponse("http://127.0.0.1:11012/");
 
-            String address = "sokolov_ea@farmsib.ru";
-            String subject = "Заявка на закупку";
-            String body = Nskd.JsonV3.ToString(Rqp); ;
-            String attachment = $@"
+            /*
+Желательно
+19.03.19 в 11:31  
+менеджер Сущева передала 
+заявку №…. в отдел закупок»
+наименование заказчика, 
+контракт и 
+список товара из заявки
+ */
+            StringBuilder zzpf1 = new StringBuilder();
+            DataSet data = rsp.Data;
+            DataTable dt0 = data.Tables[0];
+            DataTable dt1 = data.Tables[1];
+            zzpf1.Append($@"
                 <!DOCTYPE HTML>
                 <html>
                  <head>
@@ -275,9 +286,47 @@ namespace DeliverySchedule.Models
                   <title>DeliverySchedule</title>
                  </head>
                  <body>
-                  <div>{body}</div>
+                  <div>
+                    <table>
+                     <tr><td>Передано в закупку: </td><td>{((DateTime)dt0.Rows[0]["передано_в_закупку_время"]).ToString("dd.MM.yy в HH.mm")}</td></tr>
+                     <tr><td>Менеджер: </td><td>{(String)dt0.Rows[0]["менеджер"]}</td></tr>
+                     <tr><td>Номер аукциона: </td><td>{(String)dt0.Rows[0]["номер_аукциона"]}</td></tr>
+                     <tr><td>Заказчик: </td><td>{(String)dt0.Rows[0]["наименование_заказчика_сокращённое"]}</td></tr>
+                     <tr><td>Номер заявки на закупку: </td><td>{(Int32)dt0.Rows[0]["номер_заявки_на_закупку"]}</td></tr>
+                    </table>
+                  </div>
+                  <div>
+                    <table>
+            ");
+            zzpf1.Append($@"
+                     <tr>
+                      <th>№</th>
+                      <th>Товар</th>
+                      <th>Кол-во</th>
+                      <th>Срок годности</th>
+                     </tr>
+            ");
+            foreach (DataRow dr in dt1.Rows)
+            {
+                zzpf1.Append($@"
+                     <tr>  
+                      <td>{ConvertToString(dr["номер_строки"])}</td>
+                      <td>{ConvertToString(dr["товар"])}</td>
+                      <td>{ConvertToString(dr["количество"])}</td>
+                      <td>{ConvertToString(dr["срок_годности"])}</td>
+                     </tr>
+                ");
+            }
+            zzpf1.Append($@"
+                    </table>
+                  </div>
                  </body>
-                </html>";
+                </html>
+            ");
+            String address = "sokolov_ea@farmsib.ru";
+            String subject = "Заявка на закупку";
+            String body = zzpf1.ToString();
+            String attachment = zzpf1.ToString();
             RequestPackage rqp1 = new RequestPackage()
             {
                 SessionId = Rqp.SessionId,
