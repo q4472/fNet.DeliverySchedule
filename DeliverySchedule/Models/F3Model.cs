@@ -136,7 +136,7 @@ namespace DeliverySchedule.Models
                     && name.Length == 88
                     && (new Regex(@"[0-9a-f-]{36} [0-9a-f-]{36} \d\d\.\d\d\.\d\d \d \d [qel]")).IsMatch(name))
                 {
-                    Guid.TryParse(name.Substring(0, 36), out Guid tpId);
+                    Guid.TryParse(name.Substring(0, 36), out Guid stUid);
                     Guid.TryParse(name.Substring(37, 36), out Guid uid);
                     String field = name.Substring(87, 1);
                     String value = p.Value as String;
@@ -150,7 +150,7 @@ namespace DeliverySchedule.Models
                             Parameters = new RequestParameter[]
                             {
                                 new RequestParameter { Name = "session_id", Value = SessionId },
-                                new RequestParameter { Name = "tp_id", Value = tpId },
+                                new RequestParameter { Name = "спецификации_таблица_uid", Value = stUid },
                                 new RequestParameter { Name = "uid", Value = uid },
                                 new RequestParameter { Name = "количество", Value = Nskd.Convert.ToDecimalOrNull(value) }
                             }
@@ -166,7 +166,7 @@ namespace DeliverySchedule.Models
                             Parameters = new RequestParameter[]
                             {
                                 new RequestParameter { Name = "session_id", Value = SessionId },
-                                new RequestParameter { Name = "tp_id", Value = tpId },
+                                new RequestParameter { Name = "спецификации_таблица_uid", Value = stUid },
                                 new RequestParameter { Name = "uid", Value = uid },
                                 new RequestParameter { Name = "срок_годности", Value = value }
                             }
@@ -181,7 +181,7 @@ namespace DeliverySchedule.Models
                             Parameters = new RequestParameter[]
                             {
                                 new RequestParameter { Name = "session_id", Value = SessionId },
-                                new RequestParameter { Name = "tp_id", Value = tpId },
+                                new RequestParameter { Name = "спецификации_таблица_uid", Value = stUid },
                                 new RequestParameter { Name = "uid", Value = uid },
                                 new RequestParameter { Name = "срок_исполнения_отгрузка_покупатель", Value = Nskd.Convert.ToDecimalOrNull(value) }
                             }
@@ -348,6 +348,12 @@ namespace DeliverySchedule.Models
                 rqp1.GetResponse("http://127.0.0.1:11007/");
 
                 rqp1["address"] = "dm@farmsib.ru";
+                rqp1.GetResponse("http://127.0.0.1:11007/");
+
+                rqp1["address"] = "su@farmsib.ru";
+                rqp1.GetResponse("http://127.0.0.1:11007/");
+
+                rqp1["address"] = "mihajlova_aa@farmsib.ru";
                 rqp1.GetResponse("http://127.0.0.1:11007/");
             }
         }
@@ -562,7 +568,7 @@ namespace DeliverySchedule.Models
         private DataTable CreateSheduleTable()
         {
             DataTable dt = new DataTable();
-            dt.Columns.Add("tp_id", typeof(String));
+            dt.Columns.Add("спецификации_таблица_uid", typeof(String));
             for (int ri = 0; ri < ЗаявкиНаЗакупкуШапка.RowsCount; ri++)
             {
                 var row = ЗаявкиНаЗакупкуШапка[ri];
@@ -581,11 +587,11 @@ namespace DeliverySchedule.Models
             for (int ri = 0; ri < СпецификацияТаблица.RowsCount; ri++)
             {
                 var row = СпецификацияТаблица[ri];
-                String tpId = ConvertToString(row["tp_id"]);
-                if (!String.IsNullOrWhiteSpace(tpId))
+                String stUid = ConvertToString(row["uid"]);
+                if (!String.IsNullOrWhiteSpace(stUid))
                 {
                     DataRow ddr = dt.NewRow();
-                    ddr["tp_id"] = tpId;
+                    ddr["спецификации_таблица_uid"] = stUid;
                     dt.Rows.Add(ddr);
                 }
             }
@@ -611,7 +617,7 @@ namespace DeliverySchedule.Models
                 String colNameQty = $"{uid} {cn} {ct} {pz} q";
                 String colNameExp = $"{uid} {cn} {ct} {pz} e";
                 String colNameLag = $"{uid} {cn} {ct} {pz} l";
-                DataRow[] drs = dt.Select($"[tp_id] = '{row["tp_id"]}'");
+                DataRow[] drs = dt.Select($"[спецификации_таблица_uid] = '{row["спецификации_таблица_uid"]}'");
                 if (drs.Length > 0)
                 {
                     drs[0][colNameQty] = row["количество"];

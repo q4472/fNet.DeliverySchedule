@@ -234,7 +234,6 @@
 
         return {
             save: function () {
-                let saveButton = mainDiv.find('input[type="button"].save2_button');
                 saveButton.prop('disabled', true);
                 let inputs = headerDiv.find('input[data-modified="1"]');
                 if (inputs.length > 0) {

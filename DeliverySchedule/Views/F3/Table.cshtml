@@ -37,48 +37,80 @@
                                     String ct = dc.ColumnName.Substring(46, 1);
                                     String pz = dc.ColumnName.Substring(48, 1);
                                     <th colspan="3" data-column-index="@(4 + ci)">
-                                        <div onclick="DeliveryScheduleViewsF3Table.delColumn('@cn', '@ct');">
-                                            @if (ct == "0")
-                                            {
-                                                <span>Поставка по</span><br />
-                                                <span>графику</span><br />
-                                            }
-                                            else if (ct == "1")
-                                            {
-                                                <span>Поставка по</span><br />
-                                                <span>заявке</span><br />
-                                            }
-                                            else if (ct == "2")
-                                            {
-                                                <span>Поставка по</span><br />
-                                                <span>протоколу</span><br />
-                                            }
-                                            else
-                                            {
-                                                <span>Поставка по</span><br />
-                                                <span>?</span><br />
-                                            }
-                                        </div>
                                         @if (pz == "1")
                                         {
+                                            <div>
+                                                @if (ct == "0")
+                                                {
+                                                    <span>Поставка по</span><br />
+                                                    <span>графику</span><br />
+                                                }
+                                                else if (ct == "1")
+                                                {
+                                                    <span>Поставка по</span><br />
+                                                    <span>заявке</span><br />
+                                                }
+                                                else if (ct == "2")
+                                                {
+                                                    <span>Поставка по</span><br />
+                                                    <span>протоколу</span><br />
+                                                }
+                                                else
+                                                {
+                                                    <span>Поставка по</span><br />
+                                                    <span>?</span><br />
+                                                }
+                                            </div>
                                             <span>@cn</span>
                                             <br />
+                                            <span onclick="alert('Перенести из остатков');">Кол-во</span>
+                                            <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                            <span>Срок</span>
+                                            <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                            <span>О -> П</span>
                                         }
                                         else
                                         {
+                                            <div onclick="DeliveryScheduleViewsF3Table.delColumn('@cn', '@ct');" style="background-color: #ffccff;" title="Удалить">
+                                                @if (ct == "0")
+                                                {
+                                                    <span>Поставка по</span><br />
+                                                    <span>графику</span><br />
+                                                }
+                                                else if (ct == "1")
+                                                {
+                                                    <span>Поставка по</span><br />
+                                                    <span>заявке</span><br />
+                                                }
+                                                else if (ct == "2")
+                                                {
+                                                    <span>Поставка по</span><br />
+                                                    <span>протоколу</span><br />
+                                                }
+                                                else
+                                                {
+                                                    <span>Поставка по</span><br />
+                                                    <span>?</span><br />
+                                                }
+                                            </div>
                                             <input type="text"
                                                    name="@dc.ColumnName"
                                                    value="@cn"
                                                    data-modified="0"
                                                    class="date-selector" />
-                                            <span title="Передать в отдел закупок" onclick="DeliveryScheduleViewsF3Index.send('@uid');">&nbsp;&gt;&gt;З</span>
+                                            <span class="send"
+                                                  title="Передать в отдел закупок"
+                                                  style="background-color: #ffccff;"
+                                                  onclick="DeliveryScheduleViewsF3Index.send('@uid');">&nbsp;&gt;&gt;З</span>
                                             <br />
+                                            <span onclick="alert('Перенести из остатков');">Кол-во</span>
+                                            <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                            <span title="Установить срок годности для незаполненных полей"
+                                                  style="background-color: #ffccff;"
+                                                  onclick="DeliveryScheduleViewsF3Index.setE(this);">Срок</span>
+                                            <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                            <span>О -> П</span>
                                         }
-                                        <span onclick="alert('Перенести из остатков');">Кол-во</span>
-                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                        <span title="Установить срок годности для незаполненных полей" onclick="DeliveryScheduleViewsF3Index.setE(this);">Срок</span>
-                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                        <span>О -> П</span>
                                     </th>
                                 }
                             }
@@ -88,10 +120,10 @@
                         {
                             var dr = Model.СпецификацияТаблица[ri];
                             String row_id = dr["id"];
-                            String tp_id = dr["tp_id"];
-                            if (tp_id != "")
+                            String stUid = dr["uid"];
+                            if (stUid != "")
                             {
-                                <tr data-row_id="@row_id" data-tp_uid="@tp_id" class="fnet">
+                                <tr data-row_id="@row_id" data-tp_uid="@stUid" class="fnet">
                                     <td style="text-align: right">@dr["номер_строки"]</td>
                                     <td>@(dr["наименование"] + "; " + dr["лекарственная_форма_и_дозировка"] + "; " + dr["производитель"] + "; " + dr["страна"])</td>
                                     <td><input type="checkbox" class="row-flag" /></td>
@@ -109,7 +141,7 @@
                                             String l = String.Empty;
                                             foreach (DataRow sdr in Model.Shedule.Rows)
                                             {
-                                                if ((String)sdr["tp_id"] == tp_id)
+                                                if ((String)sdr["спецификации_таблица_uid"] == stUid)
                                                 {
                                                     q = (String)sdr[ci];
                                                     e = (String)sdr[ci + 1];
@@ -186,6 +218,7 @@
         let sheduleInputs = shdl.find('input[type="text"]');
         let todoTds = shdl.find('td.todo');
         let dateSelectors = mainDiv.find('input.date-selector');
+        let sendSpan = mainDiv.find('span.send');
 
         dateSelectors.datepicker({ dateFormat: 'dd.mm.y', firstDay: 1, changeYear: true, minDate: 0 });
         dateSelectors.change(checkForm);
@@ -194,9 +227,11 @@
 
         sheduleInputs.keyup(function () {
             this.setAttribute('data-modified', '1');
+            sendSpan.hide();
         });
         sheduleInputs.change(function () {
             this.setAttribute('data-modified', '1');
+            sendSpan.hide();
             if ($(this).parent().hasClass('q') || $(this).parent().hasClass('l')) {
                 Nskd.Validator.nNorm(this, 0);
             }
