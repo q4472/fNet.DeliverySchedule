@@ -131,12 +131,12 @@
         let headerDiv = mainDiv.find('div.header');
         let tableDiv = mainDiv.find('div.table');
         let modalDiv = mainDiv.find('div.modal');
+        let saveButton = mainDiv.find('input[type="button"].save_button');
 
         modalDiv.find('div.body2 input[type="text"]').datepicker({ dateFormat: 'mm.y', firstDay: 1, changeYear: true });
 
         function checkForm() {
             let errs = checkFormForErrors();
-            let saveButton = mainDiv.find('input[type="button"].save_button');
             saveButton.prop('disabled', errs.parsError || headerDiv.find('input[data-modified="1"]').length == 0);
             let save2Button = mainDiv.find('input[type="button"].save2_button');
             save2Button.prop('disabled', errs.shdlError || tableDiv.find('input[data-modified="1"]').length == 0);
