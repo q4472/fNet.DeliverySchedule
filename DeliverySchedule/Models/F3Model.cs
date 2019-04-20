@@ -288,11 +288,11 @@ namespace DeliverySchedule.Models
                  <body>
                   <div>
                     <table>
-                     <tr><td>Передано в закупку: </td><td>{((DateTime)dt0.Rows[0]["передано_в_закупку_время"]).ToString("dd.MM.yy в HH.mm")}</td></tr>
-                     <tr><td>Менеджер: </td><td>{(String)dt0.Rows[0]["менеджер"]}</td></tr>
-                     <tr><td>Номер аукциона: </td><td>{(String)dt0.Rows[0]["номер_аукциона"]}</td></tr>
-                     <tr><td>Заказчик: </td><td>{(String)dt0.Rows[0]["наименование_заказчика_сокращённое"]}</td></tr>
-                     <tr><td>Номер заявки на закупку: </td><td>{(Int32)dt0.Rows[0]["номер_заявки_на_закупку"]}</td></tr>
+                     <tr><td>Передано в закупку: </td><td>{Lib.ConvertToString(dt0.Rows[0]["передано_в_закупку_время"], "dd.MM.yy в HH.mm")}</td></tr>
+                     <tr><td>Менеджер: </td><td>{Lib.ConvertToString(dt0.Rows[0]["менеджер"])}</td></tr>
+                     <tr><td>Номер аукциона: </td><td>{Lib.ConvertToString(dt0.Rows[0]["номер_аукциона"])}</td></tr>
+                     <tr><td>Заказчик: </td><td>{Lib.ConvertToString(dt0.Rows[0]["наименование_заказчика_сокращённое"])}</td></tr>
+                     <tr><td>Номер заявки на закупку: </td><td>{Lib.ConvertToString(dt0.Rows[0]["номер_заявки_на_закупку"])}</td></tr>
                     </table>
                   </div>
                   <div>
@@ -310,10 +310,10 @@ namespace DeliverySchedule.Models
             {
                 zzpf1.Append($@"
                      <tr>  
-                      <td>{ConvertToString(dr["номер_строки"])}</td>
-                      <td>{ConvertToString(dr["товар"])}</td>
-                      <td>{ConvertToString(dr["количество"])}</td>
-                      <td>{ConvertToString(dr["срок_годности"])}</td>
+                      <td>{Lib.ConvertToString(dr["номер_строки"])}</td>
+                      <td>{Lib.ConvertToString(dr["товар"])}</td>
+                      <td>{Lib.ConvertToString(dr["количество"])}</td>
+                      <td>{Lib.ConvertToString(dr["срок_годности"])}</td>
                      </tr>
                 ");
             }
@@ -392,7 +392,7 @@ namespace DeliverySchedule.Models
                             String v = String.Empty;
                             if (!String.IsNullOrWhiteSpace(fieldName) && dr != null && dr.Table.Columns.Contains(fieldName))
                             {
-                                v = ConvertToString(dr[fieldName]);
+                                v = Lib.ConvertToString(dr[fieldName]);
                             }
                             return v;
                         }
@@ -431,7 +431,7 @@ namespace DeliverySchedule.Models
                             String v = String.Empty;
                             if (!String.IsNullOrWhiteSpace(fieldName) && dr != null && dr.Table.Columns.Contains(fieldName))
                             {
-                                v = ConvertToString(dr[fieldName]);
+                                v = Lib.ConvertToString(dr[fieldName]);
                             }
                             return v;
                         }
@@ -478,7 +478,7 @@ namespace DeliverySchedule.Models
                             String v = String.Empty;
                             if (!String.IsNullOrWhiteSpace(fieldName) && dr != null && dr.Table.Columns.Contains(fieldName))
                             {
-                                v = ConvertToString(dr[fieldName]);
+                                v = Lib.ConvertToString(dr[fieldName]);
                             }
                             return v;
                         }
@@ -522,7 +522,7 @@ namespace DeliverySchedule.Models
                             String v = String.Empty;
                             if (!String.IsNullOrWhiteSpace(fieldName) && dr != null && dr.Table.Columns.Contains(fieldName))
                             {
-                                v = ConvertToString(dr[fieldName]);
+                                v = Lib.ConvertToString(dr[fieldName]);
                             }
                             return v;
                         }
@@ -531,40 +531,6 @@ namespace DeliverySchedule.Models
             }
         }
 
-        private static String ConvertToString(Object v)
-        {
-            String s = String.Empty;
-            CultureInfo ic = CultureInfo.InvariantCulture;
-            if (v != null && v != DBNull.Value)
-            {
-                String tfn = v.GetType().FullName;
-                switch (tfn)
-                {
-                    case "System.Guid":
-                        s = ((Guid)v).ToString(null, ic);
-                        break;
-                    case "System.Int32":
-                        s = ((Int32)v).ToString(ic);
-                        break;
-                    case "System.Boolean":
-                        s = ((Boolean)v).ToString(ic);
-                        break;
-                    case "System.String":
-                        s = (String)v;
-                        break;
-                    case "System.Decimal":
-                        s = ((Decimal)v).ToString("n3", ic);
-                        break;
-                    case "System.DateTime":
-                        s = ((DateTime)v).ToString("dd.MM.yy", ic);
-                        break;
-                    default:
-                        s = "FNet.Supply.Models.F0Model.ConvertToString() result: " + tfn;
-                        break;
-                }
-            }
-            return s;
-        }
         private DataTable CreateSheduleTable()
         {
             DataTable dt = new DataTable();
@@ -572,10 +538,10 @@ namespace DeliverySchedule.Models
             for (int ri = 0; ri < ЗаявкиНаЗакупкуШапка.RowsCount; ri++)
             {
                 var row = ЗаявкиНаЗакупкуШапка[ri];
-                String uid = ConvertToString(row["uid"]);
-                String cn = ConvertToString(row["дата_поставки_покупателю"]);
-                String ct = ConvertToString(row["тип_формирования"]);
-                String pz = (ConvertToString(row["передано_в_закупку"]) == "True") ? "1" : "0";
+                String uid = Lib.ConvertToString(row["uid"]);
+                String cn = Lib.ConvertToString(row["дата_поставки_покупателю"]);
+                String ct = Lib.ConvertToString(row["тип_формирования"]);
+                String pz = (Lib.ConvertToString(row["передано_в_закупку"]) == "True") ? "1" : "0";
                 String colNameQty = $"{uid} {cn} {ct} {pz} q";
                 String colNameExp = $"{uid} {cn} {ct} {pz} e";
                 String colNameLag = $"{uid} {cn} {ct} {pz} l";
@@ -587,7 +553,7 @@ namespace DeliverySchedule.Models
             for (int ri = 0; ri < СпецификацияТаблица.RowsCount; ri++)
             {
                 var row = СпецификацияТаблица[ri];
-                String stUid = ConvertToString(row["uid"]);
+                String stUid = Lib.ConvertToString(row["uid"]);
                 if (!String.IsNullOrWhiteSpace(stUid))
                 {
                     DataRow ddr = dt.NewRow();

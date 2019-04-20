@@ -3,7 +3,8 @@
     {
         <div>Debugging is enabled.</div>
     }
-    <input type="button" value="График поставок для спецификации с id='122527'." onclick="DeliveryScheduleViewsHomeIndex.goToDeliverySchedulePage()" />
+    <input type="text" name="код" value="122740" />
+    <input type="button" value="Перейти к графику поставок" onclick="DeliveryScheduleViewsHomeIndex.goToDeliverySchedulePage()" />
 </div>
 <script type="text/javascript">
     var DeliveryScheduleViewsHomeIndex = (function () {
@@ -13,7 +14,7 @@
                     SessionId: '00000000-0000-0000-0000-000000000000',
                     Command: 'GoToDeliverySchedule',
                     Parameters: [
-                        { Name: 'id', Value: '122527' }
+                        { Name: 'id', Value: $('#deliveryschedule_views_home_index input[name="код"]').val() }
                     ]
                 };
                 Nskd.Http.post({
