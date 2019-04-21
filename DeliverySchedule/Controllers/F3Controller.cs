@@ -22,7 +22,7 @@ namespace DeliverySchedule.Controllers
                         v = PartialView("~/Views/F3/Table.cshtml", m);
                         break;
                     case "DeliverySchedule.F3.Index.Send":
-                        m.Send();
+                        m.Send(ControllerContext);
                         m.Load();
                         v = PartialView("~/Views/F3/Table.cshtml", m);
                         break;

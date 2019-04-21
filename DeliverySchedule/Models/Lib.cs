@@ -70,8 +70,8 @@ namespace DeliverySchedule.Models
         }
         public static String ConvertToString(Object v, String format = null)
         {
-            CultureInfo ic = CultureInfo.InvariantCulture;
             String s = String.Empty;
+            CultureInfo ic = CultureInfo.InvariantCulture;
             if (v != null && v != DBNull.Value)
             {
                 String tfn = v.GetType().FullName;

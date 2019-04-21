@@ -1,12 +1,45 @@
 ﻿@using System.Data
+@using DeliverySchedule.Models
 @model DataSet
-    <!DOCTYPE HTML>
-    <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <title>DeliverySchedule</title>
-    </head>
-    <body>
-        <div>{body}</div>
-    </body>
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>DeliverySchedule</title>
+</head>
+<body>
+    @if (Model != null && Model.Tables.Count > 1)
+    {
+        Lib.ТаблицаДанных h = new Lib.ТаблицаДанных(Model.Tables[0]);
+        Lib.ТаблицаДанных t = new Lib.ТаблицаДанных(Model.Tables[1]);
+        <div>
+            <table>
+                <tr><td>Передано в закупку: </td><td>@h[0]["передано_в_закупку_время", "dd.MM.yy в HH.mm"]</td></tr>
+                <tr><td>Менеджер: </td><td>@h[0]["менеджер"]</td></tr>
+                <tr><td>Номер аукциона: </td><td>@h[0]["номер_аукциона"]</td></tr>
+                <tr><td>Заказчик: </td><td>@h[0]["наименование_заказчика_сокращённое"]</td></tr>
+                <tr><td>Номер заявки на закупку: </td><td>@h[0]["номер_заявки_на_закупку"]</td></tr>
+            </table>
+        </div>
+        <div>
+            <table>
+                <tr>
+                    <th>№</th>
+                    <th>Товар</th>
+                    <th>Кол-во</th>
+                    <th>Срок годности</th>
+                </tr>
+                @for (int ri = 0; ri < t.RowsCount; ri++)
+                {
+                    <tr>
+                        <td>@t[ri]["номер_строки"]</td>
+                        <td>@t[ri]["товар"]</td>
+                        <td>@t[ri]["количество"]</td>
+                        <td>@t[ri]["срок_годности"]</td>
+                    </tr>
+                }
+            </table>
+        </div>
+    }
+</body>
 </html>
