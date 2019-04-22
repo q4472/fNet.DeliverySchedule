@@ -98,10 +98,13 @@
                                                    value="@cn"
                                                    data-modified="0"
                                                    class="date-selector" />
-                                            <span class="send"
-                                                  title="Передать в отдел закупок"
-                                                  style="background-color: #ffccff;"
-                                                  onclick="DeliveryScheduleViewsF3Index.send('@uid');">&nbsp;&gt;&gt;З</span>
+                                            <!--
+                                               <span class="send"
+                                              title="Передать в отдел закупок"
+                                              style="background-color: #ffccff;"
+                                              onclick="DeliveryScheduleViewsF3Index.send('@uid');">&nbsp;&gt;&gt;З</span>
+                                            -->
+                                            <input type="checkbox" class="column-selector" data-order_uid="@uid" />
                                             <br />
                                             <span onclick="alert('Перенести из остатков');">Кол-во</span>
                                             <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -127,7 +130,7 @@
                                     <td style="text-align: right">@dr["номер_строки"]</td>
                                     <td>@(dr["наименование"] + "; " + dr["лекарственная_форма_и_дозировка"] + "; " + dr["производитель"] + "; " + dr["страна"])</td>
                                     <td><input type="checkbox" class="row-flag" /></td>
-                                    <td class="row-qty" style="text-align: right">@dr["количество"].Replace(".000", "")</td>
+                                    <td class="row-qty" style="text-align: right">@dr["количество", "n0"]</td>
                                     <td class="todo" style="text-align: right"></td>
                                     @if (Model.Shedule != null && Model.Shedule.Columns.Count > 1)
                                     {
@@ -156,7 +159,7 @@
                                             if (pz == "1")
                                             {
                                                 <td class="q" data-column-index="@(4 + ci)" style="text-align: right; width: 50px;">
-                                                    <span>@q.Replace(".000", "")</span>
+                                                    <span>@q</span>
                                                 </td>
                                                 <td class="e" data-column-index="@(5 + ci)" style="text-align: right; width: 50px;">
                                                     <span>@((e == "") ? "" : e.Substring(3, 5))</span>
@@ -170,7 +173,7 @@
                                                 <td class="q" data-column-index="@(4 + ci)">
                                                     <input type="text"
                                                            name="@dc1.ColumnName"
-                                                           value="@q.Replace(".000", "")"
+                                                           value="@q"
                                                            data-modified="0"
                                                            style="width: 50px" />
                                                 </td>
@@ -201,7 +204,7 @@
                                     <td>@dr["descr"]</td>
                                     <td><input type="checkbox" class="row-flag" /></td>
                                     <td colspan="3" style="text-align: right">Количество по накладным:</td>
-                                    <td class="row-qty" style="text-align: right">@dr["количество"]</td>
+                                    <td class="row-qty" style="text-align: right">@dr["количество", "n0"]</td>
                                 </tr>
                             }
                         }
@@ -218,7 +221,7 @@
         let sheduleInputs = shdl.find('input[type="text"]');
         let todoTds = shdl.find('td.todo');
         let dateSelectors = mainDiv.find('input.date-selector');
-        let sendSpan = mainDiv.find('span.send');
+        let cSelectors = mainDiv.find('input.column-selector');
 
         dateSelectors.datepicker({ dateFormat: 'dd.mm.y', firstDay: 1, changeYear: true, minDate: 0 });
         dateSelectors.change(checkForm);
@@ -227,11 +230,11 @@
 
         sheduleInputs.keyup(function () {
             this.setAttribute('data-modified', '1');
-            sendSpan.hide();
+            cSelectors.hide();
         });
         sheduleInputs.change(function () {
             this.setAttribute('data-modified', '1');
-            sendSpan.hide();
+            cSelectors.hide();
             if ($(this).parent().hasClass('q') || $(this).parent().hasClass('l')) {
                 Nskd.Validator.nNorm(this, 0);
             }

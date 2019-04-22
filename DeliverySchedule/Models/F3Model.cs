@@ -4,6 +4,7 @@ using System.Data;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
+using static DeliverySchedule.Models.Lib;
 
 namespace DeliverySchedule.Models
 {
@@ -20,10 +21,10 @@ namespace DeliverySchedule.Models
         public String sDps;
         public String sSizs;
         public String sDozp;
-        public Спецификация.Шапка СпецификацияШапка;
-        public Спецификация.Таблица СпецификацияТаблица;
-        public ЗаявкиНаЗакупку.Шапка ЗаявкиНаЗакупкуШапка;
-        public ЗаявкиНаЗакупку.Таблица ЗаявкиНаЗакупкуТаблица;
+        public ТаблицаДанных СпецификацияШапка;
+        public ТаблицаДанных СпецификацияТаблица;
+        public ТаблицаДанных ЗаявкиНаЗакупкуШапка;
+        public ТаблицаДанных ЗаявкиНаЗакупкуТаблица;
 
         public F3Model(RequestPackage rqp, Boolean isDebuggingEnabled)
         {
@@ -47,11 +48,11 @@ namespace DeliverySchedule.Models
             ResponsePackage rsp = rqp.GetResponse("http://127.0.0.1:11012/");
             if (rsp != null && rsp.Data != null && rsp.Data.Tables.Count > 0)
             {
-                СпецификацияШапка = new Спецификация.Шапка(rsp.Data.Tables[0]);
+                СпецификацияШапка = new ТаблицаДанных(rsp.Data.Tables[0]);
                 if (rsp.Data.Tables.Count > 1)
                 {
-                    СпецификацияТаблица = new Спецификация.Таблица(rsp.Data.Tables[1]);
-                    СпецификацияТаблица.Sort("[номер_строки]");
+                    СпецификацияТаблица = new ТаблицаДанных(rsp.Data.Tables[1]);
+                    СпецификацияТаблица.Sort = "[номер_строки]";
                 }
             }
 
@@ -108,11 +109,11 @@ namespace DeliverySchedule.Models
             rsp = rqp.GetResponse("http://127.0.0.1:11012/");
             if (rsp != null && rsp.Data != null && rsp.Data.Tables.Count > 0)
             {
-                ЗаявкиНаЗакупкуШапка = new ЗаявкиНаЗакупку.Шапка(rsp.Data.Tables[0]);
-                ЗаявкиНаЗакупкуШапка.Sort("[дата_поставки_покупателю], [тип_формирования]");
+                ЗаявкиНаЗакупкуШапка = new ТаблицаДанных(rsp.Data.Tables[0]);
+                ЗаявкиНаЗакупкуШапка.Sort = "[дата_поставки_покупателю], [тип_формирования]";
                 if (rsp.Data.Tables.Count > 1)
                 {
-                    ЗаявкиНаЗакупкуТаблица = new ЗаявкиНаЗакупку.Таблица(rsp.Data.Tables[1]);
+                    ЗаявкиНаЗакупкуТаблица = new ТаблицаДанных(rsp.Data.Tables[1]);
                 }
             }
 
@@ -300,179 +301,6 @@ namespace DeliverySchedule.Models
             }
         }
 
-        public class Спецификация
-        {
-            public class Шапка
-            {
-                private DataTable dt;
-                public Шапка(DataTable dt) { this.dt = dt; }
-                public Int32 RowsCount { get => (dt == null) ? 0 : dt.Rows.Count; }
-                public СтрокаДанных this[Int32 index]
-                {
-                    get
-                    {
-                        СтрокаДанных row = null;
-                        if (dt != null && index >= 0 && index < dt.Rows.Count)
-                        {
-                            DataRow dr = dt.Rows[index];
-                            row = new СтрокаДанных(dr);
-                        }
-                        return row;
-                    }
-                }
-                public class СтрокаДанных
-                {
-                    private DataRow dr;
-                    public СтрокаДанных(DataRow dr)
-                    {
-                        this.dr = dr;
-                    }
-                    public String this[String fieldName]
-                    {
-                        get
-                        {
-                            String v = String.Empty;
-                            if (!String.IsNullOrWhiteSpace(fieldName) && dr != null && dr.Table.Columns.Contains(fieldName))
-                            {
-                                v = Lib.ConvertToString(dr[fieldName]);
-                            }
-                            return v;
-                        }
-                    }
-                }
-            }
-            public class Таблица
-            {
-                private DataTable dt;
-                public Таблица(DataTable dt) { this.dt = dt; }
-                public Int32 RowsCount { get => (dt == null) ? 0 : dt.Rows.Count; }
-                public СтрокаДанных this[Int32 index]
-                {
-                    get
-                    {
-                        СтрокаДанных row = null;
-                        if (dt != null && index >= 0 && index < dt.Rows.Count)
-                        {
-                            DataRow dr = dt.Rows[index];
-                            row = new СтрокаДанных(dr);
-                        }
-                        return row;
-                    }
-                }
-                public class СтрокаДанных
-                {
-                    private DataRow dr;
-                    public СтрокаДанных(DataRow dr)
-                    {
-                        this.dr = dr;
-                    }
-                    public String this[String fieldName]
-                    {
-                        get
-                        {
-                            String v = String.Empty;
-                            if (!String.IsNullOrWhiteSpace(fieldName) && dr != null && dr.Table.Columns.Contains(fieldName))
-                            {
-                                v = Lib.ConvertToString(dr[fieldName]);
-                            }
-                            return v;
-                        }
-                    }
-                }
-                public void Sort(String expression)
-                {
-                    dt.DefaultView.Sort = expression;
-                    dt = dt.DefaultView.ToTable();
-                }
-            }
-        }
-        public class ЗаявкиНаЗакупку
-        {
-            public class Шапка
-            {
-                private DataTable dt;
-                public Шапка(DataTable dt) { this.dt = dt; }
-                public Int32 RowsCount { get => (dt == null) ? 0 : dt.Rows.Count; }
-                public СтрокаДанных this[Int32 index]
-                {
-                    get
-                    {
-                        СтрокаДанных row = null;
-                        if (dt != null && index >= 0 && index < dt.Rows.Count)
-                        {
-                            DataRow dr = dt.Rows[index];
-                            row = new СтрокаДанных(dr);
-                        }
-                        return row;
-                    }
-                }
-                public class СтрокаДанных
-                {
-                    private DataRow dr;
-                    public СтрокаДанных(DataRow dr)
-                    {
-                        this.dr = dr;
-                    }
-                    public String this[String fieldName]
-                    {
-                        get
-                        {
-                            String v = String.Empty;
-                            if (!String.IsNullOrWhiteSpace(fieldName) && dr != null && dr.Table.Columns.Contains(fieldName))
-                            {
-                                v = Lib.ConvertToString(dr[fieldName]);
-                            }
-                            return v;
-                        }
-                    }
-                }
-                public void Sort(String expression)
-                {
-                        dt.DefaultView.Sort = expression;
-                        dt = dt.DefaultView.ToTable();
-                }
-            }
-            public class Таблица
-            {
-                private DataTable dt;
-                public Таблица(DataTable dt) { this.dt = dt; }
-                public Int32 RowsCount { get => (dt == null) ? 0 : dt.Rows.Count; }
-                public СтрокаДанных this[Int32 index]
-                {
-                    get
-                    {
-                        СтрокаДанных row = null;
-                        if (dt != null && index >= 0 && index < dt.Rows.Count)
-                        {
-                            DataRow dr = dt.Rows[index];
-                            row = new СтрокаДанных(dr);
-                        }
-                        return row;
-                    }
-                }
-                public class СтрокаДанных
-                {
-                    private DataRow dr;
-                    public СтрокаДанных(DataRow dr)
-                    {
-                        this.dr = dr;
-                    }
-                    public String this[String fieldName]
-                    {
-                        get
-                        {
-                            String v = String.Empty;
-                            if (!String.IsNullOrWhiteSpace(fieldName) && dr != null && dr.Table.Columns.Contains(fieldName))
-                            {
-                                v = Lib.ConvertToString(dr[fieldName]);
-                            }
-                            return v;
-                        }
-                    }
-                }
-            }
-        }
-
         private DataTable CreateSheduleTable()
         {
             DataTable dt = new DataTable();
@@ -505,7 +333,7 @@ namespace DeliverySchedule.Models
             }
             for (int ri = 0; ri < ЗаявкиНаЗакупкуТаблица.RowsCount; ri++)
             {
-                ЗаявкиНаЗакупку.Таблица.СтрокаДанных row = ЗаявкиНаЗакупкуТаблица[ri];
+                СтрокаДанных row = ЗаявкиНаЗакупкуТаблица[ri];
                 String uid = String.Empty;
                 String cn = String.Empty;
                 String ct = String.Empty;
@@ -528,7 +356,7 @@ namespace DeliverySchedule.Models
                 DataRow[] drs = dt.Select($"[спецификации_таблица_uid] = '{row["спецификации_таблица_uid"]}'");
                 if (drs.Length > 0)
                 {
-                    drs[0][colNameQty] = row["количество"];
+                    drs[0][colNameQty] = row["количество", "n0"];
                     drs[0][colNameExp] = row["срок_годности"];
                     drs[0][colNameLag] = row["срок_исполнения_отгрузка_покупатель"];
                 }

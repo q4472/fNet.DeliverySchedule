@@ -404,14 +404,19 @@
             checkForm: function () {
                 checkForm();
             },
-            send: function (uid) {
+            send: function () {
+                let inputs = tableDiv.find('input.column-selector:checked');
+                if (inputs.length == 0) { alert('Нет выбранных колонок.'); return; }
+                if (inputs.length > 1) { alert('Должна быть выбрана только одна колонка.'); return; }
+                let orderUid = inputs.attr('data-order_uid');
                 if (confirm('Передать заявку в отдел снабжения и заблокировать столбец?')) {
                     let rqp = {
                         SessionId: Nskd.Server.SessionId,
                         Command: 'DeliverySchedule.F3.Index.Send',
                         Parameters: [
-                            { Name: "код_спецификации", Value: specId },
-                            { Name: "uid", Value: uid }]
+                            { Name: "uid", Value: orderUid },
+                            { Name: "код_спецификации", Value: specId }
+                        ]
                     };
                     //console.log(rqp); return;
                     tableDiv.html('');
