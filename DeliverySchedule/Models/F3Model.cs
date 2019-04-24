@@ -253,8 +253,6 @@ namespace DeliverySchedule.Models
         public void DelColumn()
         {
             if (Rqp == null || SpecId == 0) { throw new ArgumentException(); }
-            if (!DateTime.TryParse(Rqp["дата_поставки_покупателю"] as String, out DateTime dpp)) { throw new ArgumentException(); }
-            Rqp["дата_поставки_покупателю"] = dpp;
             Rqp.Command = "[DeliverySchedule].[dbo].[заявки_на_закупку__удалить]";
             Rqp.AddSessionIdToParameters();
             var rsp = Rqp.GetResponse("http://127.0.0.1:11012/");

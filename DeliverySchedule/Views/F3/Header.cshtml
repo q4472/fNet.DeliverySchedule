@@ -173,19 +173,24 @@
                     </table>
                 </td>
                 <td>
-                    <span style="font-weight: bold; font-size: 12pt">Действия для выделенных строк</span>
+                    <span style="font-weight: bold; font-size: 11pt">Действия для выделенных строк</span>
                     <br />
                     <br />
                     <input type="button" value="Объединить в группу" onclick="DeliveryScheduleViewsF3Index.execGroup();" />
                     <br />
-                    <br />
                     <input type="button" value="Выполнить зачёт" onclick="DeliveryScheduleViewsF3Index.execCorr();" />
                     <br />
                     <br />
-                    <span style="font-weight: bold; font-size: 12pt">Действия для выделенных колонок</span>
+                    <span style="font-weight: bold; font-size: 11pt">Действия для выделенных колонок</span>
                     <br />
+                    <br />
+                    <input type="button" value="Заполнить количество" onclick="DeliveryScheduleViewsF3Index.setQ();" />
+                    <br />
+                    <input type="button" value="Заполнить срок" onclick="DeliveryScheduleViewsF3Index.setE();" />
                     <br />
                     <input type="button" value="Передать в закупку" onclick="DeliveryScheduleViewsF3Index.send();" />
+                    <br />
+                    <input type="button" value="Удалить" onclick="DeliveryScheduleViewsF3Index.delColumn();" />
                 </td>
             </tr>
         </table>

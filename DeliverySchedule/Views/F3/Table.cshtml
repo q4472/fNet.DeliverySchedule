@@ -24,9 +24,9 @@
                         <tr>
                             <th>№</th>
                             <th>Описание</th>
-                            <th>&nbsp;</th>
-                            <th>Кол-во</th>
-                            <th><span>Остаток по</span><br /><span>заявкам</span></th>
+                            <th title="Колонка выбора строк для дальнейшей обработки">&nbsp;</th>
+                            <th title="Общее количество планируемой поставки покупателю по спецификации">Кол-во</th>
+                            <th title="Максимальное количество которое можно добавить в поставку по заявке"><span>Остаток по</span><br /><span>заявкам</span></th>
                             @if (Model.Shedule != null && Model.Shedule.Columns.Count > 1)
                             {
                                 for (Int32 ci = 1; ci < Model.Shedule.Columns.Count; ci += 3)
@@ -39,80 +39,74 @@
                                     <th colspan="3" data-column-index="@(4 + ci)">
                                         @if (pz == "1")
                                         {
-                                            <div>
-                                                @if (ct == "0")
-                                                {
-                                                    <span>Поставка по</span><br />
-                                                    <span>графику</span><br />
-                                                }
-                                                else if (ct == "1")
-                                                {
-                                                    <span>Поставка по</span><br />
-                                                    <span>заявке</span><br />
-                                                }
-                                                else if (ct == "2")
-                                                {
-                                                    <span>Поставка по</span><br />
-                                                    <span>протоколу</span><br />
-                                                }
-                                                else
-                                                {
-                                                    <span>Поставка по</span><br />
-                                                    <span>?</span><br />
-                                                }
-                                            </div>
-                                            <span>@cn</span>
-                                            <br />
-                                            <span onclick="alert('Перенести из остатков');">Кол-во</span>
-                                            <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                            <span>Срок</span>
-                                            <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                            <span>О -> П</span>
+                                            <table style="border: none; width: 100%;">
+                                                <tr>
+                                                    <td colspan="3" style="border: none;">
+                                                        @switch (ct)
+                                                        {
+                                                            case "0":
+                                                                <span>Поставка по графику</span>
+                                                                break;
+                                                            case "1":
+                                                                <span>Поставка по заявке</span>
+                                                                break;
+                                                            case "2":
+                                                                <span>Поставка по протоколу</span>
+                                                                break;
+                                                            default:
+                                                                <span>Поставка по ?</span>
+                                                                break;
+                                                        }
+                                                    </td>
+                                                </tr>
+                                                <tr><td colspan="3" style="border: none;" title="Планируемая дата получения покупателем">@cn</td></tr>
+                                                <tr>
+                                                    <td style="border: none; text-align: center; width: 50px;">Кол-во</td>
+                                                    <td style="border: none; text-align: center; width: 50px;" title="Срок годности">Срок</td>
+                                                    <td style="border: none; text-align: center; width: 40px;" title="Срок от отгрузки до получения покупателем">О&rarr;П</td>
+                                                </tr>
+                                            </table>
                                         }
                                         else
                                         {
-                                            <div onclick="DeliveryScheduleViewsF3Table.delColumn('@cn', '@ct');" style="background-color: #ffccff;" title="Удалить">
-                                                @if (ct == "0")
-                                                {
-                                                    <span>Поставка по</span><br />
-                                                    <span>графику</span><br />
-                                                }
-                                                else if (ct == "1")
-                                                {
-                                                    <span>Поставка по</span><br />
-                                                    <span>заявке</span><br />
-                                                }
-                                                else if (ct == "2")
-                                                {
-                                                    <span>Поставка по</span><br />
-                                                    <span>протоколу</span><br />
-                                                }
-                                                else
-                                                {
-                                                    <span>Поставка по</span><br />
-                                                    <span>?</span><br />
-                                                }
-                                            </div>
-                                            <input type="text"
-                                                   name="@dc.ColumnName"
-                                                   value="@cn"
-                                                   data-modified="0"
-                                                   class="date-selector" />
-                                            <!--
-                                               <span class="send"
-                                              title="Передать в отдел закупок"
-                                              style="background-color: #ffccff;"
-                                              onclick="DeliveryScheduleViewsF3Index.send('@uid');">&nbsp;&gt;&gt;З</span>
-                                            -->
-                                            <input type="checkbox" class="column-selector" data-order_uid="@uid" />
-                                            <br />
-                                            <span onclick="alert('Перенести из остатков');">Кол-во</span>
-                                            <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                            <span title="Установить срок годности для незаполненных полей"
-                                                  style="background-color: #ffccff;"
-                                                  onclick="DeliveryScheduleViewsF3Index.setE(this);">Срок</span>
-                                            <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                            <span>О -> П</span>
+                                            <table style="border: none; width: 100%;">
+                                                <tr>
+                                                    <td colspan="3" style="border: none;">
+                                                        @switch (ct)
+                                                        {
+                                                            case "0":
+                                                                <span>Поставка по графику</span>
+                                                                break;
+                                                            case "1":
+                                                                <span>Поставка по заявке</span>
+                                                                break;
+                                                            case "2":
+                                                                <span>Поставка по протоколу</span>
+                                                                break;
+                                                            default:
+                                                                <span>Поставка по ?</span>
+                                                                break;
+                                                        }
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2" style="border: none;" title="Планируемая дата получения покупателем">
+                                                        <input type="text"
+                                                               name="@dc.ColumnName"
+                                                               value="@cn"
+                                                               data-modified="0"
+                                                               class="date-selector" />
+                                                    </td>
+                                                    <td style="border: none;">
+                                                        <input type="checkbox" class="column-selector" data-order_uid="@uid" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="border: none; text-align: center; width: 50px;">Кол-во</td>
+                                                    <td style="border: none; text-align: center; width: 50px;" title="Срок годности">Срок</td>
+                                                    <td style="border: none; text-align: center; width: 40px;" title="Срок от отгрузки до получения покупателем">О&rarr;П</td>
+                                                </tr>
+                                            </table>
                                         }
                                     </th>
                                 }
@@ -164,7 +158,7 @@
                                                 <td class="e" data-column-index="@(5 + ci)" style="text-align: right; width: 50px;">
                                                     <span>@((e == "") ? "" : e.Substring(3, 5))</span>
                                                 </td>
-                                                <td class="e" data-column-index="@(6 + ci)" style="text-align: right; width: 50px;">
+                                                <td class="e" data-column-index="@(6 + ci)" style="text-align: right; width: 40px;">
                                                     <span>@l</span>
                                                 </td>
                                             }
@@ -221,7 +215,6 @@
         let sheduleInputs = shdl.find('input[type="text"]');
         let todoTds = shdl.find('td.todo');
         let dateSelectors = mainDiv.find('input.date-selector');
-        let cSelectors = mainDiv.find('input.column-selector');
 
         dateSelectors.datepicker({ dateFormat: 'dd.mm.y', firstDay: 1, changeYear: true, minDate: 0 });
         dateSelectors.change(checkForm);
@@ -230,11 +223,9 @@
 
         sheduleInputs.keyup(function () {
             this.setAttribute('data-modified', '1');
-            cSelectors.hide();
         });
         sheduleInputs.change(function () {
             this.setAttribute('data-modified', '1');
-            cSelectors.hide();
             if ($(this).parent().hasClass('q') || $(this).parent().hasClass('l')) {
                 Nskd.Validator.nNorm(this, 0);
             }
@@ -283,29 +274,6 @@
         }
 
         return {
-            delColumn: function (cn, ct) {
-                if (confirm('Удалить колонку?')) {
-                    let specId = DeliveryScheduleViewsF3Index.getSpecId();
-                    let rqp = {
-                        SessionId: Nskd.Server.SessionId,
-                        Command: 'DeliverySchedule.F3.Table.DelColumn',
-                        Parameters: [
-                            { Name: "код_спецификации", Value: specId },
-                            { Name: "дата_поставки_покупателю", Value: cn },
-                            { Name: "тип_формирования", Value: ct }]
-                    };
-                    //console.log(rqp); return;
-                    DeliveryScheduleViewsF3Index.setTableDivHtml('');
-                    Nskd.Http.post({
-                        url: '/deliveryschedule/f3',
-                        rqp: rqp,
-                        done: function (data) {
-                            DeliveryScheduleViewsF3Index.setTableDivHtml(data);
-                            DeliveryScheduleViewsF3Index.checkForm();
-                        }
-                    });
-                }
-            }
         };
     })();
 </script>

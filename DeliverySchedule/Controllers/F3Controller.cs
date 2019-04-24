@@ -16,7 +16,7 @@ namespace DeliverySchedule.Controllers
                 F3Model m = new F3Model(rqp, HttpContext.IsDebuggingEnabled);
                 switch (rqp.Command)
                 {
-                    case "DeliverySchedule.F3.Table.DelColumn":
+                    case "DeliverySchedule.F3.Index.DelColumn":
                         m.DelColumn();
                         m.Load();
                         v = PartialView("~/Views/F3/Table.cshtml", m);

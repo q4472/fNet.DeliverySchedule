@@ -149,12 +149,12 @@
         let headerDiv = mainDiv.find('div.header');
         let tableDiv = mainDiv.find('div.table');
         let modalDiv = mainDiv.find('div.modal');
-        let saveButton = mainDiv.find('input[type="button"].save_button');
 
         modalDiv.find('div.body2 input[type="text"]').datepicker({ dateFormat: 'mm.y', firstDay: 1, changeYear: true });
 
         function checkForm() {
             let errs = checkFormForErrors();
+            let saveButton = mainDiv.find('input[type="button"].save_button');
             saveButton.prop('disabled', errs.parsError || headerDiv.find('input[data-modified="1"]').length == 0);
             let save2Button = mainDiv.find('input[type="button"].save2_button');
             save2Button.prop('disabled', errs.shdlError || tableDiv.find('input[data-modified="1"]').length == 0);
@@ -252,6 +252,7 @@
 
         return {
             save: function () {
+                let saveButton = mainDiv.find('input[type="button"].save_button');
                 saveButton.prop('disabled', true);
                 let inputs = headerDiv.find('input[data-modified="1"]');
                 if (inputs.length > 0) {
@@ -397,9 +398,26 @@
             unselectAllRows: function () {
                 alert('unselectAllRows');
             },
-            setE: function (element) {
-                let ci = $(element).closest('th').attr('data-column-index');
+            setQ: function (element) {
+                let inputs = tableDiv.find('input.column-selector:checked');
+                if (inputs.length == 0) { alert('Нет выбранных колонок.'); return; }
+                if (inputs.length > 1) { alert('Должна быть выбрана только одна колонка.'); return; }
+                if (confirm('Заполнить количество из остатков по заявкам?')) {
+                    let orderUid = inputs.attr('data-order_uid');
+                    let ci = $(inputs).closest('th').attr('data-column-index');
+                    tableDiv.find('td.q[data-column-index="' + ci + '"] input').each(function (index, element) {
+                        element.value = tableDiv.find('td.todo').eq(index).text();
+                        element.setAttribute('data-modified', '1');
+                    });
+                    checkForm();
+                }
+            },
+            setE: function () {
+                let inputs = tableDiv.find('input.column-selector:checked');
+                if (inputs.length == 0) { alert('Нет выбранных колонок.'); return; }
+                if (inputs.length > 1) { alert('Должна быть выбрана только одна колонка.'); return; }
                 if (confirm('Установить срок годности для незаполненных полей?')) {
+                    let ci = $(inputs).closest('th').attr('data-column-index');
                     modalDiv.find('div.body2 input[type="hidden"]').val(ci);
                     modalDiv.find('div.body1').hide();
                     modalDiv.find('div.body2').show();
@@ -425,6 +443,9 @@
                 checkForm();
             },
             send: function () {
+                let saveButton = mainDiv.find('input[type="button"].save_button');
+                let save2Button = mainDiv.find('input[type="button"].save2_button');
+                if (!saveButton.prop('disabled') || !save2Button.prop('disabled')) { alert('Перед передачей в закупку все данные надо сохранить.'); return; }
                 let inputs = tableDiv.find('input.column-selector:checked');
                 if (inputs.length == 0) { alert('Нет выбранных колонок.'); return; }
                 if (inputs.length > 1) { alert('Должна быть выбрана только одна колонка.'); return; }
@@ -452,14 +473,35 @@
                     rqp: rqp,
                     done: function (data) {
                         tableDiv.html(data);
+                        checkForm();
                     }
                 });
             },
-            getSpecId: function () {
-                return specId;
-            },
-            setTableDivHtml: function (html) {
-                tableDiv.html(html);
+            delColumn: function () {
+                let inputs = tableDiv.find('input.column-selector:checked');
+                if (inputs.length == 0) { alert('Нет выбранных колонок.'); return; }
+                if (inputs.length > 1) { alert('Должна быть выбрана только одна колонка.'); return; }
+                if (confirm('Удалить колонку?')) {
+                    let orderUid = inputs.attr('data-order_uid');
+                    let rqp = {
+                        SessionId: Nskd.Server.SessionId,
+                        Command: 'DeliverySchedule.F3.Index.DelColumn',
+                        Parameters: [
+                            { Name: "uid", Value: orderUid },
+                            { Name: "код_спецификации", Value: specId }
+                        ]
+                    };
+                    //console.log(rqp); return;
+                    tableDiv.html('');
+                    Nskd.Http.post({
+                        url: '/deliveryschedule/f3',
+                        rqp: rqp,
+                        done: function (data) {
+                            tableDiv.html(data);
+                            checkForm();
+                        }
+                    });
+                }
             }
         };
     })();
