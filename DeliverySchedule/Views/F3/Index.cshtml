@@ -50,7 +50,7 @@
             margin: 15% auto; /* 15% from the top and centered */
             padding: 10px;
             border: 1px solid #888;
-            width: 480px;
+            width: 520px;
         }
 
             /* The Close Button */
@@ -119,6 +119,24 @@
                     <input type="hidden" value="" />
                     <input type="text" /><br />
                     <input type="button" value="OK" onclick="DeliveryScheduleViewsF3Index.setE_();" />
+                </div>
+                <div class="body3" style="display: none;">
+                    <p>Передать заявку в отдел снабжения и заблокировать столбец?</p><br />
+                    <table style="border: none;">
+                        <tr>
+                            <td style="text-align: right; border: none; vertical-align: top;">Примечание:&nbsp;</td>
+                            <td style="border: none; vertical-align: top;"><textarea style="width: 400px;"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; border: none; vertical-align: top;">Срочно:&nbsp;</td>
+                            <td style="border: none; vertical-align:  top;"><input type="checkbox" /></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; border: none; vertical-align: top;">Вложить файл:&nbsp;</td>
+                            <td style="border: none; vertical-align: top;"><input type="file" style="width: 400px;" /></td>
+                        </tr>
+                        <tr><td colspan="2" style="text-align: center; border: none;"><input type="button" value="OK" onclick="DeliveryScheduleViewsF3Index.send_();" /></td></tr>
+                    </table>
                 </div>
             </div>
         </div>
@@ -296,6 +314,7 @@
                 // select Ftype
                 modalDiv.find('div.body1').show();
                 modalDiv.find('div.body2').hide();
+                modalDiv.find('div.body3').hide();
                 modalDiv.show();
             },
             addColumn_: function () {
@@ -381,9 +400,10 @@
             setE: function (element) {
                 let ci = $(element).closest('th').attr('data-column-index');
                 if (confirm('Установить срок годности для незаполненных полей?')) {
+                    modalDiv.find('div.body2 input[type="hidden"]').val(ci);
                     modalDiv.find('div.body1').hide();
                     modalDiv.find('div.body2').show();
-                    modalDiv.find('div.body2 input[type="hidden"]').val(ci);
+                    modalDiv.find('div.body3').hide();
                     modalDiv.show();
                 }
             },
@@ -408,26 +428,32 @@
                 let inputs = tableDiv.find('input.column-selector:checked');
                 if (inputs.length == 0) { alert('Нет выбранных колонок.'); return; }
                 if (inputs.length > 1) { alert('Должна быть выбрана только одна колонка.'); return; }
+                modalDiv.find('div.body1').hide();
+                modalDiv.find('div.body2').hide();
+                modalDiv.find('div.body3').show();
+                modalDiv.show();
+            },
+            send_: function () {
+                modalDiv.hide();
+                let inputs = tableDiv.find('input.column-selector:checked');
                 let orderUid = inputs.attr('data-order_uid');
-                if (confirm('Передать заявку в отдел снабжения и заблокировать столбец?')) {
-                    let rqp = {
-                        SessionId: Nskd.Server.SessionId,
-                        Command: 'DeliverySchedule.F3.Index.Send',
-                        Parameters: [
-                            { Name: "uid", Value: orderUid },
-                            { Name: "код_спецификации", Value: specId }
-                        ]
-                    };
-                    //console.log(rqp); return;
-                    tableDiv.html('');
-                    Nskd.Http.post({
-                        url: '/deliveryschedule/f3',
-                        rqp: rqp,
-                        done: function (data) {
-                            tableDiv.html(data);
-                        }
-                    });
-                }
+                let rqp = {
+                    SessionId: Nskd.Server.SessionId,
+                    Command: 'DeliverySchedule.F3.Index.Send',
+                    Parameters: [
+                        { Name: "uid", Value: orderUid },
+                        { Name: "код_спецификации", Value: specId }
+                    ]
+                };
+                //console.log(rqp); return;
+                tableDiv.html('');
+                Nskd.Http.post({
+                    url: '/deliveryschedule/f3',
+                    rqp: rqp,
+                    done: function (data) {
+                        tableDiv.html(data);
+                    }
+                });
             },
             getSpecId: function () {
                 return specId;
