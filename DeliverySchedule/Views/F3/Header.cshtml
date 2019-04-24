@@ -106,67 +106,11 @@
                             </td>
                             <td>
                                 <table>
-                                    <tr>
-                                        <td>Поставка по графику</td>
-                                        @if (Model.СпецификацияШапка[0]["поставка_по_графику"] == "True")
-                                        {
-                                            <td><input type="checkbox" name="поставка_по_графику" data-modified="0" checked="checked" /></td>
-                                        }
-                                        else
-                                        {
-                                            <td><input type="checkbox" name="поставка_по_графику" data-modified="0" /></td>
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td>Поставка по заявкам</td>
-                                        @if (Model.СпецификацияШапка[0]["поставка_по_заявкам"] == "True")
-                                        {
-                                            <td><input type="checkbox" name="поставка_по_заявкам" data-modified="0" checked="checked" /></td>
-                                        }
-                                        else
-                                        {
-                                            <td><input type="checkbox" name="поставка_по_заявкам" data-modified="0" /></td>
-                                        }
-                                    </tr>
-                                    <tr><td style="border: none">&nbsp;</td><td style="border: none">&nbsp;</td></tr>
-                                    <tr>
-                                        <td>Поставка по протоколу</td>
-                                        @if (Model.СпецификацияШапка[0]["поставка_по_протоколу"] == "True")
-                                        {
-                                            <td><input type="checkbox" name="поставка_по_протоколу" data-modified="0" checked="checked" /></td>
-                                        }
-                                        else
-                                        {
-                                            <td><input type="checkbox" name="поставка_по_протоколу" data-modified="0" /></td>
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td>Разрешена поставка по протоколу</td>
-                                        <td><input type="checkbox" name="разрешена_поставка_по_протоколу" data-modified="0" disabled="disabled" /></td>
-                                    </tr>
-                                    <tr><td style="border: none">&nbsp;</td><td style="border: none">&nbsp;</td></tr>
-                                    <tr>
-                                        <td>Готово для отд. закупок</td>
-                                        @if (Model.СпецификацияШапка[0]["готово_для_отдела_закупок"] == "True")
-                                        {
-                                            <td><input type="checkbox" name="готово_для_отдела_закупок" data-modified="0" checked="checked" /></td>
-                                        }
-                                        else
-                                        {
-                                            <td><input type="checkbox" name="готово_для_отдела_закупок" data-modified="0" /></td>
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td>Принято отд. закупок</td>
-                                        @if (Model.СпецификацияШапка[0]["принято_отделом_закупок"] == "True")
-                                        {
-                                            <td><input type="checkbox" name="принято_отделом_закупок" data-modified="0" disabled="disabled" checked="checked" /></td>
-                                        }
-                                        else
-                                        {
-                                            <td><input type="checkbox" name="принято_отделом_закупок" data-modified="0" disabled="disabled" /></td>
-                                        }
-                                    </tr>
+                                    <!-- поставка_по_графику всегда разрешена -->
+                                    <!-- поставка_по_заявкам всегда разрешена -->
+                                    <!-- поставка_по_протоколу и разрешена_поставка_по_протоколу всегда True -->
+                                    <!-- готово_для_отдела_закупок - Перенесено в журнал обмена заявками с отделом закупок (спецификацию разделена на заявки)-->
+                                    <!-- принято_отделом_закупок - Перенесено в журнал обмена заявками с отделом закупок-->
                                 </table>
                             </td>
                         </tr>

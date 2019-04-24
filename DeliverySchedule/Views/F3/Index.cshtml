@@ -182,7 +182,7 @@
                 if (d < d2 || d > d3 || d < d0) { e.addClass('err-bg'); shdlError = true; } else e.removeClass('err-bg');
             });
             // Прверяем таблицу на ошибки в столбце "по заявкам"
-            let isOrd = headerDiv.find('input[type="checkbox"][name="поставка_по_заявкам"]').prop('checked');
+            let isOrd = true;
             tableDiv.find('td.todo').each(function (i, e) {
                 e = $(e);
                 // 1. все ячейки должны быть пустыми при отсутствии галки "по заявкам"
@@ -265,8 +265,7 @@
                         if (e.type === 'checkbox') rqp.Parameters.push({ Name: e.name, Value: e.checked });
                         else rqp.Parameters.push({ Name: e.name, Value: e.value });
                     });
-                    if (headerDiv.find('input[name="поставка_по_графику"]').prop('checked')
-                        && mainDiv.find('input[name="расчитать_новый_график"]').prop('checked')) {
+                    if (mainDiv.find('input[name="расчитать_новый_график"]').prop('checked')) {
                         if (confirm('Внимание!\nБудет сформирован новый график для каждой позиции в спецификации.\n')) {
                             rqp.Parameters.push({ Name: 'расчитать_новый_график', Value: true });
                         };
