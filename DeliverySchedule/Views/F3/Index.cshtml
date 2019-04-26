@@ -455,6 +455,15 @@
             },
             send_: function () {
                 modalDiv.hide();
+                let commentTextarea = modalDiv.find('div.body3 textarea');
+                let comment = commentTextarea.val();
+                commentTextarea.val('');
+                let urgentInput = modalDiv.find('div.body3 input[type="checkbox"]');
+                let urgent = urgentInput.prop('checked');
+                urgentInput.prop('checked', false);
+                let fileInput = modalDiv.find('div.body3 input[type="file"]');
+                fileInput.val('');
+                //return;
                 let inputs = tableDiv.find('input.column-selector:checked');
                 let orderUid = inputs.attr('data-order_uid');
                 let rqp = {
