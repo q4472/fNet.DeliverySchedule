@@ -1,8 +1,11 @@
 ﻿using Nskd;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
+using System.Web;
 using System.Web.Mvc;
 using static DeliverySchedule.Models.Lib;
 
@@ -297,6 +300,24 @@ namespace DeliverySchedule.Models
                 rqp1["address"] = "mihajlova_aa@farmsib.ru";
                 rqp1.GetResponse("http://127.0.0.1:11007/");
             }
+        }
+
+        public static Object FileUpload(Guid sessionId, HttpFileCollectionBase files)
+        {
+            StringBuilder result = new StringBuilder();
+            result.Append("{files:[ ");
+            for(int i = 0; i < files.Count; i++)
+            {
+                HttpPostedFileBase file = files[i];
+                result.Append("{");
+                result.Append($"name:'{Nskd.JsonV3.ToString(file.FileName)}',");
+                result.Append($"size:{file.ContentLength}");
+                result.Append("},");
+            }
+            result.Length--;
+            result.Append(" ]}");
+
+            return result.ToString();
         }
 
         private DataTable CreateSheduleTable()

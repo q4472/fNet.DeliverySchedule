@@ -62,12 +62,10 @@ namespace DeliverySchedule.Controllers
         }
         public Object FileUpload()
         {
-            String r = null;
-            Object sessionId = Session["SessionId"];
-            if (sessionId == null) sessionId = new Guid();
-            r = (new Random()).Next().ToString();
-            //F3Model.FileUpload(sessionId, Request.InputStream, Request.ContentEncoding);
-            return r;
+            Object result;
+            Guid sessionId = (Session["SessionId"] != null) ? (Guid)Session["SessionId"] : new Guid();
+            result = F3Model.FileUpload(sessionId, Request.Files);
+            return result;
         }
     }
 }
