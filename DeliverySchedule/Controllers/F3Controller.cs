@@ -13,6 +13,7 @@ namespace DeliverySchedule.Controllers
             RequestPackage rqp = RequestPackage.ParseRequest(Request.InputStream, Request.ContentEncoding);
             if (rqp != null && !String.IsNullOrWhiteSpace(rqp.Command))
             {
+                Session["SessionId"] = rqp.SessionId;
                 F3Model m = new F3Model(rqp, HttpContext.IsDebuggingEnabled);
                 switch (rqp.Command)
                 {
@@ -25,6 +26,10 @@ namespace DeliverySchedule.Controllers
                         m.Send(ControllerContext);
                         m.Load();
                         v = PartialView("~/Views/F3/Table.cshtml", m);
+                        break;
+                    case "DeliverySchedule.F3.Index.Save":
+                        m.Update();
+                        v = PartialView("~/Views/F3/Index.cshtml", m);
                         break;
                     case "DeliverySchedule.F3.Index.Save2":
                         m.Update2();
@@ -47,14 +52,6 @@ namespace DeliverySchedule.Controllers
             }
             return v;
         }
-        public Object Save()
-        {
-            RequestPackage rqp = RequestPackage.ParseRequest(Request.InputStream, Request.ContentEncoding);
-            F3Model m = new F3Model(rqp, HttpContext.IsDebuggingEnabled);
-            m.Update();
-            PartialViewResult pvr = PartialView("~/Views/F3/Index.cshtml", m);
-            return pvr;
-        }
         public Object Corr()
         {
             Object v = "DeliverySchedule.Controllers.F3Controller.Corr()";
@@ -62,6 +59,15 @@ namespace DeliverySchedule.Controllers
             F3Model m = new F3Model(rqp, HttpContext.IsDebuggingEnabled);
             m.Corr();
             return v;
+        }
+        public Object FileUpload()
+        {
+            String r = null;
+            Object sessionId = Session["SessionId"];
+            if (sessionId == null) sessionId = new Guid();
+            r = (new Random()).Next().ToString();
+            //F3Model.FileUpload(sessionId, Request.InputStream, Request.ContentEncoding);
+            return r;
         }
     }
 }

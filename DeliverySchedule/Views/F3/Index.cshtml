@@ -1,43 +1,115 @@
 ﻿@using System.Data
 @model DeliverySchedule.Models.F3Model
-<link rel="stylesheet" href="~/Content/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u">
 <style type="text/css">
-/*
- * jQuery File Upload Plugin CSS Example
- * https://github.com/blueimp/jQuery-File-Upload
- *
- * Copyright 2013, Sebastian Tschan
- * https://blueimp.net
- *
- * Licensed under the MIT license:
- * https://opensource.org/licenses/MIT
- */
+    .btn {
+        display: inline-block;
+        font-weight: 400;
+        color: #212529;
+        text-align: center;
+        vertical-align: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-color: transparent;
+        border: 1px solid transparent;
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        border-radius: 0.25rem;
+        transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
 
-    body {
-  padding-top: 60px;
-}
+        .btn:hover {
+            color: #212529;
+            text-decoration: none;
+        }
 
-#carbonads {
-  box-sizing: border-box;
-  max-width: 300px;
-  min-height: 130px;
-  padding: 15px 15px 15px 160px;
-  margin: 0;
-  border-radius: 4px;
-  font-size: 13px;
-  line-height: 1.4;
-  background-color: rgba(0, 0, 0, 0.05);
-}
-#carbonads .carbon-img {
-  float: left;
-  margin-left: -145px;
-}
-#carbonads .carbon-poweredby {
-  display: block;
-  color: #777 !important;
-}
+        .btn:focus, .btn.focus {
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .btn.disabled, .btn:disabled {
+            opacity: 0.65;
+        }
+
+    .btn-success {
+        color: #fff;
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+        .btn-success:hover {
+            color: #fff;
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+
+        .btn-success:focus, .btn-success.focus {
+            box-shadow: 0 0 0 0.2rem rgba(72, 180, 97, 0.5);
+        }
+
+        .btn-success.disabled, .btn-success:disabled {
+            color: #fff;
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+        .btn-success:not(:disabled):not(.disabled):active, .btn-success:not(:disabled):not(.disabled).active,
+        .show > .btn-success.dropdown-toggle {
+            color: #fff;
+            background-color: #1e7e34;
+            border-color: #1c7430;
+        }
+
+            .btn-success:not(:disabled):not(.disabled):active:focus, .btn-success:not(:disabled):not(.disabled).active:focus,
+            .show > .btn-success.dropdown-toggle:focus {
+                box-shadow: 0 0 0 0.2rem rgba(72, 180, 97, 0.5);
+            }
+
+    .fileinput-button {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+    }
+
+        .fileinput-button input {
+            position: absolute;
+            top: 0;
+            right: 0;
+            margin: 0;
+            opacity: 0;
+            -ms-filter: 'alpha(opacity=0)';
+            font-size: 200px !important;
+            direction: ltr;
+            cursor: pointer;
+        }
+
+    .progress {
+        display: -ms-flexbox;
+        display: flex;
+        height: 1rem;
+        overflow: hidden;
+        font-size: 0.75rem;
+        background-color: #e9ecef;
+        border-radius: 0.25rem;
+    }
+
+    .progress-bar {
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        -ms-flex-pack: center;
+        justify-content: center;
+        color: #fff;
+        text-align: center;
+        white-space: nowrap;
+        background-color: #007bff;
+        transition: width 0.6s ease;
+    }
 </style>
-<link rel="stylesheet" href="~/content/jQuery.FileUpload/css/jquery.fileupload.css">
 <style type="text/css">
     #deliveryschedule_views_f3_index input[type="text"] {
         border: 1px solid black;
@@ -133,66 +205,69 @@
                     <span onclick="$(this).closest('div.modal').hide();">&times;</span>
                     <h2>&nbsp;</h2>
                 </div>
-                <div class="body1" style="display: none;">
+                <div class="body1" style="        display: none;">
                     <table>
                         <tr>
-                            <td style="text-align: right">Поставка по графику:&nbsp;</td>
+                            <td style="        text-align: right">Поставка по графику:&nbsp;</td>
                             <td><input type="radio" name="ftype" value="0" checked="checked"></td>
                         </tr>
                         <tr>
-                            <td style="text-align: right">Поставка по заявкам:&nbsp;</td>
+                            <td style="        text-align: right">Поставка по заявкам:&nbsp;</td>
                             <td><input type="radio" name="ftype" value="1"></td>
                         </tr>
                         <tr>
-                            <td style="text-align: right">Поставка по протоколу:&nbsp;</td>
+                            <td style="        text-align: right">Поставка по протоколу:&nbsp;</td>
                             <td><input type="radio" name="ftype" value="2"></td>
                         </tr>
                     </table>
                     <br />
-                    <div style="text-align: center">
+                    <div style="        text-align: center">
                         <input type="button" value="OK" onclick="DeliveryScheduleViewsF3Index.addColumn_();" />
                     </div>
                 </div>
-                <div class="body2" style="display: none;">
+                <div class="body2" style="        display: none;">
                     <input type="hidden" value="" />
                     <input type="text" /><br />
                     <input type="button" value="OK" onclick="DeliveryScheduleViewsF3Index.setE_();" />
                 </div>
-                <div class="body3" style="display: none;">
+                <div class="body3" style="        display: none;">
                     <p>Передать заявку в отдел снабжения и заблокировать столбец?</p><br />
-                    <table style="border: none;">
+                    <table style="        border: none;">
                         <tr>
-                            <td style="text-align: right; border: none; vertical-align: top;">Примечание:&nbsp;</td>
-                            <td style="border: none; vertical-align: top;"><textarea style="width: 400px;"></textarea></td>
+                            <td style="text-align: right; border: none; vertical-align: top;">
+                                Примечание:&nbsp;
+                            </td>
+                            <td style="border: none; vertical-align: top;">
+                                <textarea style="width: 400px;"></textarea>
+                            </td>
                         </tr>
                         <tr>
-                            <td style="text-align: right; border: none; vertical-align: top;">Срочно:&nbsp;</td>
-                            <td style="border: none; vertical-align:  top;"><input type="checkbox" /></td>
+                            <td style="text-align: right; border: none; vertical-align: top;">
+                                Срочно:&nbsp;
+                            </td>
+                            <td style="border: none; vertical-align: top;">
+                                <input type="checkbox" />
+                            </td>
                         </tr>
                         <tr>
-                            <!--
-                            <td style="text-align: right; border: none; vertical-align: top;">Вложить файл:&nbsp;</td>
-                            <td style="border: none; vertical-align: top;"><input type="file" style="width: 400px;" /></td>
-                            -->
                             <td colspan="2">
-                                <!-- The fileinput-button span is used to style the file input field as button -->
                                 <span class="btn btn-success fileinput-button">
-                                    <i class="glyphicon glyphicon-plus"></i>
                                     <span>Вложить файлы...</span>
-                                    <!-- The file input field used as target for the file upload widget -->
-                                    <input id="fileupload" type="file" name="files[]" multiple>
+                                    <input id="fileupload" type="file">
                                 </span>
                                 <br>
                                 <br>
-                                <!-- The global progress bar -->
                                 <div id="progress" class="progress">
-                                    <div class="progress-bar progress-bar-success"></div>
+                                    <div class="progress-bar"></div>
                                 </div>
-                                <!-- The container for the uploaded files -->
                                 <div id="files" class="files"></div>
                             </td>
                         </tr>
-                        <tr><td colspan="2" style="text-align: center; border: none;"><input type="button" value="OK" onclick="DeliveryScheduleViewsF3Index.send_();" /></td></tr>
+                        <tr>
+                            <td colspan="2" style="text-align: center; border: none;">
+                                <input type="button" value="OK" onclick="DeliveryScheduleViewsF3Index.send_();" />
+                            </td>
+                        </tr>
                     </table>
                 </div>
             </div>
@@ -315,7 +390,7 @@
                 if (inputs.length > 0) {
                     let rqp = {
                         SessionId: Nskd.Server.SessionId,
-                        Command: 'DeliverySchedule.F3.Save',
+                        Command: 'DeliverySchedule.F3.Index.Save',
                         Parameters: [{ Name: "id", Value: specId }]
                     };
                     inputs.each(function (i, e) {
@@ -329,7 +404,7 @@
                     }
                     //console.log(rqp); return;
                     Nskd.Http.post({
-                        url: '/DeliverySchedule/F3/Save',
+                        url: '/deliveryschedule/f3',
                         rqp: rqp,
                         done: function (data) {
                             $('#_layout_content').html(data);
@@ -507,7 +582,8 @@
                 if (inputs.length > 1) { alert('Должна быть выбрана только одна колонка.'); return; }
                 modalDiv.find('div.body3 textarea').val('');
                 modalDiv.find('div.body3 input[type="checkbox"]').prop('checked', false);
-                modalDiv.find('div.body3 input[type="file"]').val('');
+                //modalDiv.find('div.body3 input[type="file"]').val('');
+                modalDiv.find('div.body3 div.files').html('');
                 modalDiv.find('div.body1').hide();
                 modalDiv.find('div.body2').hide();
                 modalDiv.find('div.body3').show();
@@ -517,8 +593,6 @@
                 modalDiv.hide();
                 let comment = modalDiv.find('div.body3 textarea').val();
                 let urgent = modalDiv.find('div.body3 input[type="checkbox"]').prop('checked');
-                let fileInput = modalDiv.find('div.body3 input[type="file"]');
-                //return;
                 let inputs = tableDiv.find('input.column-selector:checked');
                 let orderUid = inputs.attr('data-order_uid');
                 let rqp = {
@@ -569,20 +643,28 @@
         };
     })();
 </script>
-<script>
+<script type="text/javascript">
     /*jslint unparam: true */
     /*global window, $ */
     $(function () {
         'use strict';
         // Change this to the location of your server-side upload handler:
-        var url = '//jquery-file-upload.appspot.com/';// : 'server/php/';
         $('#fileupload').fileupload({
-            url: url,
+            url: '/deliveryschedule/f3/fileupload',
             dataType: 'json',
             done: function (e, data) {
-                $.each(data.result.files, function (index, file) {
-                    $('<p/>').text(file.name).appendTo('#files');
-                });
+                console.log('done');
+                console.log(data);
+                if (data.result) {
+                    $.each(data.files, function (index, file) {
+                        $('<p/>').text('(' + data.result + ') ' + file.name).appendTo('#files');
+                    });
+                }
+            },
+            fail: function (e, data) {
+                console.log('fail');
+                console.log(data);
+                $('<p/>').text('error').appendTo('#files');
             },
             progressall: function (e, data) {
                 var progress = parseInt(data.loaded / data.total * 100, 10);

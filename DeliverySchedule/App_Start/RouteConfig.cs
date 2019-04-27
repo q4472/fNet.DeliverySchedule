@@ -11,20 +11,14 @@ namespace DeliverySchedule
 
             routes.MapRoute(
                 name: null,
+                url: "deliveryschedule/f3/fileupload",
+                defaults: new { controller = "F3", action = "FileUpload" }
+            );
+
+            routes.MapRoute(
+                name: null,
                 url: "deliveryschedule/f3/corr",
                 defaults: new { controller = "F3", action = "Corr" }
-            );
-
-            routes.MapRoute(
-                name: null,
-                url: "deliveryschedule/f3/save2",
-                defaults: new { controller = "F3", action = "Save2" }
-            );
-
-            routes.MapRoute(
-                name: null,
-                url: "deliveryschedule/f3/save",
-                defaults: new { controller = "F3", action = "Save" }
             );
 
             routes.MapRoute(
