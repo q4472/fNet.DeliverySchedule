@@ -13,7 +13,6 @@ namespace DeliverySchedule.Controllers
             RequestPackage rqp = RequestPackage.ParseRequest(Request.InputStream, Request.ContentEncoding);
             if (rqp != null && !String.IsNullOrWhiteSpace(rqp.Command))
             {
-                Session["SessionId"] = rqp.SessionId;
                 F3Model m = new F3Model(rqp, HttpContext.IsDebuggingEnabled);
                 switch (rqp.Command)
                 {
@@ -63,8 +62,9 @@ namespace DeliverySchedule.Controllers
         public Object FileUpload()
         {
             Object result;
-            Guid sessionId = (Session["SessionId"] != null) ? (Guid)Session["SessionId"] : new Guid();
-            result = F3Model.FileUpload(sessionId, Request.Files);
+            Guid.TryParse(Request.Form["sessionId"], out Guid sessionId);
+            Guid.TryParse(Request.Form["orderUid"], out Guid orderUid);
+            result = F3Model.FileUpload(sessionId, orderUid, Request.Files);
             return result;
         }
     }

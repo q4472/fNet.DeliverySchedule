@@ -302,7 +302,7 @@ namespace DeliverySchedule.Models
             }
         }
 
-        public static Object FileUpload(Guid sessionId, HttpFileCollectionBase files)
+        public static Object FileUpload(Guid sessionId, Guid orderUid, HttpFileCollectionBase files)
         {
             StringBuilder result = new StringBuilder();
             result.Append("{files:[ ");

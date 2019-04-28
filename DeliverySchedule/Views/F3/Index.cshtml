@@ -253,14 +253,14 @@
                             <td colspan="2">
                                 <span class="btn btn-success fileinput-button">
                                     <span>Вложить файлы...</span>
-                                    <input id="fileupload" type="file">
+                                    <input type="file" />
                                 </span>
                                 <br>
                                 <br>
-                                <div id="progress" class="progress">
+                                <div class="progress">
                                     <div class="progress-bar"></div>
                                 </div>
-                                <div id="files" class="files"></div>
+                                <div class="files"></div>
                             </td>
                         </tr>
                         <tr>
@@ -283,6 +283,29 @@
         let modalDiv = mainDiv.find('div.modal');
 
         modalDiv.find('div.body2 input[type="text"]').datepicker({ dateFormat: 'mm.y', firstDay: 1, changeYear: true });
+
+        $('div.body3 input[type="file"]').fileupload({
+            url: '/deliveryschedule/f3/fileupload',
+            done: function (e, data) {
+                //console.log('done');
+                //console.log(data);
+                if (data.result) {
+                    $('<p/>').text(data.result).appendTo('div.body3 div.files');
+                    $.each(data.files, function (index, file) {
+                        $('<p/>').text(file.name).appendTo('div.body3 div.files');
+                    });
+                }
+            },
+            fail: function (e, data) {
+                //console.log('fail');
+                //console.log(data);
+                $('<p/>').text('error').appendTo('div.body3 div.files');
+            },
+            progressall: function (e, data) {
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+                $('div.body3 div.progress div.progress-bar').css('width', progress + '%');
+            }
+        });
 
         function checkForm() {
             let errs = checkFormForErrors();
@@ -584,6 +607,11 @@
                 modalDiv.find('div.body3 input[type="checkbox"]').prop('checked', false);
                 //modalDiv.find('div.body3 input[type="file"]').val('');
                 modalDiv.find('div.body3 div.files').html('');
+                let orderUid = tableDiv.find('input.column-selector:checked').attr('data-order_uid');
+                let sessionId = Nskd.Server.SessionId;
+                $('div.body3 input[type="file"]').bind('fileuploadsubmit', function (e, data) {
+                    data.formData = { sessionId: sessionId, orderUid: orderUid };
+                });
                 modalDiv.find('div.body1').hide();
                 modalDiv.find('div.body2').hide();
                 modalDiv.find('div.body3').show();
@@ -642,38 +670,4 @@
             }
         };
     })();
-</script>
-<script type="text/javascript">
-    /*jslint unparam: true */
-    /*global window, $ */
-    $(function () {
-        'use strict';
-        // Change this to the location of your server-side upload handler:
-        $('#fileupload').fileupload({
-            url: '/deliveryschedule/f3/fileupload',
-            //dataType: 'json',
-            done: function (e, data) {
-                console.log('done');
-                console.log(data);
-                if (data.result) {
-                    $.each(data.files, function (index, file) {
-                        $('<p/>').text('(' + data.result + ') ' + file.name).appendTo('#files');
-                    });
-                }
-            },
-            fail: function (e, data) {
-                console.log('fail');
-                console.log(data);
-                $('<p/>').text('error').appendTo('#files');
-            },
-            progressall: function (e, data) {
-                var progress = parseInt(data.loaded / data.total * 100, 10);
-                $('#progress .progress-bar').css(
-                    'width',
-                    progress + '%'
-                );
-            }
-        }).prop('disabled', !$.support.fileInput)
-            .parent().addClass($.support.fileInput ? undefined : 'disabled');
-    });
 </script>
