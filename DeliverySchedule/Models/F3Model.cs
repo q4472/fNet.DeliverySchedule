@@ -1,6 +1,5 @@
 ﻿using Nskd;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Text;
@@ -302,22 +301,26 @@ namespace DeliverySchedule.Models
             }
         }
 
-        public static Object FileUpload(Guid sessionId, Guid orderUid, HttpFileCollectionBase files)
+        public static Object FileUpload(HttpFileCollectionBase files)
         {
-            StringBuilder result = new StringBuilder();
-            result.Append("{files:[ ");
-            for(int i = 0; i < files.Count; i++)
+            String result = String.Empty;
+            for (int i = 0; i < files.Count; i++)
             {
                 HttpPostedFileBase file = files[i];
-                result.Append("{");
-                result.Append($"name:'{Nskd.JsonV3.ToString(file.FileName)}',");
-                result.Append($"size:{file.ContentLength}");
-                result.Append("},");
+                String id = (new Random()).Next().ToString("x8");
+                String name = file.FileName;
+                Int32 size = file.ContentLength;
+                try
+                {
+                    using (FileStream fs = File.Create($@"H:\Сотрудники\Соколов Евгений Анатольевич\DeliverySchedule\F3\{id} {name}"))
+                    {
+                        file.InputStream.CopyTo(fs);
+                    }
+                    result += $"<file><id>{id}</id><name>{name}</name><size>{size}</size></file>";
+                }
+                catch (Exception) { }
             }
-            result.Length--;
-            result.Append(" ]}");
-
-            return result.ToString();
+            return result;
         }
 
         private DataTable CreateSheduleTable()

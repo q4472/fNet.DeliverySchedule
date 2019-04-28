@@ -62,9 +62,7 @@ namespace DeliverySchedule.Controllers
         public Object FileUpload()
         {
             Object result;
-            Guid.TryParse(Request.Form["sessionId"], out Guid sessionId);
-            Guid.TryParse(Request.Form["orderUid"], out Guid orderUid);
-            result = F3Model.FileUpload(sessionId, orderUid, Request.Files);
+            result = F3Model.FileUpload(Request.Files);
             return result;
         }
     }
