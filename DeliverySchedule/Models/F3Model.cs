@@ -2,6 +2,8 @@
 using System;
 using System.Data;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -312,13 +314,21 @@ namespace DeliverySchedule.Models
                 Int32 size = file.ContentLength;
                 try
                 {
-                    using (FileStream fs = File.Create($@"H:\Сотрудники\Соколов Евгений Анатольевич\DeliverySchedule\F3\{id} {name}"))
+                    //IntPtr token;
+                    //if (LogonUser("sokolov", "SIBDOMAIN", "1234568", 2, 0, out token))
                     {
-                        file.InputStream.CopyTo(fs);
-                    }
+                        //var identity = new WindowsIdentity(token);
+                        //using (identity.Impersonate())
+                        {
+                            using (FileStream fs = File.Create($@"\\TS\sotrudniki\Соколов Евгений Анатольевич\DeliverySchedule\F3\{id} {name}"))
+                            {
+                                file.InputStream.CopyTo(fs);
+                            }
+                        }
+                    } //else { result += "Invalid credentials"; }
                     result += $"<file><id>{id}</id><name>{name}</name><size>{size}</size></file>";
                 }
-                catch (Exception) { }
+                catch (Exception e) { result += e.Message; }
             }
             return result;
         }
@@ -400,5 +410,15 @@ namespace DeliverySchedule.Models
             }
             return html;
         }
+        /*
+        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        public static extern bool LogonUser(
+            string lpszUsername,
+            string lpszDomain,
+            string lpszPassword,
+            int dwLogonType,
+            int dwLogonProvider,
+            out IntPtr phToken);
+        */
     }
 }
